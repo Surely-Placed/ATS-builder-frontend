@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FileText, Menu, X } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -59,8 +60,9 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Button & Theme Toggle */}
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="glow" size="default">
               Upload Resume
             </Button>
@@ -94,9 +96,12 @@ const Header = () => {
                   {link.label}
                 </a>
               ))}
-              <Button variant="glow" size="default" className="mt-2">
-                Upload Resume
-              </Button>
+              <div className="flex items-center gap-2 mt-2">
+                <ThemeToggle />
+                <Button variant="glow" size="default" className="flex-1">
+                  Upload Resume
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}
