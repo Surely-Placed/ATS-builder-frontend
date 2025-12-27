@@ -1,0 +1,218 @@
+.section-analysis-view {
+  margin: 2rem 0;
+}
+
+.overall-score {
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+  color: white;
+}
+
+.overall-score h2 {
+  margin: 0 0 1rem 0;
+}
+
+.score-circle {
+  font-size: 4rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.priority-actions {
+  margin-bottom: 2rem;
+  border-left: 4px solid hsl(var(--warning));
+}
+
+.priority-action {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.priority-high {
+  background: hsl(var(--destructive) / 0.1);
+}
+
+.priority-medium {
+  background: hsl(var(--warning) / 0.1);
+}
+
+.priority-low {
+  background: hsl(var(--primary) / 0.1);
+}
+
+.priority-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.analysis-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.section-header h3 {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+.status-badge.status-good {
+  background: hsl(var(--success) / 0.1);
+  color: hsl(var(--success));
+  border-color: hsl(var(--success));
+}
+
+.status-badge.status-needs_improvement {
+  background: hsl(var(--warning) / 0.1);
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning));
+}
+
+.status-badge.status-poor {
+  background: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
+}
+
+.section-score {
+  font-weight: 700;
+  color: hsl(var(--primary));
+  font-size: 1.125rem;
+}
+
+.section-summary {
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 1rem;
+}
+
+.issue-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.issue-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.issue-icon {
+  font-size: 1.25rem;
+}
+
+.issue-title {
+  font-weight: 600;
+  flex: 1;
+  min-width: 200px;
+}
+
+.issue-severity.severity-critical {
+  background: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
+}
+
+.issue-severity.severity-high {
+  background: hsl(var(--warning) / 0.2);
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning));
+}
+
+.issue-severity.severity-medium {
+  background: hsl(var(--warning) / 0.1);
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning));
+}
+
+.issue-severity.severity-low {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.issue-description {
+  margin: 0.5rem 0;
+  color: hsl(var(--foreground));
+}
+
+.issue-location,
+.issue-current,
+.issue-suggestion,
+.issue-example {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.issue-location strong,
+.issue-current strong,
+.issue-suggestion strong,
+.issue-example strong {
+  color: hsl(var(--foreground));
+}
+
+.issue-current code,
+.issue-example code {
+  background: hsl(var(--muted));
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.job-analysis {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.job-analysis h4 {
+  margin: 0 0 0.5rem 0;
+  color: hsl(var(--foreground));
+}
+
+.job-score {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.keyword-alignment {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+}
+
+.keyword-alignment h4 {
+  margin: 0 0 1rem 0;
+  color: hsl(var(--foreground));
+}
+
+.keyword-lists > div {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+}
+
+.keyword-lists strong {
+  color: hsl(var(--foreground));
+  margin-right: 0.5rem;
+}
+

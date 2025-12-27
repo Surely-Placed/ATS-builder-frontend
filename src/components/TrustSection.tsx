@@ -1,15 +1,7 @@
 import { motion } from "framer-motion";
+import { BrandScroller, BrandScrollerReverse } from "@/components/ui/brand-scroller";
 
 const TrustSection = () => {
-  const companies = [
-    "Google",
-    "Microsoft",
-    "Amazon",
-    "Meta",
-    "Apple",
-    "Netflix",
-  ];
-
   return (
     <section className="py-16 lg:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 lg:px-8">
@@ -28,29 +20,16 @@ const TrustSection = () => {
           </h2>
         </motion.div>
 
+        {/* Brand Scrollers */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="flex flex-wrap items-center justify-center gap-8 lg:gap-16"
+          className="mb-16 space-y-4"
         >
-          {companies.map((company, index) => (
-            <motion.div
-              key={company}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative"
-            >
-              <div className="text-2xl lg:text-3xl font-bold text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors duration-300 cursor-default">
-                {company}
-              </div>
-              {/* Hover Glow */}
-              <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </motion.div>
-          ))}
+          <BrandScroller />
+          <BrandScrollerReverse />
         </motion.div>
 
         {/* Stats */}
@@ -59,7 +38,7 @@ const TrustSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-16 pt-16 border-t border-glass-border"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8 pt-16 border-t border-glass-border"
         >
           {[
             { value: "50K+", label: "Resumes Optimized" },
@@ -68,7 +47,7 @@ const TrustSection = () => {
             { value: "4.9★", label: "User Rating" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-gradient mb-2">
+              <div className="text-3xl lg:text-4xl font-bold text-primary mb-2">
                 {stat.value}
               </div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>

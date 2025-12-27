@@ -1,0 +1,216 @@
+.comparison-view {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.comparison-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: hsl(var(--foreground));
+}
+
+.score-comparison {
+  margin: 2rem 0;
+}
+
+.score-comparison-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.score-card {
+  text-align: center;
+  padding: 2rem;
+  background: #ffffff; /* White in light mode */
+  color: #000000; /* Black text in light mode */
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 250px;
+}
+
+/* Dark mode support - opposite colors */
+.dark .score-card {
+  background: hsl(var(--card)); /* Dark background */
+  color: hsl(var(--card-foreground)); /* Light text */
+}
+
+.score-card.before {
+  border-top: 4px solid hsl(var(--warning));
+}
+
+.score-card.after {
+  border-top: 4px solid hsl(var(--success));
+}
+
+.score-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #000000; /* Black text in light mode */
+  font-weight: 600;
+}
+
+.dark .score-card h3 {
+  color: hsl(var(--muted-foreground)); /* Light text in dark mode */
+}
+
+.score-value {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #000000; /* Black text in light mode */
+  margin: 0.5rem 0;
+  line-height: 1;
+}
+
+.dark .score-value {
+  color: hsl(var(--foreground)); /* Light text in dark mode */
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: #000000; /* Black text in light mode */
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.dark .score-label {
+  color: hsl(var(--muted-foreground)); /* Light text in dark mode */
+}
+
+.score-improvement {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #16a34a; /* Green color for improvement - visible on white background (light mode) */
+  margin-top: 0.5rem;
+}
+
+.dark .score-improvement {
+  color: hsl(var(--success)); /* Theme success color in dark mode */
+}
+
+.score-arrow {
+  font-size: 2rem;
+  color: hsl(var(--muted-foreground));
+  display: flex;
+  align-items: center;
+}
+
+.improvements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.improvements-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.improvements-list li:last-child {
+  border-bottom: none;
+}
+
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.audit-item {
+  padding: 1rem;
+  background: #ffffff; /* White background in light mode */
+  color: #000000; /* Black text in light mode */
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.dark .audit-item {
+  background: hsl(var(--muted)); /* Dark background in dark mode */
+  color: hsl(var(--muted-foreground)); /* Light text in dark mode */
+  border-color: hsl(var(--border));
+}
+
+.audit-item strong {
+  color: #000000; /* Black text in light mode */
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.dark .audit-item strong {
+  color: hsl(var(--foreground)); /* Light text in dark mode */
+}
+
+.final-recommendations {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.final-recommendations h3 {
+  margin: 0 0 1rem 0;
+  color: hsl(var(--foreground));
+}
+
+.final-recommendations ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.final-recommendations li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.final-recommendations li:last-child {
+  border-bottom: none;
+}
+
+.download-section {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.btn-download {
+  width: 100%;
+  max-width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.download-note {
+  margin-top: 1rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .score-comparison-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .score-card {
+    max-width: 100%;
+  }
+
+  .comparison-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+

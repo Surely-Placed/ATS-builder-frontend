@@ -1,53 +1,190 @@
-import { FileText } from "lucide-react";
+import { FileText, Mail, Phone, MapPin, Twitter, Linkedin, Github, Instagram } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const links = [
+  const quickLinks = [
+    { href: "#", label: "Home" },
+    { href: "#features", label: "Features" },
+    { href: "#pricing", label: "Pricing" },
+    { href: "#contact", label: "Contact" },
+  ];
+
+  const resources = [
+    { href: "#", label: "Blog" },
+    { href: "#", label: "Help Center" },
+    { href: "#", label: "Career Guide" },
+    { href: "#", label: "Resume Templates" },
+  ];
+
+  const legal = [
     { href: "#", label: "Privacy Policy" },
     { href: "#", label: "Terms of Service" },
-    { href: "#", label: "Contact" },
+    { href: "#", label: "Cookie Policy" },
+    { href: "#", label: "Disclaimer" },
+  ];
+
+  const socialLinks = [
+    { icon: Twitter, href: "#", label: "Twitter" },
+    { icon: Linkedin, href: "#", label: "LinkedIn" },
+    { icon: Github, href: "#", label: "GitHub" },
+    { icon: Instagram, href: "#", label: "Instagram" },
   ];
 
   return (
-    <footer className="py-12 border-t border-glass-border">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-          {/* Logo & Description */}
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <a href="/" className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-                <FileText className="w-5 h-5 text-primary" />
+    <footer className="relative bg-background border-t border-border overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        {/* Main Footer Content */}
+        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+          {/* Company Info */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="lg:col-span-2"
+          >
+            <a href="/" className="inline-flex items-center gap-2 mb-4">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/50 shadow-lg">
+                <FileText className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">
-                Resume<span className="text-primary">AI</span>
+              <span className="text-2xl font-bold">
+                Resume<span className="text-gradient">AI</span>
               </span>
             </a>
-            <p className="text-sm text-muted-foreground text-center md:text-left max-w-xs">
-              AI-powered resume optimization for ATS compatibility. Land more interviews, faster.
+            <p className="text-muted-foreground mb-6 max-w-sm">
+              Transform your career with AI-powered resume optimization. Get past ATS systems and land your dream job faster.
             </p>
-          </div>
-
-          {/* Links */}
-          <nav className="flex flex-wrap items-center justify-center gap-6">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {link.label}
+            
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <a href="mailto:support@resumeai.com" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group">
+                <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Mail className="w-4 h-4" />
+                </div>
+                support@resumeai.com
               </a>
-            ))}
-          </nav>
+              <a href="tel:+15551234567" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group">
+                <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Phone className="w-4 h-4" />
+                </div>
+                +1 (555) 123-4567
+              </a>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                San Francisco, CA 94000
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-3">
+              {quickLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Resources */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <h3 className="text-lg font-semibold mb-4">Resources</h3>
+            <ul className="space-y-3">
+              {resources.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Legal */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <ul className="space-y-3">
+              {legal.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         </div>
 
-        {/* Bottom Line */}
-        <div className="mt-8 pt-8 border-t border-glass-border text-center">
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} ResumeAI. All rights reserved.
-          </p>
-        </div>
+        {/* Bottom Bar */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="py-8 border-t border-border"
+        >
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* Copyright */}
+            <p className="text-sm text-muted-foreground text-center md:text-left">
+              © {currentYear} ResumeAI. All rights reserved. Built with ❤️ for job seekers.
+            </p>
+
+            {/* Social Links */}
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => (
+                <motion.a
+                  key={social.label}
+                  href={social.href}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 rounded-lg bg-primary/10 hover:bg-primary hover:text-primary-foreground text-muted-foreground transition-all duration-300 group"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-4 h-4" />
+                </motion.a>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </footer>
   );
