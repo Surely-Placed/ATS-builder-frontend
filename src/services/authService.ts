@@ -9,8 +9,9 @@ import {
   signOut
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { trackLogin, trackSignup, trackLogout } from '../utils/analytics';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api';
 
 export const authService = {
   async signup(name: string, email: string, password: string) {
@@ -44,6 +45,9 @@ export const authService = {
 
       // Force sign out until email is verified
       await signOut(auth);
+
+      // Track signup event (email signup)
+      trackSignup('email');
 
       return {
         success: true,
@@ -101,6 +105,10 @@ export const authService = {
       
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Login failed');
+      
+      // Track login event
+      trackLogin('email');
+      
       return data;
     } catch (error: any) {
       if (error.message === 'EMAIL_NOT_VERIFIED') {
@@ -125,6 +133,10 @@ export const authService = {
       
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Google sign-in failed');
+      
+      // Track Google sign-in event (could be login or signup)
+      trackLogin('google');
+      
       return data;
     } catch (error: any) {
       throw new Error(error.message);
@@ -166,6 +178,10 @@ export const authService = {
         method: 'POST',
         credentials: 'include'
       });
+      
+      // Track logout event
+      trackLogout();
+      
       return { message: 'Logout successful' };
     } catch (error: any) {
       throw new Error(error.message);

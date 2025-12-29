@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, Home, Sparkles, DollarSign, Phone, Menu, X, Sun, Moon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavBar } from "@/components/ui/tubelight-navbar";
 import { MenuItem, MenuContainer } from "@/components/ui/fluid-menu";

@@ -42,6 +42,9 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
         description: 'Logged in successfully',
       });
       onOpenChange(false);
+      // Small delay to ensure cookie is set before navigating
+      // This is especially important for cross-origin requests (Firebase Hosting -> Fly.dev)
+      await new Promise(resolve => setTimeout(resolve, 300));
       navigate('/dashboard');
     } catch (err: any) {
       const isVerificationError = err.message?.includes('verify your email') || 
@@ -92,6 +95,8 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
         description: 'Logged in with Google',
       });
       onOpenChange(false);
+      // Small delay to ensure cookie is set before navigating
+      await new Promise(resolve => setTimeout(resolve, 300));
       navigate('/dashboard');
     } catch (err: any) {
       toast({

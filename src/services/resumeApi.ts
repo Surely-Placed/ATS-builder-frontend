@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
+import { trackResumeUpload, trackResumeDelete, trackConversion } from '../utils/analytics';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api';
 
 // Create axios instance with cookie-only authentication
 const apiClient = axios.create({
@@ -33,42 +34,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Helper to handle API errors
-export const handleApiError = (error: any): string => {
-  if (axios.isAxiosError(error)) {
-    const response = error.response;
-    
-    if (!response) {
-      return 'Network error. Please check your internet connection.';
-    }
-
-    const message = response.data?.message;
-
-    switch (response.status) {
-      case 400:
-        return message || 'Invalid request. Please check your inputs.';
-      case 401:
-        return 'Session expired. Please log in again.';
-      case 403:
-        return message || 'Access forbidden. Please verify your email.';
-      case 404:
-        return message || 'Resource not found.';
-      case 413:
-        return 'File too large. Maximum size is 10MB.';
-      case 429:
-        return message || 'Too many requests. Please try again later.';
-      case 500:
-        return 'Server error. Please try again later.';
-      case 503:
-        return message || 'Service temporarily unavailable.';
-      default:
-        return message || 'An unexpected error occurred.';
-    }
-  }
-
-  return error?.message || 'An unexpected error occurred.';
-};
-
 export { apiClient };
 
 export const resumeApi = {
@@ -98,9 +63,12 @@ export const resumeApi = {
       throw new Error('Upload succeeded but no resume ID was returned');
     }
 
+    // Track analytics event
+    trackResumeUpload(file.size, file.name);
+    trackConversion('resume_upload');
+
     return resumeId;
   },
-
 
   getAll: async () => {
     const response = await apiClient.get('/resume');
@@ -114,6 +82,7 @@ export const resumeApi = {
 
   delete: async (id: string) => {
     const response = await apiClient.delete(`/resume/${id}`);
+    trackResumeDelete(id);
     return response.data;
   },
 };

@@ -5,7 +5,7 @@ type Socket = ReturnType<typeof io>;
 
 // Get API URL and remove /api suffix for WebSocket (Socket.IO runs on base server URL)
 const getApiUrl = (): string => {
-  const envUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const envUrl = import.meta.env.VITE_API_URL || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api';
   // Remove /api suffix if present (WebSocket runs on base server URL, not /api path)
   const baseUrl = envUrl.replace(/\/api$/, '');
   return baseUrl;

@@ -24,6 +24,13 @@ export const ResumeDownloadButton: React.FC<ResumeDownloadButtonProps> = ({
     try {
       const url = getResumeUrl(resume, { useProxy, preferOptimized });
       
+      // Track download event
+      if (resume.id) {
+        const downloadType = preferOptimized ? 'optimized' : 'original';
+        trackResumeDownload(downloadType, resume.id);
+        trackConversion('download');
+      }
+      
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a');
       link.href = url;

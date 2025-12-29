@@ -20,8 +20,8 @@ export const getResumeUrl = (
     useProxy = false,
     preferOptimized = true,
     baseUrl = typeof window !== 'undefined' 
-      ? window.location.origin.replace(':3000', ':5000').replace(':5173', ':5000').replace(':8080', ':5000') // Frontend port to backend port
-      : 'http://localhost:5000'
+      ? (import.meta.env.VITE_API_URL?.replace('/api', '') || window.location.origin.replace(':3000', ':5000').replace(':5173', ':5000').replace(':8080', ':5000')) // Frontend port to backend port
+      : (import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev')
   } = options || {};
 
   // If using proxy, return authenticated proxy URL
@@ -56,7 +56,7 @@ export const getResumeUrl = (
  * Check if URL is a local storage URL
  */
 export const isLocalStorageUrl = (url: string): boolean => {
-  return url.includes('/api/files/resumes/') || url.includes('localhost:5000/api/files/');
+  return url.includes('/api/files/resumes/') || url.includes('localhost:5000/api/files/') || url.includes('ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api/files/');
 };
 
 /**

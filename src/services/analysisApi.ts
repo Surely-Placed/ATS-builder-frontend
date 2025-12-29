@@ -1,6 +1,16 @@
 import axios from 'axios';
+import { 
+  trackAnalysisStart, 
+  trackAnalysisComplete, 
+  trackOptimizationStart, 
+  trackOptimizationComplete, 
+  trackOptimizationFailed,
+  trackResumeDownload,
+  trackPDFGenerate,
+  trackConversion
+} from '../utils/analytics';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -253,13 +263,23 @@ export class AnalysisApiService {
    */
   static async analyzeResume(data: StartAnalysisRequest): Promise<AnalysisResult> {
     try {
+      // Track analysis start
+      trackAnalysisStart(data.resume_id, data.job_title);
+      
       const response = await api.post<AnalysisResponse>('/analyze', data);
       
       if (!response.data.success || !response.data.data) {
         throw new Error('Failed to analyze resume');
       }
       
-      return response.data.data;
+      const result = response.data.data;
+      
+      // Track analysis complete
+      const atsScore = result.ats_analysis?.before?.score || 0;
+      trackAnalysisComplete(data.resume_id, atsScore, data.job_title);
+      trackConversion('analysis');
+      
+      return result;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
@@ -274,6 +294,9 @@ export class AnalysisApiService {
    */
   static async startOptimization(analysisId: string): Promise<OptimizationJobResponse> {
     try {
+      // Track optimization start
+      trackOptimizationStart(analysisId);
+      
       const response = await api.post<OptimizationJobResponse>(`/analyze/${analysisId}/optimize`);
       
       if (!response.data.success || !response.data.jobId) {
@@ -354,7 +377,13 @@ export class AnalysisApiService {
    * Download optimized resume (direct URL download)
    * Uses local storage URLs (no Cloudinary)
    */
-  static downloadResume(url: string, filename: string = 'optimized-resume.pdf'): void {
+  static downloadResume(url: string, filename: string = 'optimized-resume.pdf', resumeId?: string): void {
+    // Track download event
+    if (resumeId) {
+      trackResumeDownload('optimized', resumeId);
+      trackConversion('download');
+    }
+    
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
@@ -396,6 +425,9 @@ export class AnalysisApiService {
       if (!response.data.success) {
         throw new Error('Failed to generate PDF');
       }
+      
+      // Track PDF generation
+      trackPDFGenerate(analysisId);
       
       return response.data;
     } catch (error: any) {

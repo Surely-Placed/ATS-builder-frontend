@@ -8,10 +8,16 @@ import { FileText, TrendingUp, Sparkles, Loader2, AlertCircle } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { trackPageView } from "@/utils/analytics";
 
 const Dashboard = () => {
   const { stats, loading, error, refetch } = useDashboard();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackPageView('Dashboard', '/dashboard');
+  }, []);
 
   if (loading) {
     return (
@@ -47,7 +53,7 @@ const Dashboard = () => {
     );
   }
 
-      return (
+  return (
         <DashboardLayout activeTab="Dashboard">
           <div className="space-y-4 sm:space-y-6">
             {/* Welcome Section with Start Optimization Button */}

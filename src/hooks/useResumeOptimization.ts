@@ -3,6 +3,7 @@ import AnalysisApiService, { OptimizationResult, JobStatusResponse } from '../se
 import { socketService, JobStatusEvent } from '../services/socketService';
 import { useAuth } from '../context/AuthContext';
 import { getResumeUrl } from '../utils/resumeUrlHelper';
+import { trackOptimizationComplete, trackOptimizationFailed, trackConversion } from '../utils/analytics';
 
 export interface UseResumeOptimizationOptions {
   analysisId: string;
@@ -80,16 +81,32 @@ export function useResumeOptimization({
           onProgress(data.progress || 0);
         }
         if (data.status === 'complete') {
-          setResult(data.result as OptimizationResult);
+          const optimizationResult = data.result as OptimizationResult;
+          setResult(optimizationResult);
           
           // Try multiple paths for the optimized resume URL
-          const resumeUrl = data.result?.optimized_resume?.file_url || 
-                           data.result?.optimized_resume?.pdf_url ||
-                           data.result?.pdf_url ||
+          const resumeUrl = optimizationResult?.optimized_resume?.file_url || 
+                           optimizationResult?.optimized_resume?.pdf_url ||
+                           optimizationResult?.pdf_url ||
                            null;
           setOptimizedResumeUrl(resumeUrl);
           
           setStatus('complete');
+          
+          // Track optimization completion
+          if (optimizationResult?.analysis) {
+            const scoreBefore = optimizationResult.analysis.ats_score_before;
+            const scoreAfter = optimizationResult.analysis.ats_score_after;
+            const scoreImprovement = optimizationResult.analysis.score_improvement;
+            
+            trackOptimizationComplete(
+              analysisId,
+              scoreImprovement,
+              scoreBefore,
+              scoreAfter
+            );
+            trackConversion('optimization');
+          }
           
           // Always fetch latest analysis to ensure we have the optimized resume URL
           // This is a fallback in case WebSocket result doesn't include the URL
@@ -107,16 +124,19 @@ export function useResumeOptimization({
           }
           
           if (onComplete) {
-            onComplete(data.result);
+            onComplete(optimizationResult);
           }
         }
 
         if (data.status === 'failed') {
-          const errorMessage = data.error || 'Optimization failed';
-          setError(errorMessage);
+          // Track optimization failure
+          trackOptimizationFailed(analysisId, data.error || 'Unknown error');
+          
+          setError(data.error || 'Optimization failed');
           setStatus('failed');
+          
           if (onError) {
-            onError(errorMessage);
+            onError(data.error || 'Optimization failed');
           }
         }
       }

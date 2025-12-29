@@ -99,6 +99,8 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
         description: 'Signed up with Google',
       });
       onOpenChange(false);
+      // Small delay to ensure cookie is set before navigating
+      await new Promise(resolve => setTimeout(resolve, 300));
       navigate('/dashboard');
     } catch (err: any) {
       toast({

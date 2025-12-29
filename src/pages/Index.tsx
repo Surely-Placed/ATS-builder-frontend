@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { trackPageView } from "@/utils/analytics";
 import Header from "@/components/Header";
 import { HeroSection } from "@/components/ui/hero-section-dark";
 import BrandsSection from "@/components/BrandsSection";
@@ -23,6 +24,11 @@ const Index = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // Track page view
+    const pageName = location.pathname === '/login' ? 'Login' : 
+                     location.pathname === '/signup' ? 'Signup' : 'Home';
+    trackPageView(pageName, location.pathname);
+
     if (location.pathname === '/login') {
       setLoginOpen(true);
     } else if (location.pathname === '/signup') {
