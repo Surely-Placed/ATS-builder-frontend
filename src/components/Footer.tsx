@@ -1,5 +1,6 @@
 import { FileText, Mail, Phone, MapPin, Twitter, Linkedin, Github, Instagram } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,18 +12,11 @@ const Footer = () => {
     { href: "#contact", label: "Contact" },
   ];
 
-  const resources = [
-    { href: "#", label: "Blog" },
-    { href: "#", label: "Help Center" },
-    { href: "#", label: "Career Guide" },
-    { href: "#", label: "Resume Templates" },
-  ];
-
   const legal = [
-    { href: "#", label: "Privacy Policy" },
-    { href: "#", label: "Terms of Service" },
-    { href: "#", label: "Cookie Policy" },
-    { href: "#", label: "Disclaimer" },
+    { href: "/privacy-policy", label: "Privacy Policy" },
+    { href: "/terms-of-service", label: "Terms of Service" },
+    { href: "/cookie-policy", label: "Cookie Policy" },
+    { href: "/disclaimer", label: "Disclaimer" },
   ];
 
   const socialLinks = [
@@ -40,7 +34,7 @@ const Footer = () => {
       
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         {/* Main Footer Content */}
-        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -75,11 +69,15 @@ const Footer = () => {
                 </div>
                 +1 (555) 123-4567
               </a>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="p-1.5 rounded-lg bg-primary/10">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <div className="p-1.5 rounded-lg bg-primary/10 mt-0.5">
                   <MapPin className="w-4 h-4" />
                 </div>
-                San Francisco, CA 94000
+                <div>
+                  Gandhinagar, Gujarat, India<br />
+                  Salt Lake City, Utah, USA<br />
+                  IFZA Business Park, Dubai, UAE
+                </div>
               </div>
             </div>
           </motion.div>
@@ -107,47 +105,24 @@ const Footer = () => {
             </ul>
           </motion.div>
 
-          {/* Resources */}
+          {/* Legal */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
-            <ul className="space-y-3">
-              {resources.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Legal */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
             <h3 className="text-lg font-semibold mb-4">Legal</h3>
             <ul className="space-y-3">
               {legal.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 group"
                   >
                     <span className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
