@@ -93,17 +93,21 @@ export function useResumeOptimization({
           
           setStatus('complete');
           
-          // Track optimization completion
+          // Track optimization completion with token usage
           if (optimizationResult?.analysis) {
             const scoreBefore = optimizationResult.analysis.ats_score_before;
             const scoreAfter = optimizationResult.analysis.ats_score_after;
             const scoreImprovement = optimizationResult.analysis.score_improvement;
             
+            // Get token usage from WebSocket event or result
+            const tokenUsage = data.token_usage || optimizationResult.token_usage;
+            
             trackOptimizationComplete(
               analysisId,
               scoreImprovement,
               scoreBefore,
-              scoreAfter
+              scoreAfter,
+              tokenUsage
             );
             trackConversion('optimization');
           }

@@ -30,6 +30,13 @@ export interface StartAnalysisRequest {
 export interface AnalysisResponse {
   success: boolean;
   data: AnalysisResult;
+  // OpenAI token usage (if provided by backend)
+  token_usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    model?: string;
+  };
 }
 
 export interface OptimizationJobResponse {
@@ -44,6 +51,13 @@ export interface JobStatusResponse {
   progress: number;
   result: OptimizationResult | null;
   error: string | null;
+  // OpenAI token usage (if provided by backend)
+  token_usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    model?: string;
+  };
 }
 
 export interface ResumeQualityScore {
@@ -274,9 +288,10 @@ export class AnalysisApiService {
       
       const result = response.data.data;
       
-      // Track analysis complete
+      // Track analysis complete with token usage if available
       const atsScore = result.ats_analysis?.before?.score || 0;
-      trackAnalysisComplete(data.resume_id, atsScore, data.job_title);
+      const tokenUsage = response.data.token_usage;
+      trackAnalysisComplete(data.resume_id, atsScore, data.job_title, tokenUsage);
       trackConversion('analysis');
       
       return result;

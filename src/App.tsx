@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./context/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { PageViewTracker } from "./components/PageViewTracker";
 
 // Lazy load pages for code splitting with error handling
 const lazyWithRetry = (componentImport: () => Promise<any>) => {
@@ -79,6 +80,7 @@ const App = () => (
               v7_relativeSplatPath: true,
             }}
           >
+              <PageViewTracker />
               <AuthProvider>
                 <ErrorBoundary
                   fallback={

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { authService } from '../services/authService';
+import { identifyUser, resetMixpanel, setUserProperties } from '../config/mixpanel';
 
 interface AuthContextType {
   user: User | null;
@@ -94,6 +95,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       await authService.logout();
       setUser(null);
+      // Reset Mixpanel on logout
+      resetMixpanel();
     } catch (err: any) {
       setError(err.message);
       throw err;

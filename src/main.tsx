@@ -3,6 +3,10 @@ import App from "./App.tsx";
 import "./index.css";
 import { measureWebVitals } from "./utils/performance";
 import { setupChunkErrorHandler } from "./utils/chunkErrorHandler";
+import { initMixpanel } from "./config/mixpanel";
+
+// Initialize Mixpanel
+initMixpanel();
 
 // Setup chunk error handling and Web Vitals in production
 if (import.meta.env.PROD) {

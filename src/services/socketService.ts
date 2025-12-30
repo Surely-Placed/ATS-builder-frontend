@@ -19,6 +19,13 @@ export interface JobStatusEvent {
   progress: number;
   result?: any;
   error?: string;
+  // OpenAI token usage (if provided by backend)
+  token_usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    model?: string;
+  };
 }
 
 interface SocketConfig {

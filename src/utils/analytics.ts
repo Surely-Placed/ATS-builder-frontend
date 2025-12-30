@@ -1,19 +1,28 @@
 import { logEvent, Analytics } from 'firebase/analytics';
 import { analytics } from '../config/firebase';
+import { trackEvent as trackMixpanelEvent } from '../config/mixpanel';
 
 /**
  * Analytics utility for tracking custom events
- * All events are automatically sent to Firebase Analytics (Google Analytics 4)
+ * All events are automatically sent to Firebase Analytics (Google Analytics 4) and Mixpanel
  */
 
 // Helper to safely log events (handles null analytics)
 const safeLogEvent = (eventName: string, eventParams?: Record<string, any>) => {
+  // Send to Firebase Analytics
   if (analytics) {
     try {
       logEvent(analytics, eventName, eventParams);
     } catch (error) {
-      console.warn('Analytics event failed:', error);
+      console.warn('Firebase Analytics event failed:', error);
     }
+  }
+  
+  // Send to Mixpanel
+  try {
+    trackMixpanelEvent(eventName, eventParams);
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
   }
 };
 
@@ -55,12 +64,25 @@ export const trackAnalysisStart = (resumeId: string, jobTitle?: string) => {
 export const trackAnalysisComplete = (
   resumeId: string,
   atsScore: number,
-  jobTitle?: string
+  jobTitle?: string,
+  tokenUsage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    model?: string;
+  }
 ) => {
   safeLogEvent('analysis_complete', {
     resume_id: resumeId,
     ats_score: atsScore,
     job_title: jobTitle || 'unknown',
+    // Token usage tracking
+    ...(tokenUsage && {
+      openai_prompt_tokens: tokenUsage.prompt_tokens,
+      openai_completion_tokens: tokenUsage.completion_tokens,
+      openai_total_tokens: tokenUsage.total_tokens,
+      openai_model: tokenUsage.model || 'unknown',
+    }),
   });
 };
 
@@ -75,13 +97,26 @@ export const trackOptimizationComplete = (
   analysisId: string,
   scoreImprovement: number,
   atsScoreBefore: number,
-  atsScoreAfter: number
+  atsScoreAfter: number,
+  tokenUsage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+    model?: string;
+  }
 ) => {
   safeLogEvent('optimization_complete', {
     analysis_id: analysisId,
     score_improvement: scoreImprovement,
     ats_score_before: atsScoreBefore,
     ats_score_after: atsScoreAfter,
+    // Token usage tracking
+    ...(tokenUsage && {
+      openai_prompt_tokens: tokenUsage.prompt_tokens,
+      openai_completion_tokens: tokenUsage.completion_tokens,
+      openai_total_tokens: tokenUsage.total_tokens,
+      openai_model: tokenUsage.model || 'unknown',
+    }),
   });
 };
 
