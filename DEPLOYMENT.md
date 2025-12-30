@@ -75,3 +75,4 @@ To set up automatic deployments:
 2. Enable GitHub Actions or use Firebase CI/CD
 3. Configure automatic deployments on push to main branch
 
+
