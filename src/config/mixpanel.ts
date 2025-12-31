@@ -5,16 +5,25 @@ export const initMixpanel = () => {
   const token = import.meta.env.VITE_MIXPANEL_TOKEN;
   
   if (!token) {
-    console.warn('Mixpanel token not found. Analytics will be disabled.');
+    // Mixpanel token not found - analytics disabled silently
     return;
   }
 
-  // Initialize Mixpanel
+  // Initialize Mixpanel with all logging disabled
   mixpanel.init(token, {
-    debug: import.meta.env.DEV,
-    track_pageview: true, // Automatically track page views
+    debug: false, // Disable debug mode to prevent console logs
+    track_pageview: false, // Disable automatic page views - we'll track manually
     persistence: 'localStorage', // Store user data in localStorage
     ignore_dnt: false, // Respect Do Not Track
+    verbose: false, // Disable verbose logging
+    batch_requests: true, // Batch requests to reduce logs
+    loaded: (mp) => {
+      // Suppress all console logs from Mixpanel
+      mp.set_config({ 
+        verbose: false,
+        debug: false,
+      });
+    },
   });
 
   // Identify user if logged in
@@ -65,13 +74,20 @@ export const setUserProperties = (properties: Record<string, any>) => {
   }
 };
 
-// Track page view
-export const trackPageView = (pageName: string, properties?: Record<string, any>) => {
+// Track home page visit
+export const trackHomePageVisit = () => {
   const mp = getMixpanel();
   if (mp) {
-    mp.track('Page View', {
-      page: pageName,
-      ...properties,
+    mp.track('Home Page Visits');
+  }
+};
+
+// Track home page load time
+export const trackHomePageLoadTime = (loadTime: number) => {
+  const mp = getMixpanel();
+  if (mp) {
+    mp.track('Home Page Load Time', {
+      load_time_ms: loadTime,
     });
   }
 };

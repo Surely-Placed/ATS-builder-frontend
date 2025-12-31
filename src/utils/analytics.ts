@@ -26,39 +26,92 @@ const safeLogEvent = (eventName: string, eventParams?: Record<string, any>) => {
   }
 };
 
-// Authentication Events
+// Authentication Events - Only track counts for Mixpanel
 export const trackLogin = (method: 'email' | 'google') => {
-  safeLogEvent('login', { method });
+  // Firebase Analytics
+  if (analytics) {
+    try {
+      logEvent(analytics, 'login', { method });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
+  
+  // Mixpanel - Only track count
+  try {
+    trackMixpanelEvent('Sign In Count');
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
+  }
 };
 
 export const trackSignup = (method: 'email' | 'google') => {
-  safeLogEvent('sign_up', { method });
+  // Firebase Analytics
+  if (analytics) {
+    try {
+      logEvent(analytics, 'sign_up', { method });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
+  
+  // Mixpanel - Only track count
+  try {
+    trackMixpanelEvent('Sign Up Count');
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
+  }
 };
 
 export const trackLogout = () => {
-  safeLogEvent('logout');
+  // Only Firebase Analytics - no Mixpanel tracking
+  if (analytics) {
+    try {
+      logEvent(analytics, 'logout');
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
-// Resume Events
+// Resume Events - Only Firebase Analytics, not Mixpanel
 export const trackResumeUpload = (fileSize: number, fileName: string) => {
-  safeLogEvent('resume_upload', {
-    file_size: fileSize,
-    file_name: fileName,
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'resume_upload', {
+        file_size: fileSize,
+        file_name: fileName,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
 export const trackResumeDelete = (resumeId: string) => {
-  safeLogEvent('resume_delete', {
-    resume_id: resumeId,
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'resume_delete', {
+        resume_id: resumeId,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
-// Analysis Events
+// Analysis Events - Only Firebase Analytics, not Mixpanel
 export const trackAnalysisStart = (resumeId: string, jobTitle?: string) => {
-  safeLogEvent('analysis_start', {
-    resume_id: resumeId,
-    job_title: jobTitle || 'unknown',
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'analysis_start', {
+        resume_id: resumeId,
+        job_title: jobTitle || 'unknown',
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
 export const trackAnalysisComplete = (
@@ -72,25 +125,44 @@ export const trackAnalysisComplete = (
     model?: string;
   }
 ) => {
-  safeLogEvent('analysis_complete', {
-    resume_id: resumeId,
-    ats_score: atsScore,
-    job_title: jobTitle || 'unknown',
-    // Token usage tracking
-    ...(tokenUsage && {
-      openai_prompt_tokens: tokenUsage.prompt_tokens,
-      openai_completion_tokens: tokenUsage.completion_tokens,
-      openai_total_tokens: tokenUsage.total_tokens,
-      openai_model: tokenUsage.model || 'unknown',
-    }),
-  });
+  // Firebase Analytics - full details
+  if (analytics) {
+    try {
+      logEvent(analytics, 'analysis_complete', {
+        resume_id: resumeId,
+        ats_score: atsScore,
+        job_title: jobTitle || 'unknown',
+        ...(tokenUsage && {
+          openai_prompt_tokens: tokenUsage.prompt_tokens,
+          openai_completion_tokens: tokenUsage.completion_tokens,
+          openai_total_tokens: tokenUsage.total_tokens,
+          openai_model: tokenUsage.model || 'unknown',
+        }),
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
+  
+  // Mixpanel - Only track count
+  try {
+    trackMixpanelEvent('ATS Run Count');
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
+  }
 };
 
-// Optimization Events
+// Optimization Events - Only Firebase Analytics, not Mixpanel
 export const trackOptimizationStart = (analysisId: string) => {
-  safeLogEvent('optimization_start', {
-    analysis_id: analysisId,
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'optimization_start', {
+        analysis_id: analysisId,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
 export const trackOptimizationComplete = (
@@ -105,26 +177,45 @@ export const trackOptimizationComplete = (
     model?: string;
   }
 ) => {
-  safeLogEvent('optimization_complete', {
-    analysis_id: analysisId,
-    score_improvement: scoreImprovement,
-    ats_score_before: atsScoreBefore,
-    ats_score_after: atsScoreAfter,
-    // Token usage tracking
-    ...(tokenUsage && {
-      openai_prompt_tokens: tokenUsage.prompt_tokens,
-      openai_completion_tokens: tokenUsage.completion_tokens,
-      openai_total_tokens: tokenUsage.total_tokens,
-      openai_model: tokenUsage.model || 'unknown',
-    }),
-  });
+  // Firebase Analytics - full details
+  if (analytics) {
+    try {
+      logEvent(analytics, 'optimization_complete', {
+        analysis_id: analysisId,
+        score_improvement: scoreImprovement,
+        ats_score_before: atsScoreBefore,
+        ats_score_after: atsScoreAfter,
+        ...(tokenUsage && {
+          openai_prompt_tokens: tokenUsage.prompt_tokens,
+          openai_completion_tokens: tokenUsage.completion_tokens,
+          openai_total_tokens: tokenUsage.total_tokens,
+          openai_model: tokenUsage.model || 'unknown',
+        }),
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
+  
+  // Mixpanel - Only track count
+  try {
+    trackMixpanelEvent('ATS Optimize Count');
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
+  }
 };
 
 export const trackOptimizationFailed = (analysisId: string, error?: string) => {
-  safeLogEvent('optimization_failed', {
-    analysis_id: analysisId,
-    error: error || 'unknown',
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'optimization_failed', {
+        analysis_id: analysisId,
+        error: error || 'unknown',
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
 // Download Events
@@ -132,59 +223,53 @@ export const trackResumeDownload = (
   type: 'original' | 'optimized',
   resumeId: string
 ) => {
-  safeLogEvent('resume_download', {
-    download_type: type,
-    resume_id: resumeId,
-  });
+  // Firebase Analytics - full details
+  if (analytics) {
+    try {
+      logEvent(analytics, 'resume_download', {
+        download_type: type,
+        resume_id: resumeId,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
+  
+  // Mixpanel - Only track count
+  try {
+    trackMixpanelEvent('Resume Download Count');
+  } catch (error) {
+    console.warn('Mixpanel event failed:', error);
+  }
 };
 
 export const trackPDFGenerate = (analysisId: string) => {
-  safeLogEvent('pdf_generate', {
-    analysis_id: analysisId,
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'pdf_generate', {
+        analysis_id: analysisId,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
-// Navigation Events
-export const trackPageView = (pageName: string, pagePath: string) => {
-  safeLogEvent('page_view', {
-    page_name: pageName,
-    page_path: pagePath,
-  });
-};
-
-// User Engagement Events
-export const trackButtonClick = (buttonName: string, location?: string) => {
-  safeLogEvent('button_click', {
-    button_name: buttonName,
-    location: location || 'unknown',
-  });
-};
-
-export const trackFeatureUse = (featureName: string, details?: Record<string, any>) => {
-  safeLogEvent('feature_use', {
-    feature_name: featureName,
-    ...details,
-  });
-};
-
-// Error Events
-export const trackError = (errorType: string, errorMessage: string, location?: string) => {
-  safeLogEvent('error', {
-    error_type: errorType,
-    error_message: errorMessage,
-    location: location || 'unknown',
-  });
-};
-
-// Conversion Events (for measuring key business metrics)
+// Conversion Events - Only Firebase Analytics, not Mixpanel
 export const trackConversion = (
   conversionType: 'resume_upload' | 'analysis' | 'optimization' | 'download',
   value?: number
 ) => {
-  safeLogEvent('conversion', {
-    conversion_type: conversionType,
-    value: value || 0,
-  });
+  if (analytics) {
+    try {
+      logEvent(analytics, 'conversion', {
+        conversion_type: conversionType,
+        value: value || 0,
+      });
+    } catch (error) {
+      console.warn('Firebase Analytics event failed:', error);
+    }
+  }
 };
 
 

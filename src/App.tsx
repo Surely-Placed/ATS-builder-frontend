@@ -35,6 +35,7 @@ const VerifyEmail = lazyWithRetry(() => import("./pages/VerifyEmail"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const Documents = lazyWithRetry(() => import("./pages/Documents"));
 const ResumeOptimization = lazyWithRetry(() => import("./pages/ResumeAnalyzer"));
+const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
 const CookiePolicy = lazyWithRetry(() => import("./pages/CookiePolicy"));
@@ -109,6 +110,7 @@ const App = () => (
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/documents" element={<Documents />} />
                       <Route path="/resume-optimization" element={<ResumeOptimization />} />
+                      <Route path="/profile/*" element={<Profile />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/terms-of-service" element={<TermsOfService />} />
                       <Route path="/cookie-policy" element={<CookiePolicy />} />

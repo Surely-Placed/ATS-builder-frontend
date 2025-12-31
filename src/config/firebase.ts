@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
@@ -14,6 +14,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+// Set persistence to LOCAL so users stay logged in even after closing the tab
+// This ensures the session persists across browser sessions
+// IMPORTANT: This must be set before any auth operations
+if (typeof window !== 'undefined') {
+  // Set persistence immediately and ensure it's applied
+  setPersistence(auth, browserLocalPersistence).catch(() => {
+    // Silently fail - persistence will use default
+  });
+}
 
 // Initialize Analytics only in browser environment and production
 // Skip analytics on localhost to prevent cookie domain errors

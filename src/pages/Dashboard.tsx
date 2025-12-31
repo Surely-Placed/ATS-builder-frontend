@@ -9,15 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { trackPageView } from "@/utils/analytics";
 
 const Dashboard = () => {
   const { stats, loading, error, refetch } = useDashboard();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    trackPageView('Dashboard', '/dashboard');
-  }, []);
 
   if (loading) {
     return (

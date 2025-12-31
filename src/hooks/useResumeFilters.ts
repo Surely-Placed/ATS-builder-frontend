@@ -103,29 +103,41 @@ export const useResumeFilters = (filter: 'all' | 'drafts' | 'published' = 'all')
       const source = axios.CancelToken.source();
       resumesCancelTokenRef.current = source;
 
-      const response = await apiClient.get<{ success: boolean; data: { resumes: ResumeWithStatus[] }; message?: string }>(`/resume?filter=${filter}`, {
+      const response = await apiClient.get<{ success: boolean; data: { resumes?: ResumeWithStatus[] } | ResumeWithStatus[]; message?: string }>(`/resume?filter=${filter}`, {
         cancelToken: source.token,
       });
 
       if (response.data.success) {
-        setResumes(response.data.data.resumes);
+        // Handle both response structures: { data: { resumes: [] } } or { data: [] }
+        const resumesData = response.data.data;
+        let resumesArray: ResumeWithStatus[] = [];
+        
+        if (Array.isArray(resumesData)) {
+          resumesArray = resumesData;
+        } else if (resumesData && typeof resumesData === 'object' && 'resumes' in resumesData && Array.isArray(resumesData.resumes)) {
+          resumesArray = resumesData.resumes;
+        }
+        
+        setResumes(resumesArray);
       } else {
         throw new Error(response.data.message || 'Failed to fetch resumes');
       }
     } catch (err: any) {
-      // Ignore cancelled requests
+      // Ignore cancelled requests - don't set error or update state
       if (axios.isCancel(err)) {
-        return;
+        return; // Finally block will still run
       }
 
       if (err.response?.status === 429) {
         const errorMessage = 'Too many requests. Please wait a moment.';
         setError(errorMessage);
-        return;
+        setResumes([]);
+        return; // Finally block will still run
       }
 
       const errorMessage = err.response?.data?.message || err.message || 'An error occurred';
       setError(errorMessage);
+      setResumes([]); // Set empty array on error
     } finally {
       setLoading(false);
       resumesFetchingRef.current = false;

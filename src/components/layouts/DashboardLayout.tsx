@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,15 +14,13 @@ import {
 import {
   Menu,
   FileText,
-  LogOut,
-  Sun,
-  Moon,
   Sparkles,
   FolderOpen
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "next-themes";
 import { useToast } from "@/hooks/use-toast";
+import { HeaderActions } from "@/components/shared/HeaderActions";
+import { DashboardSidebar } from "@/components/shared/DashboardSidebar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -34,22 +29,24 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { logout } = useAuth();
   const { toast } = useToast();
-  const [mounted, setMounted] = useState(false);
   const [isSideSheetOpen, setIsSideSheetOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const tabs = [
     { id: "Dashboard", label: "Dashboard", path: "/dashboard", icon: FileText },
     { id: "Documents", label: "Documents", path: "/documents", icon: FolderOpen },
     { id: "Resume Optimization", label: "Resume Optimization", path: "/resume-optimization", icon: Sparkles }
   ];
+
+  const handleTabClick = (path: string) => {
+    navigate(path);
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
 
   const handleLogout = async () => {
     try {
@@ -71,81 +68,23 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {activeTab !== "Profile" && (
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-4 px-4 sm:px-6">
-          {/* Menu button to open side sheet */}
-          <Sheet open={isSideSheetOpen} onOpenChange={setIsSideSheetOpen}>
-            <SheetTrigger asChild>
+          {/* Sidebar */}
+          <DashboardSidebar
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabClick={handleTabClick}
+            onLogout={handleLogoutClick}
+            isOpen={isSideSheetOpen}
+            onOpenChange={setIsSideSheetOpen}
+            trigger={
               <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
                 <Menu className="w-5 h-5" />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72">
-              <div className="flex flex-col gap-6 pt-6">
-                {/* Logo/Brand */}
-                <div className="flex items-center gap-2 pb-4">
-                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-primary-foreground" />
-                  </div>
-                  <span className="font-semibold text-lg">AI Resume Genius</span>
-                </div>
-
-                <Separator />
-
-                {/* Navigation Tabs */}
-                <nav className="flex flex-col gap-1">
-                  {tabs.map((tab) => (
-                    <Button
-                      key={tab.id}
-                      variant={activeTab === tab.id ? "default" : "ghost"}
-                      onClick={() => {
-                        navigate(tab.path);
-                        setIsSideSheetOpen(false);
-                      }}
-                      className="justify-start gap-2"
-                    >
-                      <tab.icon className="w-4 h-4" />
-                      {tab.label}
-                    </Button>
-                  ))}
-                </nav>
-
-                <Separator />
-
-                {/* Theme Toggle */}
-                <Button
-                  variant="outline"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="justify-start gap-2"
-                >
-                  {mounted && theme === "dark" ? (
-                    <>
-                      <Sun className="w-4 h-4" />
-                      Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4" />
-                      Dark Mode
-                    </>
-                  )}
-                </Button>
-
-                {/* Logout */}
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setIsSideSheetOpen(false);
-                    setShowLogoutDialog(true);
-                  }}
-                  className="justify-start gap-2 text-destructive hover:text-destructive"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+            }
+          />
 
           {/* Logo/Brand in header */}
           <div className="flex items-center gap-2">
@@ -158,34 +97,10 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
           <div className="flex-1" />
 
           {/* Right side actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-8 w-8 sm:h-10 sm:w-10"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowLogoutDialog(true)}
-              className="h-8 w-8 sm:h-10 sm:w-10"
-            >
-              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
-              <AvatarImage src={user?.photoURL || ""} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm">
-                {user?.displayName?.charAt(0) || user?.email?.charAt(0) || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
+          <HeaderActions themeToggleVariant="icon" />
         </div>
       </header>
+      )}
 
       <div className="flex flex-1">
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">

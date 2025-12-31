@@ -23,7 +23,7 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
     );
   }
 
-  if (resumes.length === 0) {
+  if (!resumes || resumes.length === 0) {
     return (
       <Card>
         <CardContent className="p-12 text-center">

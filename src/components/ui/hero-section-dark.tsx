@@ -9,6 +9,7 @@ import { useTheme } from "next-themes"
 import BlurText from "@/components/BlurText"
 import { useNavigate } from "react-router-dom"
 import { SpotlightHeading } from "@/components/ui/spotlight-heading"
+import { useAuth } from "@/context/AuthContext"
 
 interface HeroSectionProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
@@ -51,6 +52,7 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   ) => {
     const { theme } = useTheme();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const isDark = theme === "dark";
 
     return (
@@ -127,19 +129,21 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
               <p className="max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
                 {description}
               </p>
-              <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/login');
-                  }}
-                  className="relative inline-flex rounded-full text-center group items-center justify-center bg-gradient-to-tr from-zinc-300/20 via-purple-400/30 to-transparent dark:from-zinc-300/5 dark:via-purple-400/20 text-gray-900 dark:text-white border-input border-[1px] hover:bg-gradient-to-tr hover:from-zinc-300/30 hover:via-purple-400/40 hover:to-transparent dark:hover:from-zinc-300/10 dark:hover:via-purple-400/30 transition-all py-4 px-10 cursor-pointer z-10 overflow-hidden"
-                >
-                  <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] -z-10" />
-                  <span className="relative z-10">{ctaText}</span>
-                </button>
-              </div>
+              {!user && (
+                <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/login');
+                    }}
+                    className="relative inline-flex rounded-full text-center group items-center justify-center bg-gradient-to-tr from-zinc-300/20 via-purple-400/30 to-transparent dark:from-zinc-300/5 dark:via-purple-400/20 text-gray-900 dark:text-white border-input border-[1px] hover:bg-gradient-to-tr hover:from-zinc-300/30 hover:via-purple-400/40 hover:to-transparent dark:hover:from-zinc-300/10 dark:hover:via-purple-400/30 transition-all py-4 px-10 cursor-pointer z-10 overflow-hidden"
+                  >
+                    <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] -z-10" />
+                    <span className="relative z-10">{ctaText}</span>
+                  </button>
+                </div>
+              )}
             </div>
             
             {bottomImage && (

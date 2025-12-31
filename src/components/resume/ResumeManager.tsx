@@ -44,7 +44,7 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
             </CardContent>
           </Card>
         )}
-        <ResumeList resumes={resumes} loading={loading} />
+        <ResumeList resumes={resumes || []} loading={loading} />
       </div>
     </div>
   );

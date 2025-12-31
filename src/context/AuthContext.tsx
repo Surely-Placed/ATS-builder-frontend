@@ -30,9 +30,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Listen to auth state changes - this will automatically restore the session
+    // from localStorage if the user was previously logged in
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+      
+      // Update Mixpanel when auth state changes
+      if (firebaseUser) {
+        identifyUser(firebaseUser.uid);
+        setUserProperties({
+          email: firebaseUser.email || undefined,
+          name: firebaseUser.displayName || undefined,
+        });
+      } else {
+        resetMixpanel();
+      }
     });
     return unsubscribe;
   }, []);
