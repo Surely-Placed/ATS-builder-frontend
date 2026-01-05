@@ -1,27 +1,22 @@
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ResumeAnalysisFlow from "@/components/ResumeAnalysisFlow";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
+/**
+ * Legacy route - redirects to /resume-analysis for backward compatibility
+ */
 export default function ResumeAnalyzer() {
-  const handleAnalysisComplete = () => {
-    // Handle completion if needed (e.g., show notification, update dashboard stats, etc.)
-  };
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const analysisId = searchParams.get('analysisId');
 
-  return (
-    <DashboardLayout activeTab="Resume Optimization">
-      <div className="space-y-4 sm:space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold mb-1">
-            Resume Optimization
-          </h1>
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            Upload your resume and job posting to get AI-powered optimization
-          </p>
-        </div>
+  useEffect(() => {
+    // Redirect to the new analysis route
+    if (analysisId) {
+      navigate(`/resume-analysis?analysisId=${analysisId}`, { replace: true });
+    } else {
+      navigate('/resume-analysis', { replace: true });
+    }
+  }, [navigate, analysisId]);
 
-        {/* Resume Analysis Flow */}
-        <ResumeAnalysisFlow onComplete={handleAnalysisComplete} />
-      </div>
-    </DashboardLayout>
-  );
+  return null; // Component will redirect immediately
 }

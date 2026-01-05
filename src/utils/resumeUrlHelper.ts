@@ -32,10 +32,15 @@ export const getResumeUrl = (
   // Get the appropriate URL (optimized or original)
   const fileUrl = (preferOptimized && resume.optimized_file_url) 
     ? resume.optimized_file_url 
-    : resume.original_file_url || '';
+    : resume.original_file_url || null;
 
+  // If no file URL and we have an ID, use proxy endpoint as fallback
   if (!fileUrl) {
-    throw new Error('No file URL available for this resume');
+    if (resume.id) {
+      return `${baseUrl}/api/resume/${resume.id}/pdf`;
+    }
+    // If no ID either, return empty string instead of throwing
+    return '';
   }
 
   // If it's already a full URL (local storage), return as-is

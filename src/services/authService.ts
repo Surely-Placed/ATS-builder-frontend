@@ -96,15 +96,28 @@ export const authService = {
 
       const firebaseToken = await user.getIdToken();
       
+      // Get stored token if available (for Safari fallback)
+      const { tokenStorage } = await import('../utils/tokenStorage');
+      const storedToken = tokenStorage.getToken();
+      
       const response = await fetch(`${API_URL}/auth/firebase`, {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Required for cookies
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+        },
         body: JSON.stringify({ firebase_token: firebaseToken })
       });
       
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Login failed');
+      
+      // Store token from response for Safari compatibility (fallback if cookies fail)
+      if (data.token) {
+        const { tokenStorage } = await import('../utils/tokenStorage');
+        tokenStorage.setToken(data.token);
+      }
       
       // Track login event
       trackLogin('email');
@@ -124,15 +137,28 @@ export const authService = {
       const result = await signInWithPopup(auth, provider);
       const firebaseToken = await result.user.getIdToken();
       
+      // Get stored token if available (for Safari fallback)
+      const { tokenStorage } = await import('../utils/tokenStorage');
+      const storedToken = tokenStorage.getToken();
+      
       const response = await fetch(`${API_URL}/auth/firebase`, {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Required for cookies
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+        },
         body: JSON.stringify({ firebase_token: firebaseToken })
       });
       
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Google sign-in failed');
+      
+      // Store token from response for Safari compatibility (fallback if cookies fail)
+      if (data.token) {
+        const { tokenStorage } = await import('../utils/tokenStorage');
+        tokenStorage.setToken(data.token);
+      }
       
       // Track Google sign-in event (could be login or signup)
       trackLogin('google');
@@ -174,11 +200,21 @@ export const authService = {
   async logout() {
     try {
       await signOut(auth);
+      // Get stored token for logout request (Safari fallback)
+      const { tokenStorage } = await import('../utils/tokenStorage');
+      const storedToken = tokenStorage.getToken();
+      
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include', // Required for cookies
+        headers: {
+          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+        },
       });
       
+      // Remove stored token
+      tokenStorage.removeToken();
+
       // Track logout event
       trackLogout();
       

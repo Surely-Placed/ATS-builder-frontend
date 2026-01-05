@@ -1,0 +1,2 @@
+export { ResumeAnalysisFormView } from './ResumeAnalysisFormView';
+

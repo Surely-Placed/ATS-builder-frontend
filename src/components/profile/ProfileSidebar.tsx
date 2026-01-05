@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, User, FileText, CreditCard, ShoppingCart, Activity, Settings, Menu } from "lucide-react";
+import { BarChart3, User, FileText, CreditCard, ShoppingCart, Activity, Settings, Menu, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ const tabs: Tab[] = [
   { id: 'purchases', label: 'Purchase History', icon: <ShoppingCart className="w-5 h-5" />, section: 'MENU' },
   { id: 'activity', label: 'Activity', icon: <Activity className="w-5 h-5" />, section: 'MENU' },
   { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" />, section: 'GENERAL' },
+  { id: 'api-keys', label: 'API Keys', icon: <KeyRound className="w-5 h-5" />, section: 'GENERAL' },
 ];
 
 export const ProfileSidebar = ({ activeTab, onTabChange }: ProfileSidebarProps) => {

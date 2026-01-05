@@ -72,41 +72,53 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
             )}
 
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-              >
-                <a
-                  href={getResumeUrl({ 
-                    id: resume.id,
-                    original_file_url: resume.original_file_url 
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  View Original
-                </a>
-              </Button>
-              {resume.optimized_file_url && (
-                <Button
-                  size="sm"
-                  asChild
-                >
-                  <a
-                    href={getResumeUrl({ 
+              {(() => {
+                const originalUrl = getResumeUrl({ 
+                  id: resume.id,
+                  original_file_url: resume.original_file_url 
+                }, { useProxy: true });
+                
+                return originalUrl ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <a
+                      href={originalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      View Original
+                    </a>
+                  </Button>
+                ) : null;
+              })()}
+              {(() => {
+                const optimizedUrl = resume.optimized_file_url 
+                  ? getResumeUrl({ 
                       id: resume.id,
                       optimized_file_url: resume.optimized_file_url 
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    }, { useProxy: true })
+                  : null;
+                
+                return optimizedUrl ? (
+                  <Button
+                    size="sm"
+                    asChild
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Optimized
-                  </a>
-                </Button>
-              )}
+                    <a
+                      href={optimizedUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Optimized
+                    </a>
+                  </Button>
+                ) : null;
+              })()}
             </div>
 
             <div className="text-xs text-muted-foreground pt-2 border-t">

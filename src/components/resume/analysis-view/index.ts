@@ -1,0 +1,2 @@
+export { ResumeAnalysisView } from './ResumeAnalysisView';
+

@@ -7,8 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./context/AuthContext";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { PageViewTracker } from "./components/PageViewTracker";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import { PageViewTracker } from "./components/common/PageViewTracker";
 
 // Lazy load pages for code splitting with error handling
 const lazyWithRetry = (componentImport: () => Promise<any>) => {
@@ -34,7 +34,9 @@ const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 const VerifyEmail = lazyWithRetry(() => import("./pages/VerifyEmail"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const Documents = lazyWithRetry(() => import("./pages/Documents"));
-const ResumeOptimization = lazyWithRetry(() => import("./pages/ResumeAnalyzer"));
+const ResumeAnalysis = lazyWithRetry(() => import("./pages/ResumeAnalysis"));
+const ResumeOptimization = lazyWithRetry(() => import("./pages/ResumeOptimization"));
+const ResumePreview = lazyWithRetry(() => import("./pages/ResumePreview"));
 const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
@@ -109,7 +111,9 @@ const App = () => (
                       <Route path="/verify-email" element={<VerifyEmail />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/documents" element={<Documents />} />
+                      <Route path="/resume-analysis" element={<ResumeAnalysis />} />
                       <Route path="/resume-optimization" element={<ResumeOptimization />} />
+                      <Route path="/resume-preview/:analysisId" element={<ResumePreview />} />
                       <Route path="/profile/*" element={<Profile />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/terms-of-service" element={<TermsOfService />} />

@@ -4,10 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 
-type FilterType = 'all' | 'drafts' | 'published';
-
 interface ResumeManagerProps {
-  activeFilter: FilterType;
   counts: { all: number; drafts: number; published: number };
   resumes: any[];
   loading: boolean;

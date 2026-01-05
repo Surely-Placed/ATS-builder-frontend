@@ -84,23 +84,27 @@ export function getDisplayScores(data: ScoreData): DisplayScores {
   }
 
   // Method 3: Fallback to real scores (backward compatibility - OLD API)
-  // Note: Real scores are >= 80, so we'll map them appropriately
+  // Only use real scores directly if display scores are not available
+  // Don't map them - use them as-is since they might already be display scores
   if (data.analysis?.ats_score_before !== undefined) {
     const realBefore = data.analysis.ats_score_before;
     const realAfter = data.analysis.ats_score_after ?? null;
     
-    // Map real scores (>= 80) to display ranges
-    // Before: 50-60, After: 80-90
-    const scoreBefore = mapToBeforeRange(realBefore);
-    const scoreAfter = realAfter !== null ? mapToAfterRange(realAfter) : null;
+    // Use real scores directly - they might already be display scores
+    // Only map if we're certain they're real scores (>= 80) and we need display scores
+    const isRealScore = realBefore >= 80;
+    const scoreBefore = isRealScore ? mapToBeforeRange(realBefore) : realBefore;
+    const scoreAfter = realAfter !== null 
+      ? (realAfter >= 80 ? mapToAfterRange(realAfter) : realAfter)
+      : null;
     const improvement = scoreAfter !== null ? scoreAfter - scoreBefore : null;
     
     return {
       scoreBefore,
       scoreAfter,
       improvement,
-      realScoreBefore: realBefore,
-      realScoreAfter: realAfter ?? undefined,
+      realScoreBefore: isRealScore ? realBefore : undefined,
+      realScoreAfter: realAfter !== null && realAfter >= 80 ? realAfter : undefined,
     };
   }
 
@@ -114,24 +118,53 @@ export function getDisplayScores(data: ScoreData): DisplayScores {
 
 /**
  * Map real score (>= 80) to before optimization range (50-60)
+ * Uses deterministic mapping based on score value (no random)
  */
 function mapToBeforeRange(realScore: number): number {
+  // Use deterministic mapping based on score hash to ensure consistency
+  // This ensures the same real score always maps to the same display score
+  const scoreHash = realScore % 10; // Use last digit for consistency
   const normalized = Math.max(realScore, 80);
-  if (normalized >= 95) return 58 + Math.floor(Math.random() * 3); // 58-60
-  if (normalized >= 90) return 56 + Math.floor(Math.random() * 4); // 56-59
-  if (normalized >= 85) return 53 + Math.floor(Math.random() * 4); // 53-56
-  return 50 + Math.floor(Math.random() * 4); // 50-53
+  
+  if (normalized >= 95) {
+    // 58-60 range, use scoreHash to pick consistently
+    return 58 + (scoreHash % 3); // 58, 59, or 60
+  }
+  if (normalized >= 90) {
+    // 56-59 range
+    return 56 + (scoreHash % 4); // 56, 57, 58, or 59
+  }
+  if (normalized >= 85) {
+    // 53-56 range
+    return 53 + (scoreHash % 4); // 53, 54, 55, or 56
+  }
+  // 50-53 range
+  return 50 + (scoreHash % 4); // 50, 51, 52, or 53
 }
 
 /**
  * Map real score (>= 80) to after optimization range (80-90)
+ * Uses deterministic mapping based on score value (no random)
  */
 function mapToAfterRange(realScore: number): number {
+  // Use deterministic mapping based on score hash to ensure consistency
+  const scoreHash = realScore % 10; // Use last digit for consistency
   const normalized = Math.max(realScore, 80);
-  if (normalized >= 95) return 88 + Math.floor(Math.random() * 3); // 88-90
-  if (normalized >= 90) return 86 + Math.floor(Math.random() * 4); // 86-89
-  if (normalized >= 85) return 83 + Math.floor(Math.random() * 4); // 83-86
-  return 80 + Math.floor(Math.random() * 4); // 80-83
+  
+  if (normalized >= 95) {
+    // 88-90 range
+    return 88 + (scoreHash % 3); // 88, 89, or 90
+  }
+  if (normalized >= 90) {
+    // 86-89 range
+    return 86 + (scoreHash % 4); // 86, 87, 88, or 89
+  }
+  if (normalized >= 85) {
+    // 83-86 range
+    return 83 + (scoreHash % 4); // 83, 84, 85, or 86
+  }
+  // 80-83 range
+  return 80 + (scoreHash % 4); // 80, 81, 82, or 83
 }
 
 // ============================================================================
@@ -155,3 +188,17 @@ export function getScoreColor(score: number): string {
   if (score >= 80) return '#f59e0b'; // amber-500
   return '#ef4444'; // red-500
 }
+
+export const getScoreLevel = (score: number): string => {
+  if (score >= 80) return 'excellent';
+  if (score >= 60) return 'good';
+  if (score >= 40) return 'fair';
+  return 'poor';
+};
+
+export const getBreakdownColorClass = (score: number): string => {
+  if (score >= 80) return 'excellent';
+  if (score >= 60) return 'good';
+  if (score >= 40) return 'fair';
+  return 'poor';
+};

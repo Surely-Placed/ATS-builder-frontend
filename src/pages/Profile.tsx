@@ -6,10 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
-import ProfileHeader from "@/components/ProfileHeader";
+import ProfileLayout from "@/components/layouts/ProfileLayout";
 
 // Components
-import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { OverviewTab } from "@/components/profile/tabs/OverviewTab";
 import { ProfileTab } from "@/components/profile/tabs/ProfileTab";
 import { ResumeTab } from "@/components/profile/tabs/ResumeTab";
@@ -17,6 +16,7 @@ import { SubscriptionTab } from "@/components/profile/tabs/SubscriptionTab";
 import { PurchasesTab } from "@/components/profile/tabs/PurchasesTab";
 import { ActivityTab } from "@/components/profile/tabs/ActivityTab";
 import { SettingsTab } from "@/components/profile/tabs/SettingsTab";
+import { ApiKeysTab } from "@/components/profile/tabs/ApiKeysTab";
 
 // Types
 interface Profile {
@@ -154,6 +154,10 @@ const Profile = () => {
       settings: { 
         title: 'Settings & Preferences', 
         subtitle: 'Customize your account settings and preferences' 
+      },
+      'api-keys': { 
+        title: 'Extension API Keys', 
+        subtitle: 'Generate and manage API keys for browser extensions' 
       },
     };
     return headings[activeTab] || { title: 'Profile', subtitle: 'Manage your account settings and preferences' };
@@ -375,7 +379,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiClient.post<{ success: boolean; data: { resume: Resume } }>(
+      const response = await apiClient.post<{ success: boolean; data: Resume }>(
         '/profile/resume/upload',
         formData,
         {
@@ -386,8 +390,14 @@ const Profile = () => {
       );
 
       if (response.data.success) {
+        const resume = response.data.data;
+        
+        if (!resume || !resume.id) {
+          throw new Error('Upload succeeded but resume data was not returned');
+        }
+        
         setSuccess('Profile resume uploaded successfully!');
-        setProfileResume(response.data.data.resume);
+        setProfileResume(resume);
         toast({
           title: "Success",
           description: "Profile resume uploaded successfully!",
@@ -508,23 +518,19 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background w-full h-full flex flex-col">
-        <ProfileHeader profileNavigation={<ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />} />
+      <ProfileLayout activeTab={activeTab} onTabChange={setActiveTab}>
         <div className="flex justify-center items-center min-h-[400px] flex-1">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-muted-foreground">Loading profile...</p>
           </div>
         </div>
-      </div>
+      </ProfileLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background w-full h-full flex flex-col">
-      {/* Profile Header with Profile Navigation */}
-      <ProfileHeader profileNavigation={<ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />} />
-
+    <ProfileLayout activeTab={activeTab} onTabChange={setActiveTab}>
       <div className="relative w-full h-full flex-1 flex flex-col">
           {/* Profile Heading - Below Header with Proper Spacing */}
           <div className="pl-4 sm:pl-6 lg:pl-8 pr-4 pt-6 pb-4 sm:pt-8 sm:pb-6">
@@ -619,10 +625,14 @@ const Profile = () => {
                   onUpdate={handleUpdatePreferences}
                 />
               )}
+
+              {activeTab === 'api-keys' && (
+                <ApiKeysTab />
+              )}
             </div>
           </div>
         </div>
-    </div>
+    </ProfileLayout>
   );
 };
 

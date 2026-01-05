@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ProgressTracker } from '../ProgressTracker';
+import { ProgressTracker } from '../analysis/ProgressTracker';
 import { X } from 'lucide-react';
 
 interface ResumeOptimizingViewProps {
@@ -60,5 +60,8 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
     </div>
   );
 };
+
+
+
 
 

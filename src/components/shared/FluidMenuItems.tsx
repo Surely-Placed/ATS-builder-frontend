@@ -13,9 +13,11 @@ interface FluidMenuItemsProps {
   items: NavItem[];
   onItemClick: (url: string) => void;
   mounted: boolean;
+  onMenuClose?: () => void;
+  onToggle?: () => void;
 }
 
-export const FluidMenuItems = ({ items, onItemClick, mounted }: FluidMenuItemsProps) => {
+export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onToggle }: FluidMenuItemsProps) => {
   const { resolvedTheme, setTheme } = useTheme();
 
   const handleThemeToggle = () => {
@@ -41,7 +43,10 @@ export const FluidMenuItems = ({ items, onItemClick, mounted }: FluidMenuItemsPr
               <X size={20} strokeWidth={2} className="text-primary-foreground" />
             </div>
           </div>
-        } 
+        }
+        onClick={() => {
+          onToggle?.();
+        }}
       />
       {items.map((item) => {
         const Icon = iconMap[item.name] || Home;
@@ -56,7 +61,16 @@ export const FluidMenuItems = ({ items, onItemClick, mounted }: FluidMenuItemsPr
                 </div>
               </div>
             }
-            onClick={() => onItemClick(item.url)}
+            onClick={() => {
+              // Close menu first, then navigate
+              if (onMenuClose) {
+                onMenuClose();
+              }
+              // Small delay to ensure menu closes before navigation
+              setTimeout(() => {
+                onItemClick(item.url);
+              }, 50);
+            }}
           />
         );
       })}
@@ -79,4 +93,7 @@ export const FluidMenuItems = ({ items, onItemClick, mounted }: FluidMenuItemsPr
     </>
   );
 };
+
+
+
 

@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layouts/Footer";
 
 const TermsOfService = () => {
   const lastUpdated = "January 1, 2024";

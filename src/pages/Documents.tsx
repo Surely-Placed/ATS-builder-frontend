@@ -32,7 +32,6 @@ const Documents = () => {
           />
         </div>
         <ResumeManager
-          activeFilter={activeFilter}
           counts={counts}
           resumes={resumes}
           loading={loading}
