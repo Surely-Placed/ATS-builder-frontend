@@ -1,8 +1,8 @@
-import React from 'react';
-import { ResumeList } from './ResumeList';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import React from "react";
+import { ResumeList } from "./ResumeList";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 
 interface ResumeManagerProps {
   counts: { all: number; drafts: number; published: number };
@@ -20,7 +20,6 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
   refetch,
   refetchCounts,
 }) => {
-
   return (
     <div className="w-full">
       {/* Main Content - Resume List */}
@@ -33,7 +32,13 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Error loading resumes</h3>
                   <p className="text-muted-foreground mb-4">{error}</p>
-                  <Button onClick={() => { refetch(); refetchCounts(); }} variant="outline">
+                  <Button
+                    onClick={() => {
+                      refetch();
+                      refetchCounts();
+                    }}
+                    variant="outline"
+                  >
                     Retry
                   </Button>
                 </div>
@@ -48,4 +53,3 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
 };
 
 export default ResumeManager;
-

@@ -1,0 +1,9 @@
+{
+  "remote.autoForwardPorts": false,
+  "remote.portsAttributes": {
+    "*": {
+      "onAutoForward": "ignore"
+    }
+  },
+  "remote.tunnels.access": "off"
+}

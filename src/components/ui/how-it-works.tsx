@@ -22,7 +22,7 @@ interface StepCardProps {
 const springValues = {
   damping: 30,
   stiffness: 100,
-  mass: 2
+  mass: 2,
 };
 
 /**
@@ -30,13 +30,7 @@ const springValues = {
  * It displays an icon, title, description, and a list of benefits.
  * Now with 3D tilt animation effect.
  */
-const StepCard: React.FC<StepCardProps> = ({
-  icon,
-  title,
-  description,
-  benefits,
-  index,
-}) => {
+const StepCard: React.FC<StepCardProps> = ({ icon, title, description, benefits, index }) => {
   const ref = useRef<HTMLDivElement>(null);
   const rotateX = useSpring(useMotionValue(0), springValues);
   const rotateY = useSpring(useMotionValue(0), springValues);
@@ -75,7 +69,7 @@ const StepCard: React.FC<StepCardProps> = ({
       transition={{
         duration: 0.5,
         delay: index * 0.2,
-        ease: [0.25, 0.4, 0.25, 1]
+        ease: [0.25, 0.4, 0.25, 1],
       }}
       onMouseMove={handleMouse}
       onMouseEnter={handleMouseEnter}
@@ -88,7 +82,7 @@ const StepCard: React.FC<StepCardProps> = ({
         rotateX,
         rotateY,
         scale,
-        transformStyle: "preserve-3d"
+        transformStyle: "preserve-3d",
       }}
     >
       {/* Icon */}
@@ -117,54 +111,38 @@ const StepCard: React.FC<StepCardProps> = ({
  * A responsive "How It Works" section that displays a 4-step process.
  * It is styled with shadcn/ui theme variables to support light and dark modes.
  */
-export const HowItWorks: React.FC<HowItWorksProps> = ({
-  className,
-  ...props
-}) => {
+export const HowItWorks: React.FC<HowItWorksProps> = ({ className, ...props }) => {
   const stepsData = [
     {
       icon: <Globe className="h-6 w-6" />,
-      title: "Explore Job Portals",
+      title: "Paste Job Details",
       description:
-        "Browse your favorite job boards and find your dream position. Copy the career page URL.",
+        "Simply paste the job title and job description from any job portal or company career page.",
       benefits: [
-        "Works with LinkedIn, Indeed, Glassdoor",
-        "Company career pages supported",
-        "Save job links for later",
+        "Paste job title & full description directly",
+        "Works with LinkedIn, Indeed, Glassdoor & more",
+        "No need to save or track job links",
       ],
     },
+    
     {
       icon: <Upload className="h-6 w-6" />,
       title: "Upload Resume",
-      description:
-        "Drop your PDF or DOCX file. We support all standard resume formats.",
-      benefits: [
-        "Instant file analysis",
-        "Secure data handling",
-        "All formats supported",
-      ],
+      description: "Drop your PDF or DOCX file. We support all standard resume formats.",
+      benefits: ["Instant file analysis", "Secure data handling", "All formats supported"],
     },
     {
       icon: <Layers className="h-6 w-6" />,
       title: "AI Analyzes",
       description:
         "Our AI scans for ATS compatibility issues, formatting errors, and missing keywords.",
-      benefits: [
-        "Deep content analysis",
-        "ATS compatibility check",
-        "Keyword optimization",
-      ],
+      benefits: ["Deep content analysis", "ATS compatibility check", "Keyword optimization"],
     },
     {
       icon: <Zap className="h-6 w-6" />,
       title: "Download Perfect PDF",
-      description:
-        "Get your ATS-optimized resume instantly. Ready to apply.",
-      benefits: [
-        "Professional formatting",
-        "ATS-friendly structure",
-        "Instant download",
-      ],
+      description: "Get your ATS-optimized resume instantly. Ready to apply.",
+      benefits: ["Professional formatting", "ATS-friendly structure", "Instant download"],
     },
   ];
 
@@ -176,7 +154,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
     >
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -185,7 +163,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
         >
           <SpotlightHeading className="w-full">
             <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl flex flex-wrap justify-center">
-              {"How it works".split(' ').map((word, index) => (
+              {"How it works".split(" ").map((word, index) => (
                 <motion.span
                   key={index}
                   initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
@@ -194,7 +172,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
                   transition={{
                     duration: 0.5,
                     delay: index * 0.1,
-                    ease: [0.25, 0.4, 0.25, 1]
+                    ease: [0.25, 0.4, 0.25, 1],
                   }}
                   className={index === 2 ? "text-gradient mr-2" : "mr-2"}
                 >
@@ -209,7 +187,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
         </motion.div>
 
         {/* Step Indicators with Connecting Line */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-100px" }}

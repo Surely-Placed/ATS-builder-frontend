@@ -3,7 +3,7 @@
  * Use this to debug and verify ATS score data from API responses
  */
 
-import { AnalysisResult } from '@/services/analysis/types';
+import { AnalysisResult } from "@/services/analysis/types";
 
 export interface AtsScoreVerification {
   before: {
@@ -65,33 +65,34 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
     // Calculate improvement
     const beforeReal = verification.before.real || verification.before.fromAnalysis || 0;
     const afterReal = verification.after.real || verification.after.fromAnalysis || 0;
-    
+
     if (beforeReal > 0 && afterReal > 0) {
       const points = afterReal - beforeReal;
-      const percent = ((points / beforeReal) * 100).toFixed(2) + '%';
-      
+      const percent = ((points / beforeReal) * 100).toFixed(2) + "%";
+
       verification.improvement = {
         points,
         percent,
-        displayImprovement: result.analysis?.display_improvement || result.ats_analysis?.after?.improvement || null,
+        displayImprovement:
+          result.analysis?.display_improvement || result.ats_analysis?.after?.improvement || null,
       };
     }
   }
 
   // Log verification
-  console.log('=== ATS Score Verification ===');
-  console.log('Before Score:', verification.before);
-  
+  console.log("=== ATS Score Verification ===");
+  console.log("Before Score:", verification.before);
+
   if (verification.after) {
-    console.log('After Score:', verification.after);
+    console.log("After Score:", verification.after);
     if (verification.improvement) {
-      console.log('Improvement:', verification.improvement);
+      console.log("Improvement:", verification.improvement);
     }
   } else {
-    console.log('After Score: Not available (resume not optimized)');
+    console.log("After Score: Not available (resume not optimized)");
   }
-  
-  console.log('=== Verification Complete ===');
+
+  console.log("=== Verification Complete ===");
 
   return verification;
 };
@@ -100,38 +101,41 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
  * Get ATS scores in a standardized format
  */
 export const getAtsScores = (result: AnalysisResult) => {
-  const beforeScore = result.ats_analysis?.before?.score || 
-                      result.analysis?.display_score_before || 
-                      result.analysis?.ats_score_before || 
-                      0;
-  
-  const beforeReal = result.ats_analysis?.before?.real_score || 
-                     result.analysis?.ats_score_before || 
-                     0;
+  const beforeScore =
+    result.ats_analysis?.before?.score ||
+    result.analysis?.display_score_before ||
+    result.analysis?.ats_score_before ||
+    0;
 
-  const afterScore = result.ats_analysis?.after?.score || 
-                     result.analysis?.display_score_after || 
-                     result.analysis?.ats_score_after || 
-                     null;
+  const beforeReal =
+    result.ats_analysis?.before?.real_score || result.analysis?.ats_score_before || 0;
 
-  const afterReal = result.ats_analysis?.after?.real_score || 
-                   result.analysis?.ats_score_after || 
-                   null;
+  const afterScore =
+    result.ats_analysis?.after?.score ||
+    result.analysis?.display_score_after ||
+    result.analysis?.ats_score_after ||
+    null;
 
-  const improvement = result.ats_analysis?.after?.improvement || 
-                      result.analysis?.display_improvement || 
-                      (afterReal && beforeReal ? afterReal - beforeReal : null);
+  const afterReal =
+    result.ats_analysis?.after?.real_score || result.analysis?.ats_score_after || null;
+
+  const improvement =
+    result.ats_analysis?.after?.improvement ||
+    result.analysis?.display_improvement ||
+    (afterReal && beforeReal ? afterReal - beforeReal : null);
 
   return {
     before: {
       display: beforeScore,
       real: beforeReal,
     },
-    after: afterScore !== null ? {
-      display: afterScore,
-      real: afterReal,
-    } : null,
+    after:
+      afterScore !== null
+        ? {
+            display: afterScore,
+            real: afterReal,
+          }
+        : null,
     improvement,
   };
 };
-

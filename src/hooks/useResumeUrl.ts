@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { getResumeUrl } from '../utils/resumeUrlHelper';
+import { useMemo } from "react";
+import { getResumeUrl } from "../utils/resumeUrlHelper";
 
 interface UseResumeUrlOptions {
   useProxy?: boolean;
@@ -8,16 +8,19 @@ interface UseResumeUrlOptions {
 }
 
 export const useResumeUrl = (
-  resume: {
-    id?: string;
-    original_file_url?: string | null;
-    optimized_file_url?: string | null;
-  } | null | undefined,
+  resume:
+    | {
+        id?: string;
+        original_file_url?: string | null;
+        optimized_file_url?: string | null;
+      }
+    | null
+    | undefined,
   options?: UseResumeUrlOptions
 ): string | null => {
   return useMemo(() => {
     if (!resume) return null;
-    
+
     try {
       return getResumeUrl(resume, options);
     } catch (error) {
@@ -25,4 +28,3 @@ export const useResumeUrl = (
     }
   }, [resume, options?.useProxy, options?.preferOptimized, options?.baseUrl]);
 };
-

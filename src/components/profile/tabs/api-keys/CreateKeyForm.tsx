@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Key, KeyRound, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Key, KeyRound, Loader2 } from "lucide-react";
 
 interface CreateKeyFormProps {
   newKeyName: string;
@@ -24,9 +24,7 @@ export const CreateKeyForm = ({
           <KeyRound className="h-5 w-5 text-primary" />
           Generate New API Key
         </CardTitle>
-        <CardDescription>
-          Create a new API key for your browser extension
-        </CardDescription>
+        <CardDescription>Create a new API key for your browser extension</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -59,4 +57,3 @@ export const CreateKeyForm = ({
     </Card>
   );
 };
-

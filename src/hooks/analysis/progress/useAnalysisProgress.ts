@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import AnalysisApiService from '@/services/analysisApi';
-import { ANALYSIS_STEPS, Step } from '@/constants/analysis/steps';
+import { useState, useEffect, useCallback, useRef } from "react";
+import AnalysisApiService from "@/services/analysisApi";
+import { ANALYSIS_STEPS, Step } from "@/constants/analysis/steps";
 
 interface UseAnalysisProgressProps {
   analysisParams?: {
@@ -15,7 +15,7 @@ interface UseAnalysisProgressProps {
 interface ProgressState {
   currentStep: number;
   progress: number;
-  status: 'idle' | 'analyzing' | 'optimizing' | 'completed' | 'failed';
+  status: "idle" | "analyzing" | "optimizing" | "completed" | "failed";
   error?: string;
 }
 
@@ -27,7 +27,7 @@ export function useAnalysisProgress({
   const [progressState, setProgressState] = useState<ProgressState>({
     currentStep: 0,
     progress: 0,
-    status: 'idle',
+    status: "idle",
   });
 
   const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -38,7 +38,7 @@ export function useAnalysisProgress({
   const simulateAnalysisProgress = useCallback(async () => {
     if (!analysisParams) return;
 
-    setProgressState({ currentStep: 0, progress: 0, status: 'analyzing' });
+    setProgressState({ currentStep: 0, progress: 0, status: "analyzing" });
     startTimeRef.current = Date.now();
 
     const startAnalysis = async () => {
@@ -79,7 +79,7 @@ export function useAnalysisProgress({
           setProgressState({
             currentStep: stepIndex,
             progress: Math.min(overallProgress, 92),
-            status: 'analyzing',
+            status: "analyzing",
           });
         }, 100);
 
@@ -93,7 +93,7 @@ export function useAnalysisProgress({
         setProgressState({
           currentStep: steps.length - 1,
           progress: 100,
-          status: 'completed',
+          status: "completed",
         });
 
         if (onComplete) {
@@ -107,11 +107,11 @@ export function useAnalysisProgress({
         setProgressState({
           currentStep: 0,
           progress: 0,
-          status: 'failed',
-          error: error.message || 'Analysis failed',
+          status: "failed",
+          error: error.message || "Analysis failed",
         });
         if (onError) {
-          onError(error.message || 'Analysis failed');
+          onError(error.message || "Analysis failed");
         }
       }
     };
@@ -135,4 +135,3 @@ export function useAnalysisProgress({
 
   return progressState;
 }
-

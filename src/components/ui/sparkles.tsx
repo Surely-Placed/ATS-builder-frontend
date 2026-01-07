@@ -19,16 +19,8 @@ type ParticlesProps = {
   particleDensity?: number;
 };
 export const SparklesCore = (props: ParticlesProps) => {
-  const {
-    id,
-    className,
-    background,
-    minSize,
-    maxSize,
-    speed,
-    particleColor,
-    particleDensity,
-  } = props;
+  const { id, className, background, minSize, maxSize, speed, particleColor, particleDensity } =
+    props;
   const [init, setInit] = useState(false);
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -524,11 +516,7 @@ export function Sparkles({
 
   return (
     isReady && (
-      <Particles
-        id={id}
-        options={{ ...defaultOptions, ...options }}
-        className={className}
-      />
+      <Particles id={id} options={{ ...defaultOptions, ...options }} className={className} />
     )
   );
 }

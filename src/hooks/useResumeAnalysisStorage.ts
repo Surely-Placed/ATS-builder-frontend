@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { AnalysisResult } from '../services/analysisApi';
+import { useState, useEffect } from "react";
+import { AnalysisResult } from "../services/analysisApi";
 
-export type ViewState = 'form' | 'analysis' | 'optimizing' | 'comparison' | 'preview';
+export type ViewState = "form" | "analysis" | "optimizing" | "comparison" | "preview";
 
 interface StoredData {
   analysisResult: AnalysisResult;
@@ -15,14 +15,14 @@ interface StoredData {
 }
 
 const STORAGE_KEYS = {
-  ANALYSIS_RESULT: 'resume_analysis_result',
-  VIEW_STATE: 'resume_analysis_view_state',
-  ANALYSIS_ID: 'resume_analysis_id',
-  RESUME_ID: 'resume_analysis_resume_id',
-  JOB_TITLE: 'resume_analysis_job_title',
-  JOB_DESCRIPTION: 'resume_analysis_job_description',
-  OPTIMIZATION_RESULT: 'resume_optimization_result',
-  OPTIMIZED_RESUME_URL: 'resume_optimized_url',
+  ANALYSIS_RESULT: "resume_analysis_result",
+  VIEW_STATE: "resume_analysis_view_state",
+  ANALYSIS_ID: "resume_analysis_id",
+  RESUME_ID: "resume_analysis_resume_id",
+  JOB_TITLE: "resume_analysis_job_title",
+  JOB_DESCRIPTION: "resume_analysis_job_description",
+  OPTIMIZATION_RESULT: "resume_optimization_result",
+  OPTIMIZED_RESUME_URL: "resume_optimized_url",
 };
 
 export const useResumeAnalysisStorage = () => {
@@ -43,9 +43,11 @@ export const useResumeAnalysisStorage = () => {
           viewState: storedViewState,
           analysisId: storedAnalysisId,
           resumeId: storedResumeId,
-          jobTitle: storedJobTitle || '',
-          jobDescription: storedJobDescription || '',
-          optimizationResult: storedOptimizationResult ? JSON.parse(storedOptimizationResult) : null,
+          jobTitle: storedJobTitle || "",
+          jobDescription: storedJobDescription || "",
+          optimizationResult: storedOptimizationResult
+            ? JSON.parse(storedOptimizationResult)
+            : null,
           optimizedResumeUrl: storedOptimizedUrl,
         };
       }
@@ -105,7 +107,7 @@ export const useResumeAnalysisStorage = () => {
 
   const clearStorage = () => {
     try {
-      Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+      Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
     } catch (error) {
       // Failed to clear local storage
     }
@@ -113,8 +115,3 @@ export const useResumeAnalysisStorage = () => {
 
   return { loadFromStorage, saveToStorage, clearStorage };
 };
-
-
-
-
-

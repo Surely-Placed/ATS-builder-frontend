@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { AnalysisResult } from '@/services/analysisApi';
-import { ViewState, useResumeAnalysisStorage } from '@/hooks/useResumeAnalysisStorage';
-import AnalysisApiService from '@/services/analysisApi';
-import { normalizeAnalysisResult } from '@/utils/analysisResultNormalizer';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { AnalysisResult } from "@/services/analysisApi";
+import { ViewState, useResumeAnalysisStorage } from "@/hooks/useResumeAnalysisStorage";
+import AnalysisApiService from "@/services/analysisApi";
+import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 
 export function useAnalysisState() {
   const [searchParams] = useSearchParams();
   const { loadFromStorage } = useResumeAnalysisStorage();
   const storedData = loadFromStorage();
-  const urlAnalysisId = searchParams.get('analysisId');
+  const urlAnalysisId = searchParams.get("analysisId");
 
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     storedData?.analysisResult || null
   );
-  
+
   // Determine initial viewState - check if optimization is complete
   const getInitialViewState = (): ViewState => {
     if (storedData?.viewState) {
@@ -23,15 +23,15 @@ export function useAnalysisState() {
     }
     // Check if optimization result exists in storage
     if (storedData?.optimizationResult) {
-      return 'comparison';
+      return "comparison";
     }
     // Check if analysis result exists
     if (storedData?.analysisResult) {
-      return 'analysis';
+      return "analysis";
     }
-    return 'form';
+    return "form";
   };
-  
+
   const [viewState, setViewState] = useState<ViewState>(getInitialViewState());
   const [analysisId, setAnalysisId] = useState<string | null>(
     urlAnalysisId || storedData?.analysisId || null
@@ -52,30 +52,35 @@ export function useAnalysisState() {
             const normalized = normalizeAnalysisResult(response);
             if (normalized.analysis?.id) {
               setAnalysisResult(normalized as unknown as AnalysisResult);
-              
+
               // Check if optimization is complete - if so, set viewState to 'comparison'
               // Check for optimization result in the response
-              const hasOptimization = normalized.optimized_resume || 
-                                      (normalized.analysis?.ats_score_after !== null && normalized.analysis?.ats_score_after !== undefined) ||
-                                      normalized.ats_analysis?.after;
-              
+              const hasOptimization =
+                normalized.optimized_resume ||
+                (normalized.analysis?.ats_score_after !== null &&
+                  normalized.analysis?.ats_score_after !== undefined) ||
+                normalized.ats_analysis?.after;
+
               if (hasOptimization) {
                 // Try to load optimization result from storage first
                 const stored = loadFromStorage();
                 if (stored?.optimizationResult) {
-                  setViewState('comparison');
+                  setViewState("comparison");
                 } else {
                   // Check if we can determine optimization status from the analysis
                   // If ats_score_after exists, optimization is likely complete
-                  if ((normalized.analysis?.ats_score_after !== null && normalized.analysis?.ats_score_after !== undefined) || 
-                      normalized.ats_analysis?.after) {
-                    setViewState('comparison');
+                  if (
+                    (normalized.analysis?.ats_score_after !== null &&
+                      normalized.analysis?.ats_score_after !== undefined) ||
+                    normalized.ats_analysis?.after
+                  ) {
+                    setViewState("comparison");
                   } else {
-                    setViewState('analysis');
+                    setViewState("analysis");
                   }
                 }
               } else {
-                setViewState('analysis');
+                setViewState("analysis");
               }
             }
           } catch (error) {
@@ -102,4 +107,3 @@ export function useAnalysisState() {
     setAnalysisError,
   };
 }
-

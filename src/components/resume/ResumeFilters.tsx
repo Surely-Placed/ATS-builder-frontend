@@ -1,15 +1,15 @@
-import React from 'react';
-import { FilterCounts } from '@/hooks/useResumeFilters';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { FilterCounts } from "@/hooks/useResumeFilters";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Filter, ChevronDown } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Filter, ChevronDown } from "lucide-react";
 
-type FilterType = 'all' | 'drafts' | 'published';
+type FilterType = "all" | "drafts" | "published";
 
 interface ResumeFiltersProps {
   activeFilter: FilterType;
@@ -23,12 +23,12 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
   counts,
 }) => {
   const filters = [
-    { key: 'all' as FilterType, label: 'All Documents' },
-    { key: 'drafts' as FilterType, label: 'Drafts' },
-    { key: 'published' as FilterType, label: 'Published' },
+    { key: "all" as FilterType, label: "All Documents" },
+    { key: "drafts" as FilterType, label: "Drafts" },
+    { key: "published" as FilterType, label: "Published" },
   ];
 
-  const activeFilterLabel = filters.find(f => f.key === activeFilter)?.label || 'All Documents';
+  const activeFilterLabel = filters.find((f) => f.key === activeFilter)?.label || "All Documents";
 
   return (
     <DropdownMenu>
@@ -59,4 +59,3 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
     </DropdownMenu>
   );
 };
-

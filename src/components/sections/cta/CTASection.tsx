@@ -1,8 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
-import { SpotlightHeading } from '@/components/ui/spotlight-heading';
-import { ContactFormDialog } from './ContactFormDialog';
+import React from "react";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+import { SpotlightHeading } from "@/components/ui/spotlight-heading";
+import { ContactFormDialog } from "./ContactFormDialog";
 
 /**
  * CTA Section component - Modular structure
@@ -33,11 +33,11 @@ export default function CTASection() {
           {/* Headline */}
           <SpotlightHeading className="w-full">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 flex flex-wrap justify-center">
-              {'Stop Guessing.'.split(' ').map((word, index) => (
+              {"Stop Guessing.".split(" ").map((word, index) => (
                 <motion.span
                   key={index}
-                  initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
-                  whileInView={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                  initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+                  whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.5,
@@ -50,11 +50,11 @@ export default function CTASection() {
                 </motion.span>
               ))}
               <br className="block w-full" />
-              {'Let AI Perfect Your Resume.'.split(' ').map((word, index) => (
+              {"Let AI Perfect Your Resume.".split(" ").map((word, index) => (
                 <motion.span
                   key={`gradient-${index}`}
-                  initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
-                  whileInView={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                  initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+                  whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.5,
@@ -71,7 +71,7 @@ export default function CTASection() {
 
           {/* Subheadline */}
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Join thousands of job seekers who landed their dream jobs with ATS-optimized resumes. 
+            Join thousands of job seekers who landed their dream jobs with ATS-optimized resumes.
             Your next opportunity is one upload away.
           </p>
 
@@ -87,4 +87,3 @@ export default function CTASection() {
     </section>
   );
 }
-

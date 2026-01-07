@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { KeyRound } from 'lucide-react';
-import type { ApiKey } from '@/services/apiKeysService';
-import { ApiKeyCard } from './ApiKeyCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { KeyRound } from "lucide-react";
+import type { ApiKey } from "@/services/apiKeysService";
+import { ApiKeyCard } from "./ApiKeyCard";
 
 interface ApiKeyListProps {
   apiKeys: ApiKey[];
@@ -26,7 +26,9 @@ export const ApiKeyList = ({
       <CardHeader>
         <CardTitle>Your API Keys</CardTitle>
         <CardDescription>
-          {loading ? 'Loading...' : `${apiKeys.length} ${apiKeys.length === 1 ? 'key' : 'keys'} total`}
+          {loading
+            ? "Loading..."
+            : `${apiKeys.length} ${apiKeys.length === 1 ? "key" : "keys"} total`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -43,7 +45,9 @@ export const ApiKeyList = ({
         ) : apiKeys.length === 0 ? (
           <div className="text-center py-12">
             <KeyRound className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No API keys yet. Generate one above to get started.</p>
+            <p className="text-muted-foreground">
+              No API keys yet. Generate one above to get started.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -63,4 +67,3 @@ export const ApiKeyList = ({
     </Card>
   );
 };
-

@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { apiKeysService, type ApiKey } from '@/services/apiKeysService';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { apiKeysService, type ApiKey } from "@/services/apiKeysService";
+import { useToast } from "@/hooks/use-toast";
 
 export const useApiKeys = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
-  const [newKeyName, setNewKeyName] = useState('Chrome Extension');
+  const [newKeyName, setNewKeyName] = useState("Chrome Extension");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [revokeDialogOpen, setRevokeDialogOpen] = useState<string | null>(null);
   const [releaseDialogOpen, setReleaseDialogOpen] = useState<string | null>(null);
@@ -26,9 +26,9 @@ export const useApiKeys = () => {
       }
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to load API keys',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to load API keys",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -45,17 +45,17 @@ export const useApiKeys = () => {
       if (response.success) {
         setNewKey(response.data.key);
         toast({
-          title: 'Success',
-          description: 'API key created successfully! Copy it now - it will not be shown again.',
+          title: "Success",
+          description: "API key created successfully! Copy it now - it will not be shown again.",
         });
         await loadApiKeys();
-        setNewKeyName('Chrome Extension');
+        setNewKeyName("Chrome Extension");
       }
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to create API key',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to create API key",
+        variant: "destructive",
       });
     } finally {
       setCreating(false);
@@ -68,16 +68,17 @@ export const useApiKeys = () => {
       const response = await apiKeysService.releaseDevice(keyId);
       if (response.success) {
         toast({
-          title: 'Success',
-          description: 'Device released successfully. You can now use this API key on another device.',
+          title: "Success",
+          description:
+            "Device released successfully. You can now use this API key on another device.",
         });
         await loadApiKeys();
       }
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to release device',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to release device",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(null);
@@ -91,16 +92,16 @@ export const useApiKeys = () => {
       const response = await apiKeysService.revokeApiKey(keyId);
       if (response.success) {
         toast({
-          title: 'Success',
-          description: 'API key revoked successfully.',
+          title: "Success",
+          description: "API key revoked successfully.",
         });
         await loadApiKeys();
       }
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to revoke API key',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to revoke API key",
+        variant: "destructive",
       });
     } finally {
       setActionLoading(null);
@@ -111,8 +112,8 @@ export const useApiKeys = () => {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Copied!',
-      description: 'API key copied to clipboard',
+      title: "Copied!",
+      description: "API key copied to clipboard",
     });
   };
 
@@ -134,4 +135,3 @@ export const useApiKeys = () => {
     copyToClipboard,
   };
 };
-

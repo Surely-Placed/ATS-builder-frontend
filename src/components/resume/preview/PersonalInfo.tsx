@@ -1,5 +1,5 @@
-import React from 'react';
-import type { ResumeStructure } from '@/types/resume/preview';
+import React from "react";
+import type { ResumeStructure } from "@/types/resume/preview";
 
 interface PersonalInfoProps {
   resume: ResumeStructure;
@@ -16,4 +16,3 @@ export const PersonalInfo: React.FC<PersonalInfoProps> = ({ resume }) => (
     </div>
   </div>
 );
-

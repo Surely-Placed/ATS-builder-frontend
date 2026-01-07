@@ -1,6 +1,6 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, Copy } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Copy } from "lucide-react";
 
 interface NewKeyAlertProps {
   newKey: string;
@@ -39,4 +39,3 @@ export const NewKeyAlert = ({ newKey, onCopy }: NewKeyAlertProps) => {
     </Alert>
   );
 };
-

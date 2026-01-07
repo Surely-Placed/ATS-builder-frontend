@@ -17,7 +17,13 @@ interface FluidMenuItemsProps {
   onToggle?: () => void;
 }
 
-export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onToggle }: FluidMenuItemsProps) => {
+export const FluidMenuItems = ({
+  items,
+  onItemClick,
+  mounted,
+  onMenuClose,
+  onToggle,
+}: FluidMenuItemsProps) => {
   const { resolvedTheme, setTheme } = useTheme();
 
   const handleThemeToggle = () => {
@@ -28,12 +34,12 @@ export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onTog
     Home,
     Features: Sparkles,
     Pricing: DollarSign,
-    Contact: Phone
+    Contact: Phone,
   };
 
   return (
     <>
-      <MenuItem 
+      <MenuItem
         icon={
           <div className="relative w-5 h-5">
             <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-100 scale-100 rotate-0 [div[data-expanded=true]_&]:opacity-0 [div[data-expanded=true]_&]:scale-0 [div[data-expanded=true]_&]:rotate-180">
@@ -51,7 +57,7 @@ export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onTog
       {items.map((item) => {
         const Icon = iconMap[item.name] || Home;
         return (
-          <MenuItem 
+          <MenuItem
             key={item.name}
             icon={
               <div className="group/item relative">
@@ -75,13 +81,14 @@ export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onTog
         );
       })}
       {mounted && (
-        <MenuItem 
+        <MenuItem
           icon={
             <div className="group/item relative">
-              {resolvedTheme === "dark" 
-                ? <Sun size={20} strokeWidth={2} className="text-foreground" />
-                : <Moon size={20} strokeWidth={2} className="text-foreground" />
-              }
+              {resolvedTheme === "dark" ? (
+                <Sun size={20} strokeWidth={2} className="text-foreground" />
+              ) : (
+                <Moon size={20} strokeWidth={2} className="text-foreground" />
+              )}
               <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-foreground text-background text-xs font-medium rounded whitespace-nowrap opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-200 pointer-events-none">
                 Theme
               </div>
@@ -93,7 +100,3 @@ export const FluidMenuItems = ({ items, onItemClick, mounted, onMenuClose, onTog
     </>
   );
 };
-
-
-
-

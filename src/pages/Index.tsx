@@ -23,34 +23,34 @@ const Index = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === '/login') {
+    if (location.pathname === "/login") {
       setLoginOpen(true);
-    } else if (location.pathname === '/signup') {
+    } else if (location.pathname === "/signup") {
       setSignupOpen(true);
     }
   }, [location]);
 
   const handleLoginClose = (open: boolean) => {
     setLoginOpen(open);
-    if (!open) navigate('/');
+    if (!open) navigate("/");
   };
 
   const handleSignupClose = (open: boolean) => {
     setSignupOpen(open);
-    if (!open) navigate('/');
+    if (!open) navigate("/");
   };
 
   const switchToSignup = () => {
     setLoginOpen(false);
     setSignupOpen(true);
-    navigate('/signup');
+    navigate("/signup");
   };
 
   const switchToLogin = () => {
     setSignupOpen(false);
     setForgotPasswordOpen(false);
     setLoginOpen(true);
-    navigate('/login');
+    navigate("/login");
   };
 
   const switchToForgotPassword = () => {
@@ -75,7 +75,7 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main>
-          <HeroSection 
+          <HeroSection
             title="AI-Powered Resume Builder"
             subtitle={{
               regular: "Transform your resume with ",
@@ -103,19 +103,19 @@ const Index = () => {
         <Footer />
       </div>
 
-      <LoginModal 
-        open={loginOpen} 
+      <LoginModal
+        open={loginOpen}
         onOpenChange={handleLoginClose}
         onSwitchToSignup={switchToSignup}
         onSwitchToForgotPassword={switchToForgotPassword}
       />
-      <SignupModal 
-        open={signupOpen} 
+      <SignupModal
+        open={signupOpen}
         onOpenChange={handleSignupClose}
         onSwitchToLogin={switchToLogin}
       />
-      <ForgotPasswordModal 
-        open={forgotPasswordOpen} 
+      <ForgotPasswordModal
+        open={forgotPasswordOpen}
         onOpenChange={setForgotPasswordOpen}
         onBackToLogin={switchToLogin}
       />

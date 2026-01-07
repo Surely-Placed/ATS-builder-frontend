@@ -1,18 +1,18 @@
 "use client";
 
-import { 
-  SiGoogle, 
-  SiSpotify, 
-  SiAmazon, 
-  SiMeta, 
-  SiApple, 
+import {
+  SiGoogle,
+  SiSpotify,
+  SiAmazon,
+  SiMeta,
+  SiApple,
   SiNetflix,
   SiTesla,
   SiAdobe,
   SiSalesforce,
   SiOracle,
   SiNvidia,
-  SiIntel
+  SiIntel,
 } from "react-icons/si";
 
 export const BrandScroller = () => {

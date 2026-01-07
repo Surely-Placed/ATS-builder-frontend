@@ -20,7 +20,10 @@ export const ActivityTab = ({ activities }: ActivityTabProps) => {
       {activities.length > 0 ? (
         <div className="space-y-3">
           {activities.map((activity) => (
-            <Card key={activity.id} className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
+            <Card
+              key={activity.id}
+              className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+            >
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
                   <div className="p-2 rounded-lg bg-primary/10">
@@ -29,7 +32,7 @@ export const ActivityTab = ({ activities }: ActivityTabProps) => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium capitalize">
-                        {activity.activity_type.replace('_', ' ')}
+                        {activity.activity_type.replace("_", " ")}
                       </span>
                       {activity.entity_type && (
                         <Badge variant="outline" className="text-xs">
@@ -61,4 +64,3 @@ export const ActivityTab = ({ activities }: ActivityTabProps) => {
     </div>
   );
 };
-

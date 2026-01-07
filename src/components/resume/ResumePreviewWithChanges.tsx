@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
-import type { ResumePreviewProps, ViewMode, ResumeStructure } from '@/types/resume/preview';
-import { getSectionChanges, getBadgeStyles } from '@/utils/resume/preview';
-import { PersonalInfo } from './preview/PersonalInfo';
-import { SummarySection } from './preview/SummarySection';
-import { SkillsSection } from './preview/SkillsSection';
-import { WorkExperienceSection } from './preview/WorkExperienceSection';
-import { ProjectsSection } from './preview/ProjectsSection';
-import { EducationSection } from './preview/EducationSection';
-import { CertificationsSection } from './preview/CertificationsSection';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
+import type { ResumePreviewProps, ViewMode, ResumeStructure } from "@/types/resume/preview";
+import { getSectionChanges, getBadgeStyles } from "@/utils/resume/preview";
+import { PersonalInfo } from "./preview/PersonalInfo";
+import { SummarySection } from "./preview/SummarySection";
+import { SkillsSection } from "./preview/SkillsSection";
+import { WorkExperienceSection } from "./preview/WorkExperienceSection";
+import { ProjectsSection } from "./preview/ProjectsSection";
+import { EducationSection } from "./preview/EducationSection";
+import { CertificationsSection } from "./preview/CertificationsSection";
 
 const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
   originalResume,
@@ -21,7 +21,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
   onCancel,
   isGenerating = false,
 }) => {
-  const [viewMode, setViewMode] = useState<ViewMode>('split');
+  const [viewMode, setViewMode] = useState<ViewMode>("split");
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
 
   const toggleSection = (section: string) => {
@@ -34,16 +34,16 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
   };
 
   const renderResumeContent = (resume: ResumeStructure) => {
-    const summaryChanges = getSectionChanges('summary', changes);
-    const skillsChanges = getSectionChanges('skills', changes);
-    const workChanges = getSectionChanges('work_experience', changes);
-    const projectsChanges = getSectionChanges('projects', changes);
-    const educationChanges = getSectionChanges('education', changes);
-    const certificationsChanges = getSectionChanges('certifications', changes);
-    
-    const isSummaryExpanded = expandedSections.has('summary') || viewMode !== 'split';
-    const isSkillsExpanded = expandedSections.has('skills') || viewMode !== 'split';
-    
+    const summaryChanges = getSectionChanges("summary", changes);
+    const skillsChanges = getSectionChanges("skills", changes);
+    const workChanges = getSectionChanges("work_experience", changes);
+    const projectsChanges = getSectionChanges("projects", changes);
+    const educationChanges = getSectionChanges("education", changes);
+    const certificationsChanges = getSectionChanges("certifications", changes);
+
+    const isSummaryExpanded = expandedSections.has("summary") || viewMode !== "split";
+    const isSkillsExpanded = expandedSections.has("skills") || viewMode !== "split";
+
     return (
       <div className="space-y-6">
         <PersonalInfo resume={resume} />
@@ -52,14 +52,14 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
           changes={summaryChanges}
           isExpanded={isSummaryExpanded}
           viewMode={viewMode}
-          onToggle={() => toggleSection('summary')}
+          onToggle={() => toggleSection("summary")}
         />
         <SkillsSection
           resume={resume}
           changes={skillsChanges}
           isExpanded={isSkillsExpanded}
           viewMode={viewMode}
-          onToggle={() => toggleSection('skills')}
+          onToggle={() => toggleSection("skills")}
         />
         <WorkExperienceSection
           resume={resume}
@@ -82,7 +82,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
           <CardHeader>
             <CardTitle className="text-3xl font-bold mb-2">Resume Optimization Preview</CardTitle>
             <p className="text-muted-foreground mb-6">
-              Review highlighted changes below. Colors indicate modifications: 
+              Review highlighted changes below. Colors indicate modifications:
               <span className="ml-2 inline-flex items-center gap-2">
                 <span className="w-3 h-3 bg-yellow-200 dark:bg-yellow-800 border border-yellow-400 dark:border-yellow-600 rounded"></span>
                 Modified
@@ -92,14 +92,14 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
                 Reordered
               </span>
             </p>
-            
+
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="text-sm font-semibold text-foreground">View Mode:</span>
-              {(['split', 'original', 'optimized'] as const).map((mode) => (
+              {(["split", "original", "optimized"] as const).map((mode) => (
                 <Button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  variant={viewMode === mode ? 'default' : 'outline'}
+                  variant={viewMode === mode ? "default" : "outline"}
                   size="sm"
                 >
                   {mode.charAt(0).toUpperCase() + mode.slice(1)} View
@@ -111,11 +111,13 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                    📊 {changes.totalChanges} total change{changes.totalChanges !== 1 ? 's' : ''} across{' '}
-                    {changes.summary.sectionsModified} section{changes.summary.sectionsModified !== 1 ? 's' : ''}
+                    📊 {changes.totalChanges} total change{changes.totalChanges !== 1 ? "s" : ""}{" "}
+                    across {changes.summary.sectionsModified} section
+                    {changes.summary.sectionsModified !== 1 ? "s" : ""}
                   </p>
                   <p className="text-xs text-blue-700 dark:text-blue-300">
-                    {changes.summary.sectionsUnchanged} section{changes.summary.sectionsUnchanged !== 1 ? 's' : ''} unchanged
+                    {changes.summary.sectionsUnchanged} section
+                    {changes.summary.sectionsUnchanged !== 1 ? "s" : ""} unchanged
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -142,7 +144,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
           </CardHeader>
         </Card>
 
-        {viewMode === 'split' ? (
+        {viewMode === "split" ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader className="sticky top-6 bg-background z-10">
@@ -157,7 +159,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
               <CardHeader className="sticky top-6 bg-background z-10">
                 <div className="flex items-center justify-between pb-3 border-b-2 border-green-500 dark:border-green-400">
                   <CardTitle className="text-xl font-bold">✨ Optimized Resume</CardTitle>
-                  <Badge variant="outline" className={getBadgeStyles('green')}>
+                  <Badge variant="outline" className={getBadgeStyles("green")}>
                     {changes.totalChanges} changes
                   </Badge>
                 </div>
@@ -169,11 +171,11 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl font-bold mb-6 pb-3 border-b-2">
-                {viewMode === 'original' ? '📄 Original Resume' : '✨ Optimized Resume'}
+                {viewMode === "original" ? "📄 Original Resume" : "✨ Optimized Resume"}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {renderResumeContent(viewMode === 'original' ? originalResume : optimizedResume)}
+              {renderResumeContent(viewMode === "original" ? originalResume : optimizedResume)}
             </CardContent>
           </Card>
         )}

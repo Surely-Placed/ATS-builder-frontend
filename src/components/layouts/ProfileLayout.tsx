@@ -10,14 +10,13 @@ interface ProfileLayoutProps {
 const ProfileLayout = ({ children, activeTab, onTabChange }: ProfileLayoutProps) => {
   return (
     <div className="min-h-screen bg-background w-full h-full flex flex-col">
-      <ProfileHeader profileNavigation={<ProfileSidebar activeTab={activeTab} onTabChange={onTabChange} />} />
-      
-      <div className="relative w-full h-full flex-1 flex flex-col">
-        {children}
-      </div>
+      <ProfileHeader
+        profileNavigation={<ProfileSidebar activeTab={activeTab} onTabChange={onTabChange} />}
+      />
+
+      <div className="relative w-full h-full flex-1 flex flex-col">{children}</div>
     </div>
   );
 };
 
 export default ProfileLayout;
-

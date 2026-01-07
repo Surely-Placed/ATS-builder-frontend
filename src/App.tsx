@@ -7,8 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./context/AuthContext";
-import ErrorBoundary from "./components/common/ErrorBoundary";
-import { PageViewTracker } from "./components/common/PageViewTracker";
+import ErrorBoundary from "@/components/system/ErrorBoundary";
+import { PageViewTracker } from "@/components/system/PageViewTracker";
 
 // Lazy load pages for code splitting with error handling
 const lazyWithRetry = (componentImport: () => Promise<any>) => {
@@ -16,13 +16,13 @@ const lazyWithRetry = (componentImport: () => Promise<any>) => {
     try {
       return await componentImport();
     } catch (error) {
-      console.error('Failed to load chunk:', error);
+      console.error("Failed to load chunk:", error);
       // Retry once after a short delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
         return await componentImport();
       } catch (retryError) {
-        console.error('Retry failed:', retryError);
+        console.error("Retry failed:", retryError);
         throw retryError;
       }
     }
@@ -78,11 +78,11 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <PageViewTracker />
               <AuthProvider>
                 <ErrorBoundary

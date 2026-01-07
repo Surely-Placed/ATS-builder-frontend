@@ -1,8 +1,17 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Trash2, Loader2, CheckCircle2, AlertCircle, Monitor, Calendar, Clock } from 'lucide-react';
-import type { ApiKey } from '@/services/apiKeysService';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  RefreshCw,
+  Trash2,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Monitor,
+  Calendar,
+  Clock,
+} from "lucide-react";
+import type { ApiKey } from "@/services/apiKeysService";
 
 interface ApiKeyCardProps {
   apiKey: ApiKey;
@@ -44,7 +53,8 @@ export const ApiKeyCard = ({
                 <div className="flex items-center gap-2">
                   <Monitor className="h-4 w-4" />
                   <span>
-                    <strong className="text-foreground">Device:</strong> {apiKey.device_name || 'Unknown Device'}
+                    <strong className="text-foreground">Device:</strong>{" "}
+                    {apiKey.device_name || "Unknown Device"}
                   </span>
                 </div>
               ) : (
@@ -57,14 +67,16 @@ export const ApiKeyCard = ({
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  <strong className="text-foreground">Created:</strong> {formatDate(apiKey.created_at)}
+                  <strong className="text-foreground">Created:</strong>{" "}
+                  {formatDate(apiKey.created_at)}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>
-                  <strong className="text-foreground">Last used:</strong> {formatDate(apiKey.last_used_at)}
+                  <strong className="text-foreground">Last used:</strong>{" "}
+                  {formatDate(apiKey.last_used_at)}
                 </span>
               </div>
             </div>
@@ -110,4 +122,3 @@ export const ApiKeyCard = ({
     </Card>
   );
 };
-

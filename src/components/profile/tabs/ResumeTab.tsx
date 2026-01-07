@@ -21,7 +21,13 @@ interface ResumeTabProps {
   fileInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-export const ResumeTab = ({ profileResume, uploading, onFileSelect, onRemove, fileInputRef }: ResumeTabProps) => {
+export const ResumeTab = ({
+  profileResume,
+  uploading,
+  onFileSelect,
+  onRemove,
+  fileInputRef,
+}: ResumeTabProps) => {
   const internalFileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = fileInputRef || internalFileInputRef;
 
@@ -45,10 +51,10 @@ export const ResumeTab = ({ profileResume, uploading, onFileSelect, onRemove, fi
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
-                    {new Date(profileResume.created_at).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    {new Date(profileResume.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </div>
                 </div>
@@ -76,19 +82,14 @@ export const ResumeTab = ({ profileResume, uploading, onFileSelect, onRemove, fi
                     </a>
                   </Button>
                 )}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={onRemove}
-                  className="gap-2"
-                >
+                <Button variant="destructive" size="sm" onClick={onRemove} className="gap-2">
                   <Trash2 className="w-4 h-4" />
                   Remove
                 </Button>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="border-2 hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -156,4 +157,3 @@ export const ResumeTab = ({ profileResume, uploading, onFileSelect, onRemove, fi
     </div>
   );
 };
-

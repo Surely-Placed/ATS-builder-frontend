@@ -1,4 +1,4 @@
-import { apiClient } from './resumeApi';
+import { apiClient } from "./resumeApi";
 
 // Types
 export interface ApiKey {
@@ -37,12 +37,12 @@ export interface ActionResponse {
 
 class ApiKeysService {
   async getApiKeys(): Promise<ApiKeyResponse> {
-    const response = await apiClient.get<ApiKeyResponse>('/api-keys');
+    const response = await apiClient.get<ApiKeyResponse>("/api-keys");
     return response.data;
   }
 
-  async createApiKey(name: string = 'Chrome Extension'): Promise<CreateApiKeyResponse> {
-    const response = await apiClient.post<CreateApiKeyResponse>('/api-keys', { name });
+  async createApiKey(name: string = "Chrome Extension"): Promise<CreateApiKeyResponse> {
+    const response = await apiClient.post<CreateApiKeyResponse>("/api-keys", { name });
     return response.data;
   }
 
@@ -58,5 +58,3 @@ class ApiKeysService {
 }
 
 export const apiKeysService = new ApiKeysService();
-
-

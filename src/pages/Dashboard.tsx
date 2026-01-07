@@ -49,41 +49,31 @@ const Dashboard = () => {
   }
 
   return (
-        <DashboardLayout activeTab="Dashboard">
-          <div className="space-y-4 sm:space-y-6">
-            {/* Welcome Section with Start Optimization Button */}
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-xl sm:text-2xl font-semibold mb-1">Welcome back!</h1>
-                <p className="text-muted-foreground text-xs sm:text-sm">Overview of your resume optimization journey</p>
-              </div>
-              <Button 
-                onClick={() => navigate("/resume-optimization")}
-                className="shrink-0"
-                size="sm"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Start Optimization
-              </Button>
-            </div>
+    <DashboardLayout activeTab="Dashboard">
+      <div className="space-y-4 sm:space-y-6">
+        {/* Welcome Section with Start Optimization Button */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-semibold mb-1">Welcome back!</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              Overview of your resume optimization journey
+            </p>
+          </div>
+          <Button onClick={() => navigate("/resume-optimization")} className="shrink-0" size="sm">
+            <Sparkles className="w-4 h-4 mr-2" />
+            Start Optimization
+          </Button>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <StatCard 
-            title="Resumes Analyzed" 
-            value={stats?.resumesAnalyzed || 0} 
-            icon={FileText} 
+          <StatCard title="Resumes Analyzed" value={stats?.resumesAnalyzed || 0} icon={FileText} />
+          <StatCard
+            title="Average ATS Score"
+            value={stats?.averageAtsScore !== null ? Math.round(stats.averageAtsScore) : "-"}
+            icon={TrendingUp}
           />
-          <StatCard 
-            title="Average ATS Score" 
-            value={stats?.averageAtsScore !== null ? Math.round(stats.averageAtsScore) : '-'} 
-            icon={TrendingUp} 
-          />
-          <StatCard 
-            title="Optimizations" 
-            value={stats?.optimizations || 0} 
-            icon={Sparkles} 
-          />
+          <StatCard title="Optimizations" value={stats?.optimizations || 0} icon={Sparkles} />
         </div>
 
         {/* Get Started Section - Only show if no resumes analyzed */}
@@ -92,7 +82,7 @@ const Dashboard = () => {
         {/* Recent Activity Section */}
         <div>
           <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recent Activity</h2>
-          
+
           {!stats || stats.recentActivity.length === 0 ? (
             <EmptyActivityCard />
           ) : (

@@ -192,7 +192,9 @@
 .breakdown-card {
   background: #ffffff; /* White background in light mode */
   color: #000000; /* Black text in light mode */
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   width: 100%;
 }
 
@@ -285,7 +287,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   background: #ffffff; /* White background in light mode */
   color: #000000; /* Black text in light mode */
 }
@@ -304,7 +308,11 @@
 .optimize-action {
   margin-top: 3rem;
   text-align: center;
-  background: linear-gradient(135deg, hsl(var(--primary) / 0.05) 0%, hsl(var(--primary) / 0.1) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.05) 0%,
+    hsl(var(--primary) / 0.1) 100%
+  ) !important;
   border: 2px dashed hsl(var(--primary) / 0.3) !important;
   transition: all 0.3s ease;
   width: 100% !important;
@@ -313,7 +321,11 @@
 
 .optimize-action:hover {
   border-color: hsl(var(--primary) / 0.5) !important;
-  background: linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.15) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.08) 0%,
+    hsl(var(--primary) / 0.15) 100%
+  ) !important;
   box-shadow: 0 4px 12px hsl(var(--primary) / 0.2);
 }
 
@@ -453,7 +465,6 @@
 .recommendations {
   border-left: 4px solid hsl(var(--primary));
 }
-
 
 .status-info {
   border-left: 4px solid hsl(var(--primary));

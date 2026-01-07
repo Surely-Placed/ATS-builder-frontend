@@ -19,7 +19,7 @@ export interface OptimizationJobResponse {
 
 export interface JobStatusResponse {
   success: boolean;
-  status: 'pending' | 'running' | 'complete' | 'failed';
+  status: "pending" | "running" | "complete" | "failed";
   progress: number;
   result: OptimizationResult | null;
   error: string | null;
@@ -35,7 +35,7 @@ export interface TokenUsage {
 
 export interface ResumeQualityScore {
   score: number;
-  level: 'Strong' | 'Average' | 'Needs Improvement';
+  level: "Strong" | "Average" | "Needs Improvement";
   issues: string[];
   strengths: string[];
 }
@@ -44,7 +44,7 @@ export interface ComprehensiveFeedback {
   overall_score: number;
   ats_score: number;
   quality_score: number | null;
-  level: 'Excellent' | 'Good' | 'Average' | 'Needs Improvement';
+  level: "Excellent" | "Good" | "Average" | "Needs Improvement";
   feedback: {
     ats_feedback: string;
     quality_feedback: string;
@@ -165,7 +165,7 @@ export interface ChangeHighlight {
   field: string;
   original: string | string[] | null;
   optimized: string | string[] | null;
-  changeType: 'added' | 'removed' | 'modified' | 'reordered';
+  changeType: "added" | "removed" | "modified" | "reordered";
   location?: { index?: number; line?: number };
 }
 
@@ -214,7 +214,7 @@ export interface SectionAnalysisResult {
 }
 
 export interface SectionAnalysis {
-  status: 'good' | 'needs_improvement' | 'poor';
+  status: "good" | "needs_improvement" | "poor";
   issues: SectionIssue[];
   score: number;
   summary: string;
@@ -229,7 +229,7 @@ export interface SkillsSectionAnalysis extends SectionAnalysis {
 }
 
 export interface WorkExperienceSectionAnalysis {
-  status: 'good' | 'needs_improvement' | 'poor';
+  status: "good" | "needs_improvement" | "poor";
   overall_score: number;
   summary: string;
   jobs: WorkExperienceJobAnalysis[];
@@ -238,14 +238,14 @@ export interface WorkExperienceSectionAnalysis {
 export interface WorkExperienceJobAnalysis {
   company: string;
   title: string;
-  status: 'good' | 'needs_improvement' | 'poor';
+  status: "good" | "needs_improvement" | "poor";
   score: number;
   issues: SectionIssue[];
 }
 
 export interface SectionIssue {
-  type: 'error' | 'warning' | 'suggestion' | 'missing' | 'ats_optimization';
-  severity: 'critical' | 'high' | 'medium' | 'low';
+  type: "error" | "warning" | "suggestion" | "missing" | "ats_optimization";
+  severity: "critical" | "high" | "medium" | "low";
   title: string;
   description: string;
   location: string;
@@ -257,6 +257,5 @@ export interface SectionIssue {
 export interface PriorityAction {
   section: string;
   action: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
 }
-

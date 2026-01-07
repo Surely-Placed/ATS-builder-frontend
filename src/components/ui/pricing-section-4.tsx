@@ -11,8 +11,7 @@ import { SpotlightHeading } from "@/components/ui/spotlight-heading";
 const plans = [
   {
     name: "Starter",
-    description:
-      "Perfect for individuals getting started with AI resume optimization",
+    description: "Perfect for individuals getting started with AI resume optimization",
     price: 19,
     yearlyPrice: 15,
     buttonText: "Get started",
@@ -28,8 +27,7 @@ const plans = [
   },
   {
     name: "Professional",
-    description:
-      "Best for serious job seekers who need advanced features and unlimited access",
+    description: "Best for serious job seekers who need advanced features and unlimited access",
     price: 49,
     yearlyPrice: 39,
     buttonText: "Start Free Trial",
@@ -48,8 +46,7 @@ const plans = [
   },
   {
     name: "Enterprise",
-    description:
-      "Advanced plan for teams and agencies with custom needs and unlimited access",
+    description: "Advanced plan for teams and agencies with custom needs and unlimited access",
     price: 99,
     yearlyPrice: 79,
     buttonText: "Contact Sales",
@@ -137,8 +134,7 @@ export default function PricingSection4() {
     },
   };
 
-  const togglePricingPeriod = (value: string) =>
-    setIsYearly(Number.parseInt(value) === 1);
+  const togglePricingPeriod = (value: string) => setIsYearly(Number.parseInt(value) === 1);
 
   return (
     <div
@@ -219,8 +215,8 @@ export default function PricingSection4() {
           customVariants={revealVariants}
           className="text-gray-600 dark:text-gray-300"
         >
-          Trusted by millions. We help teams all around the world. Explore which
-          option is right for you.
+          Trusted by millions. We help teams all around the world. Explore which option is right for
+          you.
         </TimelineContent>
 
         <TimelineContent
@@ -234,7 +230,8 @@ export default function PricingSection4() {
       </article>
 
       {/* Radial gradient effect - dark mode only */}
-      <div className="absolute top-0 left-[10%] right-[10%] w-[80%] h-full z-0 dark:block hidden"
+      <div
+        className="absolute top-0 left-[10%] right-[10%] w-[80%] h-full z-0 dark:block hidden"
         style={{
           backgroundImage: `radial-gradient(circle at center, #206ce8 0%, transparent 70%)`,
           opacity: 0.6,
@@ -299,10 +296,7 @@ export default function PricingSection4() {
                   </h4>
                   <ul className="space-y-2">
                     {plan.includes.slice(1).map((feature, featureIndex) => (
-                      <li
-                        key={featureIndex}
-                        className="flex items-center gap-2"
-                      >
+                      <li key={featureIndex} className="flex items-center gap-2">
                         <span className="h-2.5 w-2.5 bg-gray-400 dark:bg-neutral-500 rounded-full grid place-content-center"></span>
                         <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
                       </li>

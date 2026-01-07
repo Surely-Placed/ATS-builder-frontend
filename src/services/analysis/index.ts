@@ -1,6 +1,6 @@
 /**
  * Analysis API Service - Modular exports
- * 
+ *
  * This module provides a modular structure for analysis-related API operations:
  * - AnalysisService: Resume analysis operations
  * - OptimizationService: Resume optimization operations
@@ -9,26 +9,26 @@
  */
 
 // Re-export all types
-export * from './types';
+export * from "./types";
 
 // Re-export all services
-export { AnalysisService } from './analysisService';
-export { OptimizationService } from './optimizationService';
-export { DownloadService } from './downloadService';
-export { PreviewService } from './previewService';
+export { AnalysisService } from "./analysisService";
+export { OptimizationService } from "./optimizationService";
+export { DownloadService } from "./downloadService";
+export { PreviewService } from "./previewService";
 
 // Main service class that combines all services (for backward compatibility)
-import { AnalysisService } from './analysisService';
-import { OptimizationService } from './optimizationService';
-import { DownloadService } from './downloadService';
-import { PreviewService } from './previewService';
+import { AnalysisService } from "./analysisService";
+import { OptimizationService } from "./optimizationService";
+import { DownloadService } from "./downloadService";
+import { PreviewService } from "./previewService";
 import type {
   StartAnalysisRequest,
   AnalysisResult,
   OptimizationJobResponse,
   JobStatusResponse,
   PreviewResponse,
-} from './types';
+} from "./types";
 
 export class AnalysisApiService {
   static analyzeResume = AnalysisService.analyzeResume;
@@ -42,4 +42,3 @@ export class AnalysisApiService {
 }
 
 export default AnalysisApiService;
-

@@ -1,11 +1,10 @@
-import React from 'react';
-import { AnalysisResult, OptimizationResult } from '@/services/analysisApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Download, TrendingUp, AlertCircle, Eye, Loader2 } from 'lucide-react';
-import { getDisplayScores, formatScore, formatImprovement } from '@/utils/scoreUtils';
-import './ComparisonView.css';
+import { AnalysisResult, OptimizationResult } from "@/services/analysisApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Download, TrendingUp, AlertCircle, Eye, Loader2 } from "lucide-react";
+import { getDisplayScores, formatScore, formatImprovement } from "@/utils/scoreUtils";
+import "./ComparisonView.css";
 
 interface ComparisonViewProps {
   originalAnalysis: AnalysisResult;
@@ -28,9 +27,15 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 }) => {
   // Use display scores from original analysis (before optimization)
   const { scoreBefore } = getDisplayScores(originalAnalysis);
-  
+
   // Use display scores from optimized result (after optimization)
   const { scoreAfter, improvement } = getDisplayScores(optimizedResult);
+
+  const finalAudit = optimizedResult.final_audit;
+  const improvementsMade = finalAudit?.improvements_made ?? [];
+  const finalRecommendations = finalAudit?.final_recommendations ?? [];
+  const qualityScore =
+    finalAudit?.quality_score != null ? finalAudit.quality_score : (scoreAfter ?? null);
 
   return (
     <div className="comparison-view">
@@ -50,14 +55,14 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
               <div className="score-value">{scoreBefore}</div>
               <div className="score-label">ATS Score</div>
             </div>
-            
+
             <div className="score-arrow">
               <TrendingUp className="w-8 h-8" />
             </div>
-            
+
             <div className="score-card after">
               <h3>After Optimization</h3>
-              <div className="score-value">{scoreAfter ?? 'N/A'}</div>
+              <div className="score-value">{scoreAfter ?? "N/A"}</div>
               <div className="score-label">ATS Score</div>
               {improvement !== null && (
                 <div className="score-improvement">
@@ -70,17 +75,17 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
       </Card>
 
       {/* Improvements Made */}
-      {optimizedResult.final_audit?.improvements_made && optimizedResult.final_audit.improvements_made.length > 0 && (
+      {improvementsMade.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Key Improvements Made</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="improvements-list">
-              {optimizedResult.final_audit.improvements_made.map((improvement, idx) => (
-                <li key={idx} className="flex items-start gap-2">
+              {improvementsMade.map((text, idx) => (
+                <li key={`${idx}-${text}`} className="flex items-start gap-2">
                   <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>{improvement}</span>
+                  <span>{text}</span>
                 </li>
               ))}
             </ul>
@@ -89,7 +94,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
       )}
 
       {/* Final Audit */}
-      {optimizedResult.final_audit && (
+      {finalAudit && (
         <Card>
           <CardHeader>
             <CardTitle>Final Quality Check</CardTitle>
@@ -97,27 +102,24 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
           <CardContent>
             <div className="audit-grid">
               <div className="audit-item">
-                <strong>Quality Score:</strong>{' '}
-                {optimizedResult.final_audit.quality_score != null 
-                  ? formatScore(optimizedResult.final_audit.quality_score)
-                  : formatScore(scoreAfter)}
+                <strong>Quality Score:</strong> {formatScore(qualityScore)}
               </div>
               <div className="audit-item">
-                <strong>Ready for Submission:</strong>{' '}
+                <strong>Ready for Submission:</strong>{" "}
                 <Badge variant="default" className="bg-green-500">
                   ✅ Yes
                 </Badge>
               </div>
             </div>
-            
-            {optimizedResult.final_audit.final_recommendations && optimizedResult.final_audit.final_recommendations.length > 0 && (
+
+            {finalRecommendations.length > 0 && (
               <div className="final-recommendations">
                 <h3>Final Recommendations</h3>
                 <ul className="space-y-2">
-                  {optimizedResult.final_audit.final_recommendations.map((rec, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
+                  {finalRecommendations.map((text, idx) => (
+                    <li key={`${idx}-${text}`} className="flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span>{rec}</span>
+                      <span>{text}</span>
                     </li>
                   ))}
                 </ul>
@@ -133,10 +135,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
           <div className="text-center space-y-4">
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               {onPreview && (
-                <Button 
-                  onClick={onPreview} 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  onClick={onPreview}
+                  size="lg"
+                  variant="outline"
                   className="btn-preview"
                   disabled={isPreviewLoading}
                 >
@@ -153,9 +155,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   )}
                 </Button>
               )}
-              <Button 
-                onClick={onDownload} 
-                size="lg" 
+              <Button
+                onClick={onDownload}
+                size="lg"
                 className="btn-download"
                 disabled={isDownloadLoading}
               >
@@ -173,7 +175,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
               </Button>
             </div>
             <p className="download-note">
-              Your optimized resume is ready! Preview the changes or download the PDF for your job applications.
+              Your optimized resume is ready! Preview the changes or download the PDF for your job
+              applications.
             </p>
           </div>
         </CardContent>
@@ -183,4 +186,3 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 };
 
 export default ComparisonView;
-

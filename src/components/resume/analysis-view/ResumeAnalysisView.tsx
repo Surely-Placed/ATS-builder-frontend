@@ -1,12 +1,12 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { AnalysisResult } from '@/services/analysisApi';
-import { getDisplayScores } from '@/utils/scoreUtils';
-import { ResumeQualityFeedback } from '@/components/analysis/ResumeQualityFeedback';
-import { ScoreCard } from '../ScoreCard';
-import { BreakdownCards } from '../BreakdownCards';
-import { AIInsights } from '../AIInsights';
-import { OptimizeButton } from '../OptimizeButton';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { AnalysisResult } from "@/services/analysisApi";
+import { getDisplayScores } from "@/utils/scoreUtils";
+import { ResumeQualityFeedback } from "@/components/analysis/ResumeQualityFeedback";
+import { ScoreCard } from "../ScoreCard";
+import { BreakdownCards } from "../BreakdownCards";
+import { AIInsights } from "../AIInsights";
+import { OptimizeButton } from "../OptimizeButton";
 
 interface ResumeAnalysisViewProps {
   analysisResult: AnalysisResult;
@@ -68,4 +68,3 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
     </div>
   );
 };
-

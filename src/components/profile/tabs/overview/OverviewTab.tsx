@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { StatsGrid } from './StatsGrid';
-import { RecentAnalyses } from './RecentAnalyses';
-import { AccountInfoCard } from './AccountInfoCard';
-import { SubscriptionCard } from './SubscriptionCard';
-import type { AccountStats, RecentAnalysis, Subscription } from '@/types/profile/overview';
+import { useState } from "react";
+import { StatsGrid } from "./StatsGrid";
+import { RecentAnalyses } from "./RecentAnalyses";
+import { AccountInfoCard } from "./AccountInfoCard";
+import { SubscriptionCard } from "./SubscriptionCard";
+import type { AccountStats, RecentAnalysis, Subscription } from "@/types/profile/overview";
 
 interface OverviewTabProps {
   stats: AccountStats | null;
@@ -12,7 +12,7 @@ interface OverviewTabProps {
 }
 
 export const OverviewTab = ({ stats, recentAnalyses, subscription }: OverviewTabProps) => {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState("All");
 
   return (
     <div className="space-y-8 pl-0 pr-0">
@@ -37,4 +37,3 @@ export const OverviewTab = ({ stats, recentAnalyses, subscription }: OverviewTab
     </div>
   );
 };
-

@@ -6,7 +6,7 @@ export interface ImageOptimizationOptions {
   width?: number;
   height?: number;
   quality?: number;
-  format?: 'webp' | 'avif' | 'jpg' | 'png';
+  format?: "webp" | "avif" | "jpg" | "png";
 }
 
 /**
@@ -16,15 +16,15 @@ export const getOptimizedImageUrl = (
   src: string,
   options: ImageOptimizationOptions = {}
 ): string => {
-  const { width, height, quality = 80, format = 'webp' } = options;
-  
+  const { width, height, quality = 80, format = "webp" } = options;
+
   // If using a CDN or image optimization service, add parameters
   // For now, return original src (can be extended with Cloudinary, Imgix, etc.)
-  if (src.startsWith('http') && (width || height || quality !== 80)) {
+  if (src.startsWith("http") && (width || height || quality !== 80)) {
     // Example for Cloudinary: return `${src}?w=${width}&h=${height}&q=${quality}&f=${format}`;
     // Example for Imgix: return `${src}?w=${width}&h=${height}&q=${quality}&fm=${format}`;
   }
-  
+
   return src;
 };
 
@@ -34,27 +34,23 @@ export const getOptimizedImageUrl = (
 export const generateSrcSet = (
   baseSrc: string,
   sizes: number[],
-  options: Omit<ImageOptimizationOptions, 'width'> = {}
+  options: Omit<ImageOptimizationOptions, "width"> = {}
 ): string => {
   return sizes
     .map((size) => {
       const url = getOptimizedImageUrl(baseSrc, { ...options, width: size });
       return `${url} ${size}w`;
     })
-    .join(', ');
+    .join(", ");
 };
 
 /**
  * Lazy load image with intersection observer
  */
-export const lazyLoadImage = (
-  img: HTMLImageElement,
-  src: string,
-  placeholder?: string
-): void => {
-  if ('loading' in HTMLImageElement.prototype) {
+export const lazyLoadImage = (img: HTMLImageElement, src: string, placeholder?: string): void => {
+  if ("loading" in HTMLImageElement.prototype) {
     // Native lazy loading supported
-    img.loading = 'lazy';
+    img.loading = "lazy";
     img.src = src;
     if (placeholder) {
       img.src = placeholder;
@@ -74,9 +70,9 @@ export const lazyLoadImage = (
           }
         });
       },
-      { rootMargin: '50px' }
+      { rootMargin: "50px" }
     );
-    
+
     if (placeholder) {
       img.src = placeholder;
     }
@@ -89,15 +85,12 @@ export const lazyLoadImage = (
  */
 export const preloadImage = (src: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
     link.href = src;
     link.onload = () => resolve();
     link.onerror = () => reject(new Error(`Failed to preload image: ${src}`));
     document.head.appendChild(link);
   });
 };
-
-
-

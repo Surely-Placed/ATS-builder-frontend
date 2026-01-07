@@ -1,12 +1,12 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ProgressTracker } from '../analysis/ProgressTracker';
-import { X } from 'lucide-react';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { ProgressTracker } from "../analysis/ProgressTracker";
+import { X } from "lucide-react";
 
 interface ResumeOptimizingViewProps {
   analysisId: string;
   progress: number;
-  status: 'pending' | 'running' | 'complete' | 'failed';
+  status: "pending" | "running" | "complete" | "failed";
   error: string | undefined;
   onReset: () => void;
   onComplete: (result: any) => void;
@@ -25,12 +25,7 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
   return (
     <div className="resume-analysis-flow relative w-full">
       {/* Reset Button - Top Right */}
-      <Button 
-        onClick={onReset}
-        variant="outline"
-        size="sm"
-        className="absolute top-0 right-0 z-10"
-      >
+      <Button onClick={onReset} variant="outline" size="sm" className="absolute top-0 right-0 z-10">
         <X className="w-4 h-4 mr-2" />
         Reset
       </Button>
@@ -48,11 +43,7 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
           onError={onError}
         />
         {error && (
-          <Button 
-            onClick={onReset} 
-            variant="outline" 
-            className="mt-4 w-full"
-          >
+          <Button onClick={onReset} variant="outline" className="mt-4 w-full">
             ← Go Back to Analysis
           </Button>
         )}
@@ -60,8 +51,3 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
     </div>
   );
 };
-
-
-
-
-

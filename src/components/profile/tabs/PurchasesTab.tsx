@@ -24,12 +24,8 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
       pending: "secondary",
       failed: "destructive",
     };
-    
-    return (
-      <Badge variant={variants[status] || "secondary"}>
-        {status}
-      </Badge>
-    );
+
+    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
   };
 
   return (
@@ -41,11 +37,21 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
               <table className="w-full">
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Plan</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Plan
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -55,17 +61,15 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
                         {new Date(tx.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm capitalize">
-                        {tx.transaction_type.replace('_', ' ')}
+                        {tx.transaction_type.replace("_", " ")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm capitalize">
-                        {tx.plan || '-'}
+                        {tx.plan || "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         ${tx.amount.toFixed(2)} {tx.currency}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(tx.status)}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(tx.status)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -84,4 +88,3 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
     </div>
   );
 };
-

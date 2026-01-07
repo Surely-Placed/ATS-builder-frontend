@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Mail, Loader2, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -13,7 +19,11 @@ interface ForgotPasswordModalProps {
   onBackToLogin: () => void;
 }
 
-export function ForgotPasswordModal({ open, onOpenChange, onBackToLogin }: ForgotPasswordModalProps) {
+export function ForgotPasswordModal({
+  open,
+  onOpenChange,
+  onBackToLogin,
+}: ForgotPasswordModalProps) {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { resetPassword } = useAuth();
@@ -25,19 +35,19 @@ export function ForgotPasswordModal({ open, onOpenChange, onBackToLogin }: Forgo
     try {
       await resetPassword(email);
       toast({
-        title: 'Success!',
-        description: 'Password reset email sent! Check your inbox.',
+        title: "Success!",
+        description: "Password reset email sent! Check your inbox.",
       });
-      setEmail('');
+      setEmail("");
       setTimeout(() => {
         onOpenChange(false);
         onBackToLogin();
       }, 1500);
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to send reset email',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to send reset email",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -49,9 +59,7 @@ export function ForgotPasswordModal({ open, onOpenChange, onBackToLogin }: Forgo
       <DialogContent className="sm:max-w-md">
         <div className="relative z-10">
           <DialogHeader className="space-y-3 mb-8">
-            <DialogTitle className="text-2xl font-bold text-center">
-              Reset Password
-            </DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center">Reset Password</DialogTitle>
             <DialogDescription className="text-center text-sm text-muted-foreground">
               Enter your email address and we'll send you a reset link
             </DialogDescription>
@@ -91,7 +99,7 @@ export function ForgotPasswordModal({ open, onOpenChange, onBackToLogin }: Forgo
                   Sending...
                 </>
               ) : (
-                'Send Reset Link'
+                "Send Reset Link"
               )}
             </Button>
 

@@ -17,7 +17,7 @@ export const HeaderActions = ({
   showThemeToggle = true,
   showProfileDropdown = true,
   themeToggleVariant = "toggle",
-  className = ""
+  className = "",
 }: HeaderActionsProps) => {
   const { user } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
@@ -62,7 +62,3 @@ export const HeaderActions = ({
     </div>
   );
 };
-
-
-
-

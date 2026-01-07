@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Mail, Lock, Loader2, UserPlus, Eye, EyeOff, Check, X, User } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -40,21 +46,26 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: 'Error',
-        description: 'Passwords do not match',
-        variant: 'destructive',
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
       });
       return;
     }
-    
-    if (!passwordValidations.length || !passwordValidations.uppercase || !passwordValidations.lowercase || !passwordValidations.number) {
+
+    if (
+      !passwordValidations.length ||
+      !passwordValidations.uppercase ||
+      !passwordValidations.lowercase ||
+      !passwordValidations.number
+    ) {
       toast({
-        title: 'Error',
-        description: 'Password must meet all requirements',
-        variant: 'destructive',
+        title: "Error",
+        description: "Password must meet all requirements",
+        variant: "destructive",
       });
       return;
     }
@@ -62,28 +73,28 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
     setIsLoading(true);
     try {
       const result = await signup(formData.name, formData.email, formData.password);
-      
+
       if (result.requiresVerification) {
         toast({
-          title: 'Verification Required',
-          description: result.message || 'Please check your email to verify your account.',
+          title: "Verification Required",
+          description: result.message || "Please check your email to verify your account.",
           duration: 6000,
         });
         onOpenChange(false);
         onSwitchToLogin();
       } else {
         toast({
-          title: 'Success!',
-          description: 'Account created successfully',
+          title: "Success!",
+          description: "Account created successfully",
         });
         onOpenChange(false);
-        navigate('/');
+        navigate("/");
       }
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Signup failed',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Signup failed",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -95,18 +106,18 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
     try {
       await googleSignIn();
       toast({
-        title: 'Success!',
-        description: 'Signed up with Google',
+        title: "Success!",
+        description: "Signed up with Google",
       });
       onOpenChange(false);
       // Small delay to ensure cookie is set before navigating
-      await new Promise(resolve => setTimeout(resolve, 300));
-      navigate('/dashboard');
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      navigate("/dashboard");
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Google sign-up failed',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Google sign-up failed",
+        variant: "destructive",
       });
     } finally {
       setGoogleLoading(false);
@@ -125,9 +136,7 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
       <DialogContent className="sm:max-w-md">
         <div className="relative z-10">
           <DialogHeader className="space-y-3 mb-8">
-            <DialogTitle className="text-2xl font-bold text-center">
-              Create Account
-            </DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center">Create Account</DialogTitle>
             <DialogDescription className="text-center text-sm text-muted-foreground">
               Sign up to start optimizing your resume with AI
             </DialogDescription>
@@ -212,20 +221,44 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
               </div>
               {formData.password.length > 0 && (
                 <div className="mt-2 space-y-1 text-xs">
-                  <div className={`flex items-center gap-2 ${passwordValidations.length ? 'text-green-600' : 'text-muted-foreground'}`}>
-                    {passwordValidations.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  <div
+                    className={`flex items-center gap-2 ${passwordValidations.length ? "text-green-600" : "text-muted-foreground"}`}
+                  >
+                    {passwordValidations.length ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <X className="w-3 h-3" />
+                    )}
                     <span>At least 8 characters</span>
                   </div>
-                  <div className={`flex items-center gap-2 ${passwordValidations.uppercase ? 'text-green-600' : 'text-muted-foreground'}`}>
-                    {passwordValidations.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  <div
+                    className={`flex items-center gap-2 ${passwordValidations.uppercase ? "text-green-600" : "text-muted-foreground"}`}
+                  >
+                    {passwordValidations.uppercase ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <X className="w-3 h-3" />
+                    )}
                     <span>One uppercase letter</span>
                   </div>
-                  <div className={`flex items-center gap-2 ${passwordValidations.lowercase ? 'text-green-600' : 'text-muted-foreground'}`}>
-                    {passwordValidations.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  <div
+                    className={`flex items-center gap-2 ${passwordValidations.lowercase ? "text-green-600" : "text-muted-foreground"}`}
+                  >
+                    {passwordValidations.lowercase ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <X className="w-3 h-3" />
+                    )}
                     <span>One lowercase letter</span>
                   </div>
-                  <div className={`flex items-center gap-2 ${passwordValidations.number ? 'text-green-600' : 'text-muted-foreground'}`}>
-                    {passwordValidations.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                  <div
+                    className={`flex items-center gap-2 ${passwordValidations.number ? "text-green-600" : "text-muted-foreground"}`}
+                  >
+                    {passwordValidations.number ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <X className="w-3 h-3" />
+                    )}
                     <span>One number</span>
                   </div>
                 </div>
@@ -257,13 +290,25 @@ export function SignupModal({ open, onOpenChange, onSwitchToLogin }: SignupModal
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
               {formData.confirmPassword.length > 0 && (
-                <div className={`mt-1 text-xs flex items-center gap-2 ${passwordValidations.match ? 'text-green-600' : 'text-destructive'}`}>
-                  {passwordValidations.match ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                  <span>{passwordValidations.match ? 'Passwords match' : 'Passwords do not match'}</span>
+                <div
+                  className={`mt-1 text-xs flex items-center gap-2 ${passwordValidations.match ? "text-green-600" : "text-destructive"}`}
+                >
+                  {passwordValidations.match ? (
+                    <Check className="w-3 h-3" />
+                  ) : (
+                    <X className="w-3 h-3" />
+                  )}
+                  <span>
+                    {passwordValidations.match ? "Passwords match" : "Passwords do not match"}
+                  </span>
                 </div>
               )}
             </div>

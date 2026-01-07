@@ -15,7 +15,7 @@ const BrandsSection = () => {
         >
           <SpotlightHeading className="w-full">
             <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2 flex flex-wrap justify-center">
-              {"Trusted by Professionals".split(' ').map((word, index) => (
+              {"Trusted by Professionals".split(" ").map((word, index) => (
                 <motion.span
                   key={index}
                   initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
@@ -24,7 +24,7 @@ const BrandsSection = () => {
                   transition={{
                     duration: 0.5,
                     delay: index * 0.1,
-                    ease: [0.25, 0.4, 0.25, 1]
+                    ease: [0.25, 0.4, 0.25, 1],
                   }}
                   className={index === 2 ? "text-gradient mr-2" : "mr-2"}
                 >

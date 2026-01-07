@@ -47,9 +47,7 @@ const TrustSection = () => {
             { value: "4.9★", label: "User Rating" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-3xl lg:text-4xl font-bold text-primary mb-2">
-                {stat.value}
-              </div>
+              <div className="text-3xl lg:text-4xl font-bold text-primary mb-2">{stat.value}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </div>
           ))}

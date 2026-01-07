@@ -1,9 +1,6 @@
-import { AnalysisResult } from '@/services/analysisApi';
+import { AnalysisResult } from "@/services/analysisApi";
 
-export function constructFallbackResult(
-  result: any,
-  jobTitle: string = ''
-): AnalysisResult {
+export function constructFallbackResult(result: any, jobTitle: string = ""): AnalysisResult {
   return {
     analysis: {
       id: result.id,
@@ -15,19 +12,19 @@ export function constructFallbackResult(
     },
     job: result.job || {
       id: result.job_id,
-      title: jobTitle || '',
-      company: '',
-      location: '',
+      title: jobTitle || "",
+      company: "",
+      location: "",
       extracted_data: {},
     },
     original_resume: result.original_resume || {
-      file_url: '',
+      file_url: "",
       structured_data: {},
     },
     ats_analysis: result.ats_analysis || {
       before: {
         score: result.ats_score_before || 0,
-        label: '',
+        label: "",
         breakdown: {
           keyword_match: 0,
           experience_relevance: 0,
@@ -47,7 +44,6 @@ export function constructFallbackResult(
     resume_quality: null,
     comprehensive_feedback: null,
     optimized_resume: null,
-    note: '',
+    note: "",
   };
 }
-

@@ -31,12 +31,12 @@ const Footer = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      
+
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         {/* Main Footer Content */}
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -52,30 +52,39 @@ const Footer = () => {
               </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Transform your career with AI-powered resume optimization. Get past ATS systems and land your dream job faster.
+              Transform your career with AI-powered resume optimization. Get past ATS systems and
+              land your dream job faster.
             </p>
-            
+
             {/* Contact Info */}
             <div className="space-y-3">
-              <a href="mailto:support@resumeai.com" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group">
+              <a
+                href="mailto:hr@ssggetjob.com"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+              >
                 <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Mail className="w-4 h-4" />
                 </div>
-                support@resumeai.com
+                hr@ssggetjob.com
               </a>
-              <a href="tel:+15551234567" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group">
+              <a
+                href="tel:+919987815794"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+              >
                 <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Phone className="w-4 h-4" />
                 </div>
-                +1 (555) 123-4567
+                +91 9987815794
               </a>
               <div className="flex items-start gap-2 text-sm text-muted-foreground">
                 <div className="p-1.5 rounded-lg bg-primary/10 mt-0.5">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  Gandhinagar, Gujarat, India<br />
-                  Salt Lake City, Utah, USA<br />
+                  Gandhinagar, Gujarat, India
+                  <br />
+                  Salt Lake City, Utah, USA
+                  <br />
                   IFZA Business Park, Dubai, UAE
                 </div>
               </div>
@@ -130,7 +139,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -144,7 +153,7 @@ const Footer = () => {
             </p>
 
             {/* Social Links */}
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
                 <motion.a
                   key={social.label}
@@ -157,7 +166,7 @@ const Footer = () => {
                   <social.icon className="w-4 h-4" />
                 </motion.a>
               ))}
-            </div>
+            </div> */}
           </div>
         </motion.div>
       </div>

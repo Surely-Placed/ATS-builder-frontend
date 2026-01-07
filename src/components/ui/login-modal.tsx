@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Loader2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
@@ -16,7 +22,12 @@ interface LoginModalProps {
   onSwitchToForgotPassword?: () => void;
 }
 
-export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToForgotPassword }: LoginModalProps) {
+export function LoginModal({
+  open,
+  onOpenChange,
+  onSwitchToSignup,
+  onSwitchToForgotPassword,
+}: LoginModalProps) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,26 +49,26 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
     try {
       await login(formData.email, formData.password);
       toast({
-        title: 'Success!',
-        description: 'Logged in successfully',
+        title: "Success!",
+        description: "Logged in successfully",
       });
       onOpenChange(false);
       // Small delay to ensure cookie is set before navigating
       // This is especially important for cross-origin requests (Firebase Hosting -> Fly.dev)
-      await new Promise(resolve => setTimeout(resolve, 300));
-      navigate('/dashboard');
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      navigate("/dashboard");
     } catch (err: any) {
-      const isVerificationError = err.message?.includes('verify your email') || 
-                                   err.message?.includes('EMAIL_NOT_VERIFIED');
-      
+      const isVerificationError =
+        err.message?.includes("verify your email") || err.message?.includes("EMAIL_NOT_VERIFIED");
+
       if (isVerificationError) {
         setShowResendVerification(true);
       }
-      
+
       toast({
-        title: 'Error',
-        description: err.message || 'Login failed',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Login failed",
+        variant: "destructive",
         duration: isVerificationError ? 6000 : 3000,
       });
     } finally {
@@ -70,16 +81,16 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
     try {
       await resendVerificationEmail();
       toast({
-        title: 'Email Sent',
-        description: 'Verification email sent! Please check your inbox.',
+        title: "Email Sent",
+        description: "Verification email sent! Please check your inbox.",
         duration: 5000,
       });
       setShowResendVerification(false);
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Failed to send verification email',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Failed to send verification email",
+        variant: "destructive",
       });
     } finally {
       setResendingVerification(false);
@@ -91,18 +102,18 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
     try {
       await googleSignIn();
       toast({
-        title: 'Success!',
-        description: 'Logged in with Google',
+        title: "Success!",
+        description: "Logged in with Google",
       });
       onOpenChange(false);
       // Small delay to ensure cookie is set before navigating
-      await new Promise(resolve => setTimeout(resolve, 300));
-      navigate('/dashboard');
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      navigate("/dashboard");
     } catch (err: any) {
       toast({
-        title: 'Error',
-        description: err.message || 'Google sign-in failed',
-        variant: 'destructive',
+        title: "Error",
+        description: err.message || "Google sign-in failed",
+        variant: "destructive",
       });
     } finally {
       setGoogleLoading(false);
@@ -121,9 +132,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
       <DialogContent className="sm:max-w-md">
         <div className="relative z-10">
           <DialogHeader className="space-y-3 mb-8">
-            <DialogTitle className="text-2xl font-bold text-center">
-              Welcome Back
-            </DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center">Welcome Back</DialogTitle>
             <DialogDescription className="text-center text-sm text-muted-foreground">
               Sign in to optimize your resume with AI
             </DialogDescription>
@@ -216,7 +225,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToSignup, onSwitchToFor
                       Sending...
                     </>
                   ) : (
-                    'Resend Verification Email'
+                    "Resend Verification Email"
                   )}
                 </Button>
               </div>

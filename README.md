@@ -10,30 +10,35 @@ An intelligent web application that helps job seekers optimize their resumes for
 ## ✨ Features
 
 ### 🔍 Resume Analysis
+
 - **ATS Score Calculation**: Get real-time ATS compatibility scores before and after optimization
 - **Section-by-Section Analysis**: Detailed feedback on each resume section (skills, experience, summary, etc.)
 - **Keyword Alignment**: Identify missing or misaligned keywords for target job descriptions
 - **Quality Metrics**: Comprehensive scoring for content quality, structure, and formatting
 
 ### 🤖 AI-Powered Optimization
+
 - **Automatic Improvements**: AI suggests and implements improvements to boost ATS scores
 - **Real-time Processing**: WebSocket-based real-time optimization status updates
 - **Smart Recommendations**: Get actionable suggestions for enhancing your resume
 - **Content Enhancement**: Improve bullet points, summaries, and skill descriptions
 
 ### 📄 Resume Preview & Download
+
 - **Side-by-Side Comparison**: Compare original and optimized resumes with highlighted changes
 - **Change Tracking**: See exactly what changed with color-coded modifications
 - **PDF Generation**: Download professionally formatted PDF resumes
 - **Export Options**: Multiple export formats for different application systems
 
 ### 👤 User Management
+
 - **Firebase Authentication**: Secure user registration and login
 - **Dashboard**: Track your resume optimization history and statistics
 - **Document Management**: Organize and manage multiple resume versions
 - **Email Verification**: Secure email verification process
 
 ### 🎨 Modern UI/UX
+
 - **Dark Mode Support**: Beautiful dark and light themes
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 - **Smooth Animations**: Engaging animations and transitions
@@ -42,6 +47,7 @@ An intelligent web application that helps job seekers optimize their resumes for
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 18.3.1** - UI library
 - **TypeScript 5.8.3** - Type safety
 - **Vite 5.4.19** - Build tool and dev server
@@ -51,18 +57,22 @@ An intelligent web application that helps job seekers optimize their resumes for
 - **Framer Motion 12.23.26** - Animations
 
 ### State Management & Data Fetching
+
 - **TanStack Query 5.83.0** - Server state management
 - **React Hook Form 7.61.1** - Form handling
 - **Zod 3.25.76** - Schema validation
 
 ### Backend Integration
+
 - **Axios 1.13.2** - HTTP client
 - **Socket.IO Client 4.8.3** - Real-time WebSocket communication
 
 ### Authentication
+
 - **Firebase 12.7.0** - Authentication and user management
 
 ### Additional Libraries
+
 - **React Helmet Async 2.0.5** - SEO and meta tags
 - **Next Themes 0.3.0** - Theme management
 - **Canvas Confetti 1.9.4** - Celebration effects
@@ -119,13 +129,13 @@ The application will be available at `http://localhost:8080`
 
 ## 📜 Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server with hot-reload |
-| `npm run build` | Build production bundle |
-| `npm run build:dev` | Build development bundle |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint to check code quality |
+| Script              | Description                              |
+| ------------------- | ---------------------------------------- |
+| `npm run dev`       | Start development server with hot-reload |
+| `npm run build`     | Build production bundle                  |
+| `npm run build:dev` | Build development bundle                 |
+| `npm run preview`   | Preview production build locally         |
+| `npm run lint`      | Run ESLint to check code quality         |
 
 ## 📁 Project Structure
 
@@ -177,23 +187,27 @@ ai-resume-genius/
 The application communicates with a backend API for resume analysis and optimization. Key API endpoints include:
 
 ### Resume Analysis
+
 - `POST /api/analyze` - Submit resume for analysis
 - `GET /api/analyze/:analysisId` - Get analysis results
 - `GET /api/analyze/:analysisId/preview` - Get preview of changes
 - `POST /api/analyze/:analysisId/generate-pdf` - Generate optimized PDF
 
 ### Resume Management
+
 - `GET /api/resumes` - Get user's resumes
 - `GET /api/resumes/:id` - Get specific resume
 - `DELETE /api/resumes/:id` - Delete resume
 
 ### Authentication
+
 - Uses Firebase Authentication with JWT tokens
 - Tokens are stored in localStorage and sent in Authorization headers
 
 ## 🎯 Key Features Implementation
 
 ### Resume Analysis Flow
+
 1. **Upload**: User uploads resume file (PDF/DOCX)
 2. **Analysis**: Backend analyzes resume for ATS compatibility
 3. **Feedback**: Frontend displays detailed analysis with scores
@@ -202,11 +216,13 @@ The application communicates with a backend API for resume analysis and optimiza
 6. **Download**: User downloads optimized PDF
 
 ### Real-time Updates
+
 - Uses Socket.IO for real-time optimization status updates
 - Progress indicators show optimization progress
 - Toast notifications for status changes
 
 ### Score Display System
+
 - Centralized score utility (`scoreUtils.ts`) handles score mapping
 - Displays user-friendly score ranges (50-60 before, 80-90 after)
 - Shows improvement metrics and color-coded feedback
@@ -221,6 +237,7 @@ The project uses **shadcn/ui** components built on Radix UI primitives:
 - TypeScript support
 
 Key components:
+
 - Cards, Buttons, Forms, Dialogs, Toasts
 - Navigation menus, Dropdowns, Modals
 - Charts, Tables, Progress indicators
@@ -279,17 +296,20 @@ Contributions are welcome! Please follow these steps:
 ### Common Issues
 
 **Port already in use**
+
 ```bash
 # Change port in vite.config.ts or use:
 npm run dev -- --port 3000
 ```
 
 **Environment variables not loading**
+
 - Ensure `.env` file is in root directory
 - Restart dev server after adding new variables
 - Variables must start with `VITE_` to be exposed to client
 
 **Build errors**
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules package-lock.json
@@ -297,6 +317,7 @@ npm install
 ```
 
 **TypeScript errors**
+
 ```bash
 # Regenerate types
 npm run build

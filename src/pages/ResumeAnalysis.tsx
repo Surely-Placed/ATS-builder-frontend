@@ -11,9 +11,7 @@ export default function ResumeAnalysis() {
       <div className="space-y-4 sm:space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold mb-1">
-            Resume Analysis
-          </h1>
+          <h1 className="text-xl sm:text-2xl font-semibold mb-1">Resume Analysis</h1>
           <p className="text-muted-foreground text-xs sm:text-sm">
             Upload your resume and job posting to get AI-powered ATS analysis
           </p>
@@ -25,4 +23,3 @@ export default function ResumeAnalysis() {
     </DashboardLayout>
   );
 }
-

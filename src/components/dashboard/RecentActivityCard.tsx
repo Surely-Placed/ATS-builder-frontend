@@ -8,30 +8,32 @@ interface RecentActivityCardProps {
 }
 
 export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  const getStatusVariant = (
+    status: string
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status.toLowerCase()) {
-      case 'completed':
-      case 'complete':
-        return 'default';
-      case 'pending':
-        return 'secondary';
-      case 'processing':
-      case 'running':
-        return 'outline';
-      case 'failed':
-        return 'destructive';
+      case "completed":
+      case "complete":
+        return "default";
+      case "pending":
+        return "secondary";
+      case "processing":
+      case "running":
+        return "outline";
+      case "failed":
+        return "destructive";
       default:
-        return 'secondary';
+        return "secondary";
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -53,7 +55,7 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
               <span className="text-xs text-muted-foreground mb-1">Before</span>
               <span className="text-xl sm:text-2xl font-bold">{activity.atsScoreBefore}</span>
             </div>
-            
+
             {/* Show After score only if it exists (optimization completed) */}
             {activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined && (
               <>
@@ -64,7 +66,7 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
                     {activity.atsScoreAfter}
                   </span>
                 </div>
-                
+
                 {activity.scoreImprovement !== null && activity.scoreImprovement > 0 && (
                   <div className="ml-auto">
                     <Badge variant="default" className="bg-green-500 hover:bg-green-600">
@@ -86,4 +88,3 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
     </Card>
   );
 };
-

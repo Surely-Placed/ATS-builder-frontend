@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 interface ReleaseDialogProps {
   open: boolean;
@@ -22,17 +22,15 @@ export const ReleaseDialog = ({ open, onOpenChange, onConfirm }: ReleaseDialogPr
         <AlertDialogHeader>
           <AlertDialogTitle>Release Device?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to release this API key from its current device? It can then be used on another device.
+            Are you sure you want to release this API key from its current device? It can then be
+            used on another device.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
-            Release Device
-          </AlertDialogAction>
+          <AlertDialogAction onClick={onConfirm}>Release Device</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 };
-

@@ -1,12 +1,12 @@
 /**
  * FRONTEND SCORE DISPLAY FIX - Single File Solution
  * Copy this entire file to your frontend project
- * 
+ *
  * NEW SCORE RANGES:
  * - Before Optimization: 50-60 (shows room for improvement)
  * - After Optimization: 80-90 (shows successful optimization)
  * - Improvement: Typically 20-40 points (realistic improvement shown)
- * 
+ *
  * Usage: Replace all instances of data.analysis.ats_score_before/after with:
  * const { scoreBefore, scoreAfter, improvement } = getDisplayScores(data);
  */
@@ -59,12 +59,25 @@ export interface DisplayScores {
 export function getDisplayScores(data: ScoreData): DisplayScores {
   // Method 1: Use display scores from analysis object (preferred - NEW API)
   if (data.analysis?.display_score_before !== undefined) {
+    let scoreAfter = data.analysis.display_score_after ?? null;
+    let improvement = data.analysis.display_improvement ?? null;
+    const realScoreAfter = data.analysis.ats_score_after ?? undefined;
+
+    // If display_score_after is null but we have realScoreAfter, map it to display range
+    if (scoreAfter === null && realScoreAfter !== undefined && realScoreAfter !== null) {
+      scoreAfter = mapToAfterRange(realScoreAfter);
+      // Calculate improvement if we have scoreBefore
+      if (data.analysis.display_score_before !== undefined) {
+        improvement = scoreAfter - data.analysis.display_score_before;
+      }
+    }
+
     return {
       scoreBefore: data.analysis.display_score_before, // 50-60 range
-      scoreAfter: data.analysis.display_score_after ?? null, // 80-90 range
-      improvement: data.analysis.display_improvement ?? null, // 20-40 points
+      scoreAfter: scoreAfter, // 80-90 range (mapped if needed)
+      improvement: improvement, // Calculated if needed
       realScoreBefore: data.analysis.ats_score_before,
-      realScoreAfter: data.analysis.ats_score_after ?? undefined,
+      realScoreAfter: realScoreAfter,
     };
   }
 
@@ -73,7 +86,7 @@ export function getDisplayScores(data: ScoreData): DisplayScores {
     const scoreBefore = data.ats_analysis.before.score; // 50-60 range
     const scoreAfter = data.ats_analysis.after?.score ?? null; // 80-90 range
     const improvement = data.ats_analysis.after?.improvement ?? null; // 20-40 points
-    
+
     return {
       scoreBefore,
       scoreAfter,
@@ -89,16 +102,15 @@ export function getDisplayScores(data: ScoreData): DisplayScores {
   if (data.analysis?.ats_score_before !== undefined) {
     const realBefore = data.analysis.ats_score_before;
     const realAfter = data.analysis.ats_score_after ?? null;
-    
+
     // Use real scores directly - they might already be display scores
     // Only map if we're certain they're real scores (>= 80) and we need display scores
     const isRealScore = realBefore >= 80;
     const scoreBefore = isRealScore ? mapToBeforeRange(realBefore) : realBefore;
-    const scoreAfter = realAfter !== null 
-      ? (realAfter >= 80 ? mapToAfterRange(realAfter) : realAfter)
-      : null;
+    const scoreAfter =
+      realAfter !== null ? (realAfter >= 80 ? mapToAfterRange(realAfter) : realAfter) : null;
     const improvement = scoreAfter !== null ? scoreAfter - scoreBefore : null;
-    
+
     return {
       scoreBefore,
       scoreAfter,
@@ -125,7 +137,7 @@ function mapToBeforeRange(realScore: number): number {
   // This ensures the same real score always maps to the same display score
   const scoreHash = realScore % 10; // Use last digit for consistency
   const normalized = Math.max(realScore, 80);
-  
+
   if (normalized >= 95) {
     // 58-60 range, use scoreHash to pick consistently
     return 58 + (scoreHash % 3); // 58, 59, or 60
@@ -150,7 +162,7 @@ function mapToAfterRange(realScore: number): number {
   // Use deterministic mapping based on score hash to ensure consistency
   const scoreHash = realScore % 10; // Use last digit for consistency
   const normalized = Math.max(realScore, 80);
-  
+
   if (normalized >= 95) {
     // 88-90 range
     return 88 + (scoreHash % 3); // 88, 89, or 90
@@ -172,33 +184,33 @@ function mapToAfterRange(realScore: number): number {
 // ============================================================================
 
 export function formatScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return 'N/A';
+  if (score === null || score === undefined) return "N/A";
   return `${score}%`;
 }
 
 export function formatImprovement(improvement: number | null | undefined): string {
-  if (improvement === null || improvement === undefined) return 'N/A';
+  if (improvement === null || improvement === undefined) return "N/A";
   if (improvement > 0) return `+${improvement}`;
   return `${improvement}`;
 }
 
 export function getScoreColor(score: number): string {
-  if (score >= 95) return '#10b981'; // green-500
-  if (score >= 90) return '#3b82f6'; // blue-500
-  if (score >= 80) return '#f59e0b'; // amber-500
-  return '#ef4444'; // red-500
+  if (score >= 95) return "#10b981"; // green-500
+  if (score >= 90) return "#3b82f6"; // blue-500
+  if (score >= 80) return "#f59e0b"; // amber-500
+  return "#ef4444"; // red-500
 }
 
 export const getScoreLevel = (score: number): string => {
-  if (score >= 80) return 'excellent';
-  if (score >= 60) return 'good';
-  if (score >= 40) return 'fair';
-  return 'poor';
+  if (score >= 80) return "excellent";
+  if (score >= 60) return "good";
+  if (score >= 40) return "fair";
+  return "poor";
 };
 
 export const getBreakdownColorClass = (score: number): string => {
-  if (score >= 80) return 'excellent';
-  if (score >= 60) return 'good';
-  if (score >= 40) return 'fair';
-  return 'poor';
+  if (score >= 80) return "excellent";
+  if (score >= 60) return "good";
+  if (score >= 40) return "fair";
+  return "poor";
 };

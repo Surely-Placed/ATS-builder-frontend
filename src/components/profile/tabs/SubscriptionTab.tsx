@@ -45,8 +45,11 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
                 )}
                 <h3 className="font-semibold">Status</h3>
               </div>
-              <Badge variant={subscription.active ? "default" : "secondary"} className="text-base px-3 py-1">
-                {subscription.active ? 'Active' : 'Inactive'}
+              <Badge
+                variant={subscription.active ? "default" : "secondary"}
+                className="text-base px-3 py-1"
+              >
+                {subscription.active ? "Active" : "Inactive"}
               </Badge>
             </CardContent>
           </Card>
@@ -59,10 +62,10 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
                   <h3 className="font-semibold">Expires</h3>
                 </div>
                 <p className="text-lg font-semibold">
-                  {new Date(subscription.endDate).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {new Date(subscription.endDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </p>
               </CardContent>
@@ -76,7 +79,9 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
                   <Clock className="w-5 h-5 text-primary" />
                   <h3 className="font-semibold">Days Remaining</h3>
                 </div>
-                <p className={`text-2xl font-bold ${subscription.daysRemaining < 7 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                <p
+                  className={`text-2xl font-bold ${subscription.daysRemaining < 7 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}
+                >
                   {subscription.daysRemaining}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">days</p>
@@ -120,4 +125,3 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
     </div>
   );
 };
-

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
-import { ProgressTracker } from '@/components/analysis/ProgressTracker';
-import { FileUpload } from '../FileUpload';
-import { JobTitleInput } from '../JobTitleInput';
-import { JobDescriptionInput } from '../JobDescriptionInput';
-import { AnalysisActions } from '../AnalysisActions';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Sparkles } from "lucide-react";
+import { ProgressTracker } from "@/components/analysis/ProgressTracker";
+import { FileUpload } from "../FileUpload";
+import { JobTitleInput } from "../JobTitleInput";
+import { JobDescriptionInput } from "../JobDescriptionInput";
+import { AnalysisActions } from "../AnalysisActions";
 
 interface ResumeAnalysisFormViewProps {
   uploadedFile: File | null;
@@ -46,7 +46,11 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
   onAnalysisComplete,
   onAnalysisError,
 }) => {
-  const canStartAnalysis = !!resumeId && !!jobTitle.trim() && !!jobDescription.trim() && jobDescription.trim().length >= 50;
+  const canStartAnalysis =
+    !!resumeId &&
+    !!jobTitle.trim() &&
+    !!jobDescription.trim() &&
+    jobDescription.trim().length >= 50;
   const hasData = !!uploadedFile || !!jobTitle || !!jobDescription;
 
   return (
@@ -108,4 +112,3 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
     </Card>
   );
 };
-

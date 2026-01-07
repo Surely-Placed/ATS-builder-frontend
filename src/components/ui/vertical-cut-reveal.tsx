@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   forwardRef,
@@ -8,34 +8,34 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react"
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
+} from "react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface TextProps {
-  children: React.ReactNode
-  reverse?: boolean
-  transition?: any
-  splitBy?: "words" | "characters" | "lines" | string
-  staggerDuration?: number
-  staggerFrom?: "first" | "last" | "center" | "random" | number
-  containerClassName?: string
-  wordLevelClassName?: string
-  elementLevelClassName?: string
-  onClick?: () => void
-  onStart?: () => void
-  onComplete?: () => void
-  autoStart?: boolean
+  children: React.ReactNode;
+  reverse?: boolean;
+  transition?: any;
+  splitBy?: "words" | "characters" | "lines" | string;
+  staggerDuration?: number;
+  staggerFrom?: "first" | "last" | "center" | "random" | number;
+  containerClassName?: string;
+  wordLevelClassName?: string;
+  elementLevelClassName?: string;
+  onClick?: () => void;
+  onStart?: () => void;
+  onComplete?: () => void;
+  autoStart?: boolean;
 }
 
 export interface VerticalCutRevealRef {
-  startAnimation: () => void
-  reset: () => void
+  startAnimation: () => void;
+  reset: () => void;
 }
 
 interface WordObject {
-  characters: string[]
-  needsSpace: boolean
+  characters: string[];
+  needsSpace: boolean;
 }
 
 export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
@@ -62,32 +62,32 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
     },
     ref
   ) => {
-    const containerRef = useRef<HTMLSpanElement>(null)
-    const text = typeof children === "string" ? children : children?.toString() || ""
-    const [isAnimating, setIsAnimating] = useState(false)
+    const containerRef = useRef<HTMLSpanElement>(null);
+    const text = typeof children === "string" ? children : children?.toString() || "";
+    const [isAnimating, setIsAnimating] = useState(false);
 
     const splitIntoCharacters = (text: string): string[] => {
       if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
-        const segmenter = new (Intl as any).Segmenter("en", { granularity: "grapheme" })
-        return Array.from(segmenter.segment(text), ({ segment }: any) => segment)
+        const segmenter = new (Intl as any).Segmenter("en", { granularity: "grapheme" });
+        return Array.from(segmenter.segment(text), ({ segment }: any) => segment);
       }
-      return Array.from(text)
-    }
+      return Array.from(text);
+    };
 
     const elements = useMemo(() => {
-      const words = text.split(" ")
+      const words = text.split(" ");
       if (splitBy === "characters") {
         return words.map((word, i) => ({
           characters: splitIntoCharacters(word),
           needsSpace: i !== words.length - 1,
-        }))
+        }));
       }
       return splitBy === "words"
         ? text.split(" ")
         : splitBy === "lines"
           ? text.split("\n")
-          : text.split(splitBy)
-    }, [text, splitBy])
+          : text.split(splitBy);
+    }, [text, splitBy]);
 
     const getStaggerDelay = useCallback(
       (index: number) => {
@@ -101,37 +101,37 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
                     : word.characters.length + (word.needsSpace ? 1 : 0)),
                 0
               )
-            : elements.length
-        if (staggerFrom === "first") return index * staggerDuration
-        if (staggerFrom === "last") return (total - 1 - index) * staggerDuration
+            : elements.length;
+        if (staggerFrom === "first") return index * staggerDuration;
+        if (staggerFrom === "last") return (total - 1 - index) * staggerDuration;
         if (staggerFrom === "center") {
-          const center = Math.floor(total / 2)
-          return Math.abs(center - index) * staggerDuration
+          const center = Math.floor(total / 2);
+          return Math.abs(center - index) * staggerDuration;
         }
         if (staggerFrom === "random") {
-          const randomIndex = Math.floor(Math.random() * total)
-          return Math.abs(randomIndex - index) * staggerDuration
+          const randomIndex = Math.floor(Math.random() * total);
+          return Math.abs(randomIndex - index) * staggerDuration;
         }
-        return Math.abs((staggerFrom as number) - index) * staggerDuration
+        return Math.abs((staggerFrom as number) - index) * staggerDuration;
       },
       [elements.length, staggerFrom, staggerDuration]
-    )
+    );
 
     const startAnimation = useCallback(() => {
-      setIsAnimating(true)
-      onStart?.()
-    }, [onStart])
+      setIsAnimating(true);
+      onStart?.();
+    }, [onStart]);
 
     useImperativeHandle(ref, () => ({
       startAnimation,
       reset: () => setIsAnimating(false),
-    }))
+    }));
 
     useEffect(() => {
       if (autoStart) {
-        startAnimation()
+        startAnimation();
       }
-    }, [autoStart, startAnimation])
+    }, [autoStart, startAnimation]);
 
     const variants = {
       hidden: { y: reverse ? "-100%" : "100%" },
@@ -142,7 +142,7 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
           delay: ((transition?.delay as number) || 0) + getStaggerDelay(i),
         },
       }),
-    }
+    };
 
     return (
       <span
@@ -166,7 +166,7 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
         ).map((wordObj, wordIndex, array) => {
           const previousCharsCount = array
             .slice(0, wordIndex)
-            .reduce((sum, word) => sum + word.characters.length, 0)
+            .reduce((sum, word) => sum + word.characters.length, 0);
 
           return (
             <span
@@ -176,10 +176,7 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
             >
               {wordObj.characters.map((char, charIndex) => (
                 <span
-                  className={cn(
-                    elementLevelClassName,
-                    "whitespace-pre-wrap relative"
-                  )}
+                  className={cn(elementLevelClassName, "whitespace-pre-wrap relative")}
                   key={charIndex}
                 >
                   <motion.span
@@ -201,11 +198,11 @@ export const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
               ))}
               {wordObj.needsSpace && <span> </span>}
             </span>
-          )
+          );
         })}
       </span>
-    )
+    );
   }
-)
+);
 
-VerticalCutReveal.displayName = "VerticalCutReveal"
+VerticalCutReveal.displayName = "VerticalCutReveal";

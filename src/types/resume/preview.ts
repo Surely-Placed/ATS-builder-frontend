@@ -48,7 +48,7 @@ export interface ChangeHighlight {
   field: string;
   original: string | string[] | null;
   optimized: string | string[] | null;
-  changeType: 'added' | 'removed' | 'modified' | 'reordered';
+  changeType: "added" | "removed" | "modified" | "reordered";
   location?: { index?: number; line?: number };
 }
 
@@ -77,5 +77,4 @@ export interface ResumePreviewProps {
   isGenerating?: boolean;
 }
 
-export type ViewMode = 'split' | 'original' | 'optimized';
-
+export type ViewMode = "split" | "original" | "optimized";

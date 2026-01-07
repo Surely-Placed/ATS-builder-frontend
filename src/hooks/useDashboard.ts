@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { DashboardStats } from '../types/dashboard.types';
-import { apiClient } from '../services/resumeApi';
-import { AnalysisService } from '../services/analysis/analysisService';
-import { getDisplayScores } from '../utils/scoreUtils';
-import { AxiosError } from 'axios';
+import { useState, useEffect } from "react";
+import { DashboardStats } from "../types/dashboard.types";
+import { apiClient } from "../services/resumeApi";
+import { AnalysisService } from "../services/analysis/analysisService";
+import { getDisplayScores } from "../utils/scoreUtils";
+import { AxiosError } from "axios";
 
 export const useDashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -18,15 +18,16 @@ export const useDashboard = () => {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.get<{ success: boolean; data: DashboardStats; message?: string }>('/dashboard/stats');
+      const response = await apiClient.get<{
+        success: boolean;
+        data: DashboardStats;
+        message?: string;
+      }>("/dashboard/stats");
 
       if (response.data.success) {
         const rawData = response.data.data as any;
         let statsData: DashboardStats;
-        
-        // Debug: Log the raw response to see what we're getting
-        console.log('📊 Dashboard Stats Raw Response:', JSON.stringify(response.data, null, 2));
-        
+
         // Handle snake_case to camelCase conversion if needed
         if (rawData.recent_activity && !rawData.recentActivity) {
           statsData = {
@@ -48,42 +49,23 @@ export const useDashboard = () => {
         } else {
           statsData = rawData as DashboardStats;
         }
-        
-        // Debug: Log the processed data
-        console.log('📊 Dashboard Stats Processed:', {
-          recentActivity: statsData.recentActivity,
-          averageAtsScore: statsData.averageAtsScore,
-        });
-        
+
         // If ATS scores are 0 or missing, try to fetch them from individual analyses
         const enrichedActivity = await Promise.all(
           statsData.recentActivity.map(async (activity) => {
             // Check if score is 0, null, or undefined - fetch from analysis details
             const needsFetch = !activity.atsScoreBefore || activity.atsScoreBefore === 0;
-            
+
             if (needsFetch) {
               try {
-                console.log(`🔍 Fetching ATS scores for analysis ${activity.id}...`);
                 const analysisResult = await AnalysisService.getAnalysis(activity.id);
-                
+
                 // Use getDisplayScores to properly extract scores (handles all formats)
                 const displayScores = getDisplayScores({
                   analysis: analysisResult.analysis,
                   ats_analysis: analysisResult.ats_analysis,
                 });
-                
-                console.log(`✅ Fetched ATS scores for analysis ${activity.id}:`, {
-                  displayScores,
-                  rawData: {
-                    ats_analysis_before: analysisResult.ats_analysis?.before,
-                    ats_analysis_after: analysisResult.ats_analysis?.after,
-                    analysis_ats_score_before: analysisResult.analysis?.ats_score_before,
-                    analysis_ats_score_after: analysisResult.analysis?.ats_score_after,
-                    analysis_display_score_before: analysisResult.analysis?.display_score_before,
-                    analysis_display_score_after: analysisResult.analysis?.display_score_after,
-                  },
-                });
-                
+
                 return {
                   ...activity,
                   atsScoreBefore: displayScores.scoreBefore,
@@ -91,48 +73,79 @@ export const useDashboard = () => {
                   scoreImprovement: displayScores.improvement,
                 };
               } catch (err) {
-                console.warn(`⚠️ Failed to fetch analysis details for ${activity.id}:`, err);
                 // Return original activity if fetch fails
                 return activity;
               }
             }
-            
-            // Log existing scores for debugging
-            if (activity.atsScoreBefore > 0) {
-              console.log(`✓ Using existing ATS scores for ${activity.id}:`, {
-                before: activity.atsScoreBefore,
-                after: activity.atsScoreAfter,
-              });
-            }
-            
+
             return activity;
           })
         );
-        
+
         setStats({
           ...statsData,
           recentActivity: enrichedActivity,
         });
       } else {
-        throw new Error(response.data.message || 'Failed to fetch dashboard stats');
+        throw new Error(response.data.message || "Failed to fetch dashboard stats");
       }
     } catch (err: any) {
       const axiosError = err as AxiosError;
-      
-      // Retry on 401 (Unauthorized) - cookie might not be set yet
+
+      // Handle network errors (no response received)
+      if (!axiosError.response) {
+        // Network error - could be CORS, connection refused, etc.
+        if (
+          err.code === "ERR_NETWORK" ||
+          err.message?.includes("Network Error") ||
+          err.message?.includes("network error")
+        ) {
+          const errorMessage =
+            "Network error. Please check your internet connection and try again. If the problem persists, the server may be temporarily unavailable.";
+          setError(errorMessage);
+          setLoading(false);
+          return;
+        }
+
+        // Timeout error
+        if (err.code === "ECONNABORTED") {
+          setError("Request timeout. Please try again.");
+          setLoading(false);
+          return;
+        }
+
+        // CORS error (Safari specific)
+        if (err.message?.includes("CORS") || err.message?.includes("cross-origin")) {
+          const errorMessage =
+            "CORS error. Please check if the API server is configured to allow requests from this origin.";
+          setError(errorMessage);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Retry on 401 (Unauthorized) - token might not be set yet
       if (axiosError.response?.status === 401 && retryCount < maxRetries) {
         // Wait before retrying (exponential backoff)
         const delay = retryDelay * Math.pow(2, retryCount);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return fetchDashboardStats(retryCount + 1);
       }
-      
-      let errorMessage = 'An error occurred while fetching dashboard data';
-      if (axiosError.response?.data && typeof axiosError.response.data === 'object' && 'message' in axiosError.response.data) {
+
+      // Extract error message
+      let errorMessage = "An error occurred while fetching dashboard data";
+      if (
+        axiosError.response?.data &&
+        typeof axiosError.response.data === "object" &&
+        "message" in axiosError.response.data
+      ) {
         errorMessage = (axiosError.response.data as any).message || errorMessage;
       } else if (axiosError instanceof Error && axiosError.message) {
         errorMessage = axiosError.message;
+      } else if (err.message) {
+        errorMessage = err.message;
       }
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -155,4 +168,3 @@ export const useDashboard = () => {
     refetch: () => fetchDashboardStats(0),
   };
 };
-

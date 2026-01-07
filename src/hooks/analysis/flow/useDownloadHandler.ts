@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import AnalysisApiService from '@/services/analysisApi';
+import { useState, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
+import AnalysisApiService from "@/services/analysisApi";
 
 interface UseDownloadHandlerProps {
   optimizedResumeUrl: string | null;
@@ -43,8 +43,8 @@ export function useDownloadHandler({
       else {
         downloadResume();
         toast({
-          title: 'Download started',
-          description: 'Your optimized resume is downloading',
+          title: "Download started",
+          description: "Your optimized resume is downloading",
         });
         setTimeout(() => {
           setIsDownloading(false);
@@ -53,14 +53,18 @@ export function useDownloadHandler({
       }
 
       if (!downloadUrl) {
-        throw new Error('No optimized resume URL available. The resume may not be optimized yet.');
+        throw new Error("No optimized resume URL available. The resume may not be optimized yet.");
       }
 
-      AnalysisApiService.downloadResume(downloadUrl, 'optimized-resume.pdf', analysisId || undefined);
+      AnalysisApiService.downloadResume(
+        downloadUrl,
+        "optimized-resume.pdf",
+        analysisId || undefined
+      );
 
       toast({
-        title: 'Download started',
-        description: 'Your optimized resume is downloading',
+        title: "Download started",
+        description: "Your optimized resume is downloading",
       });
 
       // Reset loading state after a short delay (download happens in browser)
@@ -70,9 +74,9 @@ export function useDownloadHandler({
     } catch (err: any) {
       setIsDownloading(false);
       toast({
-        title: 'Download failed',
-        description: err.message || 'Failed to download resume',
-        variant: 'destructive',
+        title: "Download failed",
+        description: err.message || "Failed to download resume",
+        variant: "destructive",
       });
     }
   }, [optimizedResumeUrl, optimizationResult, analysisId, downloadResume, toast]);
@@ -82,4 +86,3 @@ export function useDownloadHandler({
     handleDownload,
   };
 }
-

@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { socketService } from '@/services/socketService';
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { socketService } from "@/services/socketService";
 
 export function useWebSocketConnection() {
   const { user } = useAuth();
@@ -22,4 +22,3 @@ export function useWebSocketConnection() {
     }
   }, [user]);
 }
-

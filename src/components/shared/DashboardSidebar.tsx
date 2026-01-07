@@ -29,7 +29,7 @@ export const DashboardSidebar = ({
   onLogout,
   isOpen,
   onOpenChange,
-  trigger
+  trigger,
 }: DashboardSidebarProps) => {
   const navigate = useNavigate();
 
@@ -45,9 +45,7 @@ export const DashboardSidebar = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
-        {trigger}
-      </SheetTrigger>
+      <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side="left" className="w-72">
         <div className="flex flex-col gap-6 pt-6">
           {/* Logo/Brand */}
@@ -94,7 +92,3 @@ export const DashboardSidebar = ({
     </Sheet>
   );
 };
-
-
-
-

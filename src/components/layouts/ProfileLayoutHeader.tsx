@@ -14,9 +14,7 @@ const ProfileHeader = ({ profileNavigation }: ProfileHeaderProps = {}) => {
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {/* Profile Navigation - Show before logo with small spacing */}
             {profileNavigation && (
-              <div className="flex items-center flex-shrink-0">
-                {profileNavigation}
-              </div>
+              <div className="flex items-center flex-shrink-0">{profileNavigation}</div>
             )}
 
             {/* Logo */}
@@ -32,4 +30,3 @@ const ProfileHeader = ({ profileNavigation }: ProfileHeaderProps = {}) => {
 };
 
 export default ProfileHeader;
-

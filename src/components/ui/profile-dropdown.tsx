@@ -1,6 +1,16 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Settings, CreditCard, FileText, LogOut, User, LayoutDashboard, Sun, Moon, Home } from "lucide-react";
+import {
+  Settings,
+  CreditCard,
+  FileText,
+  LogOut,
+  User,
+  LayoutDashboard,
+  Sun,
+  Moon,
+  Home,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -33,11 +43,7 @@ interface ProfileDropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   showTopbar?: boolean;
 }
 
-export function ProfileDropdown({
-  data,
-  className,
-  ...props
-}: ProfileDropdownProps) {
+export function ProfileDropdown({ data, className, ...props }: ProfileDropdownProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -50,7 +56,7 @@ export function ProfileDropdown({
 
   // Use provided data or fallback to Firebase user data
   const profileData: Profile = data || {
-    name: user?.displayName || user?.email?.split('@')[0] || "User",
+    name: user?.displayName || user?.email?.split("@")[0] || "User",
     email: user?.email || "",
     avatar: user?.photoURL || "",
     subscription: undefined, // Can be fetched from API if needed
@@ -141,9 +147,7 @@ export function ProfileDropdown({
           <div
             className={cn(
               "absolute -right-3 top-1/2 -translate-y-1/2 transition-all duration-200 pointer-events-none",
-              isOpen
-                ? "opacity-100"
-                : "opacity-60 group-hover:opacity-100"
+              isOpen ? "opacity-100" : "opacity-60 group-hover:opacity-100"
             )}
           >
             <svg
@@ -251,4 +255,3 @@ export function ProfileDropdown({
     </div>
   );
 }
-

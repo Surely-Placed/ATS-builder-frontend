@@ -13,13 +13,15 @@ export const GetStartedCard = () => {
             <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-primary" />
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h3 className="text-base sm:text-lg font-semibold mb-1">Ready to optimize your resume?</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-1">
+              Ready to optimize your resume?
+            </h3>
             <p className="text-xs sm:text-sm text-muted-foreground">
               Upload your resume and job posting to get AI-powered insights and recommendations
             </p>
           </div>
           <button
-            onClick={() => navigate('/resume-optimization')}
+            onClick={() => navigate("/resume-optimization")}
             className="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground rounded-lg text-sm sm:text-base font-medium hover:bg-primary/90 transition-colors shrink-0"
           >
             Get Started

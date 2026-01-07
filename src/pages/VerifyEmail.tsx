@@ -9,52 +9,52 @@ import { Loader2, CheckCircle2, XCircle, Mail } from "lucide-react";
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
-  const [message, setMessage] = useState('Verifying your email...');
+  const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
+  const [message, setMessage] = useState("Verifying your email...");
 
   useEffect(() => {
     const verifyEmail = async () => {
-      const mode = searchParams.get('mode');
-      const oobCode = searchParams.get('oobCode');
+      const mode = searchParams.get("mode");
+      const oobCode = searchParams.get("oobCode");
 
       // Check if this is an email verification link
-      if (mode !== 'verifyEmail' || !oobCode) {
-        setStatus('error');
-        setMessage('Invalid verification link. Please check your email and try again.');
+      if (mode !== "verifyEmail" || !oobCode) {
+        setStatus("error");
+        setMessage("Invalid verification link. Please check your email and try again.");
         return;
       }
 
       try {
         // Apply the verification code
         await applyActionCode(auth, oobCode);
-        setStatus('success');
-        setMessage('Email verified successfully! You can now log in.');
-        
+        setStatus("success");
+        setMessage("Email verified successfully! You can now log in.");
+
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate('/login');
+          navigate("/login");
         }, 3000);
       } catch (error: any) {
-        let errorMessage = 'Verification failed. ';
-        
+        let errorMessage = "Verification failed. ";
+
         switch (error.code) {
-          case 'auth/expired-action-code':
-            errorMessage += 'This verification link has expired. Please request a new one.';
+          case "auth/expired-action-code":
+            errorMessage += "This verification link has expired. Please request a new one.";
             break;
-          case 'auth/invalid-action-code':
-            errorMessage += 'This verification link is invalid or has already been used.';
+          case "auth/invalid-action-code":
+            errorMessage += "This verification link is invalid or has already been used.";
             break;
-          case 'auth/user-disabled':
-            errorMessage += 'This account has been disabled.';
+          case "auth/user-disabled":
+            errorMessage += "This account has been disabled.";
             break;
-          case 'auth/user-not-found':
-            errorMessage += 'No account found with this email.';
+          case "auth/user-not-found":
+            errorMessage += "No account found with this email.";
             break;
           default:
-            errorMessage += error.message || 'Please try again or contact support.';
+            errorMessage += error.message || "Please try again or contact support.";
         }
-        
-        setStatus('error');
+
+        setStatus("error");
         setMessage(errorMessage);
       }
     };
@@ -63,11 +63,11 @@ const VerifyEmail = () => {
   }, [searchParams, navigate]);
 
   const handleGoToLogin = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleGoHome = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -75,38 +75,33 @@ const VerifyEmail = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto mb-4">
-            {status === 'verifying' && (
+            {status === "verifying" && (
               <div className="h-16 w-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
                 <Loader2 className="h-8 w-8 text-primary animate-spin" />
               </div>
             )}
-            {status === 'success' && (
+            {status === "success" && (
               <div className="h-16 w-16 mx-auto bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
             )}
-            {status === 'error' && (
+            {status === "error" && (
               <div className="h-16 w-16 mx-auto bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
                 <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
               </div>
             )}
           </div>
           <CardTitle className="text-2xl">
-            {status === 'verifying' && 'Verifying Email'}
-            {status === 'success' && 'Email Verified!'}
-            {status === 'error' && 'Verification Failed'}
+            {status === "verifying" && "Verifying Email"}
+            {status === "success" && "Email Verified!"}
+            {status === "error" && "Verification Failed"}
           </CardTitle>
-          <CardDescription className="text-base">
-            {message}
-          </CardDescription>
+          <CardDescription className="text-base">{message}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {status === 'success' && (
+          {status === "success" && (
             <>
-              <Button 
-                onClick={handleGoToLogin} 
-                className="w-full"
-              >
+              <Button onClick={handleGoToLogin} className="w-full">
                 <Mail className="w-4 h-4 mr-2" />
                 Go to Login
               </Button>
@@ -115,24 +110,17 @@ const VerifyEmail = () => {
               </p>
             </>
           )}
-          {status === 'error' && (
+          {status === "error" && (
             <div className="space-y-2">
-              <Button 
-                onClick={handleGoToLogin} 
-                className="w-full"
-              >
+              <Button onClick={handleGoToLogin} className="w-full">
                 Try Login Anyway
               </Button>
-              <Button 
-                onClick={handleGoHome} 
-                variant="outline"
-                className="w-full"
-              >
+              <Button onClick={handleGoHome} variant="outline" className="w-full">
                 Go to Home
               </Button>
             </div>
           )}
-          {status === 'verifying' && (
+          {status === "verifying" && (
             <div className="text-center text-sm text-muted-foreground">
               Please wait while we verify your email address...
             </div>

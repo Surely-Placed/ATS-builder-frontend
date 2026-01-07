@@ -1,9 +1,9 @@
-import mixpanel from 'mixpanel-browser';
+import mixpanel from "mixpanel-browser";
 
 // Initialize Mixpanel
 export const initMixpanel = () => {
   const token = import.meta.env.VITE_MIXPANEL_TOKEN;
-  
+
   if (!token) {
     // Mixpanel token not found - analytics disabled silently
     return;
@@ -13,13 +13,13 @@ export const initMixpanel = () => {
   mixpanel.init(token, {
     debug: false, // Disable debug mode to prevent console logs
     track_pageview: false, // Disable automatic page views - we'll track manually
-    persistence: 'localStorage', // Store user data in localStorage
+    persistence: "localStorage", // Store user data in localStorage
     ignore_dnt: false, // Respect Do Not Track
     verbose: false, // Disable verbose logging
     batch_requests: true, // Batch requests to reduce logs
     loaded: (mp) => {
       // Suppress all console logs from Mixpanel
-      mp.set_config({ 
+      mp.set_config({
         verbose: false,
         debug: false,
       });
@@ -27,7 +27,7 @@ export const initMixpanel = () => {
   });
 
   // Identify user if logged in
-  const userId = localStorage.getItem('userId');
+  const userId = localStorage.getItem("userId");
   if (userId) {
     mixpanel.identify(userId);
   }
@@ -78,7 +78,7 @@ export const setUserProperties = (properties: Record<string, any>) => {
 export const trackHomePageVisit = () => {
   const mp = getMixpanel();
   if (mp) {
-    mp.track('Home Page Visits');
+    mp.track("Home Page Visits");
   }
 };
 
@@ -86,7 +86,7 @@ export const trackHomePageVisit = () => {
 export const trackHomePageLoadTime = (loadTime: number) => {
   const mp = getMixpanel();
   if (mp) {
-    mp.track('Home Page Load Time', {
+    mp.track("Home Page Load Time", {
       load_time_ms: loadTime,
     });
   }
@@ -99,4 +99,3 @@ export const resetMixpanel = () => {
     mp.reset();
   }
 };
-

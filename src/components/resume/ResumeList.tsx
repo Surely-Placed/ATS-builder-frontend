@@ -1,10 +1,10 @@
-import React from 'react';
-import { ResumeWithStatus } from '@/hooks/useResumeFilters';
-import { getResumeUrl } from '@/utils/resumeUrlHelper';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Download, TrendingUp } from 'lucide-react';
+import React from "react";
+import { ResumeWithStatus } from "@/hooks/useResumeFilters";
+import { getResumeUrl } from "@/utils/resumeUrlHelper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Loader2, FileText, Download, TrendingUp } from "lucide-react";
 
 interface ResumeListProps {
   resumes: ResumeWithStatus[];
@@ -40,11 +40,9 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
         <Card key={resume.id}>
           <CardHeader>
             <div className="flex items-start justify-between">
-              <CardTitle className="text-lg">
-                Resume #{resume.id.substring(0, 8)}
-              </CardTitle>
-              <Badge 
-                variant={resume.status === 'published' ? 'default' : 'secondary'}
+              <CardTitle className="text-lg">Resume #{resume.id.substring(0, 8)}</CardTitle>
+              <Badge
+                variant={resume.status === "published" ? "default" : "secondary"}
                 className="capitalize"
               >
                 {resume.status}
@@ -73,22 +71,17 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
 
             <div className="flex flex-wrap gap-2">
               {(() => {
-                const originalUrl = getResumeUrl({ 
-                  id: resume.id,
-                  original_file_url: resume.original_file_url 
-                }, { useProxy: true });
-                
+                const originalUrl = getResumeUrl(
+                  {
+                    id: resume.id,
+                    original_file_url: resume.original_file_url,
+                  },
+                  { useProxy: true }
+                );
+
                 return originalUrl ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                  >
-                    <a
-                      href={originalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={originalUrl} target="_blank" rel="noopener noreferrer">
                       <FileText className="w-4 h-4 mr-2" />
                       View Original
                     </a>
@@ -96,23 +89,19 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
                 ) : null;
               })()}
               {(() => {
-                const optimizedUrl = resume.optimized_file_url 
-                  ? getResumeUrl({ 
-                      id: resume.id,
-                      optimized_file_url: resume.optimized_file_url 
-                    }, { useProxy: true })
+                const optimizedUrl = resume.optimized_file_url
+                  ? getResumeUrl(
+                      {
+                        id: resume.id,
+                        optimized_file_url: resume.optimized_file_url,
+                      },
+                      { useProxy: true }
+                    )
                   : null;
-                
+
                 return optimizedUrl ? (
-                  <Button
-                    size="sm"
-                    asChild
-                  >
-                    <a
-                      href={optimizedUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                  <Button size="sm" asChild>
+                    <a href={optimizedUrl} target="_blank" rel="noopener noreferrer">
                       <Download className="w-4 h-4 mr-2" />
                       Download Optimized
                     </a>
@@ -122,10 +111,11 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
             </div>
 
             <div className="text-xs text-muted-foreground pt-2 border-t">
-              Created: {new Date(resume.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+              Created:{" "}
+              {new Date(resume.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
               })}
             </div>
           </CardContent>
@@ -134,4 +124,3 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
     </div>
   );
 };
-

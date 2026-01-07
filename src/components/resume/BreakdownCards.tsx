@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { getBreakdownColorClass } from '@/utils/scoreUtils';
+import { Card, CardContent } from "@/components/ui/card";
+import { getBreakdownColorClass } from "@/utils/scoreUtils";
 
 interface Breakdown {
   keyword_match: number;
@@ -60,4 +60,3 @@ export const BreakdownCards = ({ breakdown }: BreakdownCardsProps) => {
     </div>
   );
 };
-

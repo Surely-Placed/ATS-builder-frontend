@@ -2,22 +2,15 @@
  * Resume-related hooks - Modular exports
  */
 
-export { useResumeOptimization } from './useResumeOptimization';
-export { useResumeOptimizationWebSocket } from './useResumeOptimizationWebSocket';
-export { useResumeDownload } from './useResumeDownload';
+export { useResumeOptimization } from "./useResumeOptimization";
+export { useResumeOptimizationWebSocket } from "./useResumeOptimizationWebSocket";
+export { useResumeDownload } from "./useResumeDownload";
 
 export type {
   UseResumeOptimizationOptions,
   UseResumeOptimizationReturn,
-} from './useResumeOptimization';
+} from "./useResumeOptimization";
 
-export type {
-  UseWebSocketOptions,
-  UseWebSocketReturn,
-} from './useResumeOptimizationWebSocket';
+export type { UseWebSocketOptions, UseWebSocketReturn } from "./useResumeOptimizationWebSocket";
 
-export type {
-  UseResumeDownloadOptions,
-  UseResumeDownloadReturn,
-} from './useResumeDownload';
-
+export type { UseResumeDownloadOptions, UseResumeDownloadReturn } from "./useResumeDownload";

@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Bell, Monitor, FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -82,15 +88,18 @@ export const SettingsTab = ({ preferences, onUpdate }: SettingsTabProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           {[
-            { key: 'email_analyses', label: 'Analysis completed' },
-            { key: 'email_optimizations', label: 'Optimization completed' },
-            { key: 'email_subscription', label: 'Subscription updates' },
-            { key: 'email_marketing', label: 'Marketing emails' },
+            { key: "email_analyses", label: "Analysis completed" },
+            { key: "email_optimizations", label: "Optimization completed" },
+            { key: "email_subscription", label: "Subscription updates" },
+            { key: "email_marketing", label: "Marketing emails" },
           ].map((item) => (
             <div key={item.key} className="flex items-center justify-between">
               <Label className="text-sm">{item.label}</Label>
               <Switch
-                checked={preferences.notifications[item.key as keyof typeof preferences.notifications] || false}
+                checked={
+                  preferences.notifications[item.key as keyof typeof preferences.notifications] ||
+                  false
+                }
                 onCheckedChange={(checked) => handleNotificationChange(item.key, checked)}
               />
             </div>
@@ -110,8 +119,8 @@ export const SettingsTab = ({ preferences, onUpdate }: SettingsTabProps) => {
           <div className="space-y-2">
             <Label>Date Format</Label>
             <Select
-              value={preferences.display.date_format || 'MM/DD/YYYY'}
-              onValueChange={(value) => handleDisplayChange('date_format', value)}
+              value={preferences.display.date_format || "MM/DD/YYYY"}
+              onValueChange={(value) => handleDisplayChange("date_format", value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -138,8 +147,8 @@ export const SettingsTab = ({ preferences, onUpdate }: SettingsTabProps) => {
           <div className="space-y-2">
             <Label>Preferred Format</Label>
             <Select
-              value={preferences.analysis.preferred_format || 'pdf'}
-              onValueChange={(value) => handleAnalysisChange('preferred_format', value)}
+              value={preferences.analysis.preferred_format || "pdf"}
+              onValueChange={(value) => handleAnalysisChange("preferred_format", value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -154,7 +163,7 @@ export const SettingsTab = ({ preferences, onUpdate }: SettingsTabProps) => {
             <Label className="text-sm">Auto-optimize after analysis</Label>
             <Switch
               checked={preferences.analysis.auto_optimize || false}
-              onCheckedChange={(checked) => handleAnalysisChange('auto_optimize', checked)}
+              onCheckedChange={(checked) => handleAnalysisChange("auto_optimize", checked)}
             />
           </div>
         </CardContent>
@@ -162,4 +171,3 @@ export const SettingsTab = ({ preferences, onUpdate }: SettingsTabProps) => {
     </div>
   );
 };
-

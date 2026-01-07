@@ -1,8 +1,8 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import type { ResumeStructure, ChangeHighlight } from '@/types/resume/preview';
-import { SectionWrapper } from './SectionWrapper';
-import { SectionHeader } from './SectionHeader';
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import type { ResumeStructure, ChangeHighlight } from "@/types/resume/preview";
+import { SectionWrapper } from "./SectionWrapper";
+import { SectionHeader } from "./SectionHeader";
 
 interface EducationSectionProps {
   resume: ResumeStructure;
@@ -26,4 +26,3 @@ export const EducationSection: React.FC<EducationSectionProps> = ({ resume, chan
     </SectionWrapper>
   );
 };
-

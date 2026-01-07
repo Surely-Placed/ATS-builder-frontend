@@ -35,7 +35,3 @@ export const SidebarThemeToggle = ({ className = "" }: SidebarThemeToggleProps) 
     </Button>
   );
 };
-
-
-
-

@@ -1,33 +1,35 @@
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   sendPasswordResetEmail,
   sendEmailVerification,
   updateProfile,
-  signOut
-} from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { trackLogin, trackSignup, trackLogout } from '../utils/analytics';
+  signOut,
+} from "firebase/auth";
+import { auth } from "../config/firebase";
+import { trackLogin, trackSignup, trackLogout } from "../utils/analytics";
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api';
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api";
 
 export const authService = {
   async signup(name: string, email: string, password: string) {
     try {
       // Validate inputs
       if (!name || name.trim().length < 2) {
-        throw new Error('Name must be at least 2 characters');
+        throw new Error("Name must be at least 2 characters");
       }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        throw new Error('Invalid email format');
+        throw new Error("Invalid email format");
       }
       if (!password || password.length < 8) {
-        throw new Error('Password must be at least 8 characters');
+        throw new Error("Password must be at least 8 characters");
       }
       if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-        throw new Error('Password must contain uppercase, lowercase, and number');
+        throw new Error("Password must contain uppercase, lowercase, and number");
       }
 
       // Create user in Firebase
@@ -40,19 +42,19 @@ export const authService = {
       // Send verification email
       await sendEmailVerification(user, {
         url: `${window.location.origin}/verify-email`,
-        handleCodeInApp: false
+        handleCodeInApp: false,
       });
 
       // Force sign out until email is verified
       await signOut(auth);
 
       // Track signup event (email signup)
-      trackSignup('email');
+      trackSignup("email");
 
       return {
         success: true,
-        message: 'Signup successful! Please check your email to verify your account.',
-        requiresVerification: true
+        message: "Signup successful! Please check your email to verify your account.",
+        requiresVerification: true,
       };
     } catch (error: any) {
       // Handle Firebase errors
@@ -60,23 +62,24 @@ export const authService = {
       let errorMessage = error.message;
 
       switch (errorCode) {
-        case 'auth/email-already-in-use':
-          errorMessage = 'This email is already registered. Please login instead.';
+        case "auth/email-already-in-use":
+          errorMessage = "This email is already registered. Please login instead.";
           break;
-        case 'auth/invalid-email':
-          errorMessage = 'Invalid email address format.';
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address format.";
           break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak. Use at least 8 characters with mixed case and numbers.';
+        case "auth/weak-password":
+          errorMessage =
+            "Password is too weak. Use at least 8 characters with mixed case and numbers.";
           break;
-        case 'auth/operation-not-allowed':
-          errorMessage = 'Email/password signup is disabled. Please contact support.';
+        case "auth/operation-not-allowed":
+          errorMessage = "Email/password signup is disabled. Please contact support.";
           break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
+        case "auth/network-request-failed":
+          errorMessage = "Network error. Please check your internet connection.";
           break;
         default:
-          errorMessage = errorMessage || 'Signup failed. Please try again.';
+          errorMessage = errorMessage || "Signup failed. Please try again.";
       }
 
       throw new Error(errorMessage);
@@ -91,41 +94,48 @@ export const authService = {
       // Check if email is verified
       if (!user.emailVerified) {
         await signOut(auth);
-        throw new Error('EMAIL_NOT_VERIFIED');
+        throw new Error("EMAIL_NOT_VERIFIED");
       }
 
       const firebaseToken = await user.getIdToken();
-      
+
       // Get stored token if available (for Safari fallback)
-      const { tokenStorage } = await import('../utils/tokenStorage');
+      const { tokenStorage } = await import("../utils/tokenStorage");
       const storedToken = tokenStorage.getToken();
-      
+
       const response = await fetch(`${API_URL}/auth/firebase`, {
-        method: 'POST',
-        credentials: 'include', // Required for cookies
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+        method: "POST",
+        credentials: "include", // Required for cookies
+        headers: {
+          "Content-Type": "application/json",
+          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
         },
-        body: JSON.stringify({ firebase_token: firebaseToken })
+        body: JSON.stringify({ firebase_token: firebaseToken }),
       });
-      
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Login failed');
-      
-      // Store token from response for Safari compatibility (fallback if cookies fail)
-      if (data.token) {
-        const { tokenStorage } = await import('../utils/tokenStorage');
-        tokenStorage.setToken(data.token);
+      if (!response.ok) throw new Error(data.message || "Login failed");
+
+      // ✅ CRITICAL: Store token from response for Safari compatibility
+      // Backend returns: { success: true, data: { token: "...", user: {...} } }
+      const token = data.data?.token || data.token;
+      if (token) {
+        const { tokenStorage } = await import("../utils/tokenStorage");
+        tokenStorage.setToken(token);
+        // Also set it in axios defaults for immediate use
+        const { apiClient } = await import("./resumeApi");
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       }
-      
+
       // Track login event
-      trackLogin('email');
-      
+      trackLogin("email");
+
       return data;
     } catch (error: any) {
-      if (error.message === 'EMAIL_NOT_VERIFIED') {
-        throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
+      if (error.message === "EMAIL_NOT_VERIFIED") {
+        throw new Error(
+          "Please verify your email before logging in. Check your inbox for the verification link."
+        );
       }
       throw new Error(error.message);
     }
@@ -136,33 +146,38 @@ export const authService = {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const firebaseToken = await result.user.getIdToken();
-      
+
       // Get stored token if available (for Safari fallback)
-      const { tokenStorage } = await import('../utils/tokenStorage');
+      const { tokenStorage } = await import("../utils/tokenStorage");
       const storedToken = tokenStorage.getToken();
-      
+
       const response = await fetch(`${API_URL}/auth/firebase`, {
-        method: 'POST',
-        credentials: 'include', // Required for cookies
-        headers: { 
-          'Content-Type': 'application/json',
-          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+        method: "POST",
+        credentials: "include", // Required for cookies
+        headers: {
+          "Content-Type": "application/json",
+          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
         },
-        body: JSON.stringify({ firebase_token: firebaseToken })
+        body: JSON.stringify({ firebase_token: firebaseToken }),
       });
-      
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Google sign-in failed');
-      
-      // Store token from response for Safari compatibility (fallback if cookies fail)
-      if (data.token) {
-        const { tokenStorage } = await import('../utils/tokenStorage');
-        tokenStorage.setToken(data.token);
+      if (!response.ok) throw new Error(data.message || "Google sign-in failed");
+
+      // ✅ CRITICAL: Store token from response for Safari compatibility
+      // Backend returns: { success: true, data: { token: "...", user: {...} } }
+      const token = data.data?.token || data.token;
+      if (token) {
+        const { tokenStorage } = await import("../utils/tokenStorage");
+        tokenStorage.setToken(token);
+        // Also set it in axios defaults for immediate use
+        const { apiClient } = await import("./resumeApi");
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       }
-      
+
       // Track Google sign-in event (could be login or signup)
-      trackLogin('google');
-      
+      trackLogin("google");
+
       return data;
     } catch (error: any) {
       throw new Error(error.message);
@@ -172,7 +187,7 @@ export const authService = {
   async resetPassword(email: string) {
     try {
       await sendPasswordResetEmail(auth, email);
-      return { message: 'Password reset email sent' };
+      return { message: "Password reset email sent" };
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -181,19 +196,19 @@ export const authService = {
   async resendVerificationEmail() {
     try {
       const user = auth.currentUser;
-      if (!user) throw new Error('No user logged in');
-      
+      if (!user) throw new Error("No user logged in");
+
       await sendEmailVerification(user, {
         url: `${window.location.origin}/verify-email`,
-        handleCodeInApp: false
+        handleCodeInApp: false,
       });
-      
-      return { 
-        success: true, 
-        message: 'Verification email sent! Check your inbox.' 
+
+      return {
+        success: true,
+        message: "Verification email sent! Check your inbox.",
       };
     } catch (error: any) {
-      throw new Error('Failed to send verification email. Please try again.');
+      throw new Error("Failed to send verification email. Please try again.");
     }
   },
 
@@ -201,27 +216,26 @@ export const authService = {
     try {
       await signOut(auth);
       // Get stored token for logout request (Safari fallback)
-      const { tokenStorage } = await import('../utils/tokenStorage');
+      const { tokenStorage } = await import("../utils/tokenStorage");
       const storedToken = tokenStorage.getToken();
-      
+
       await fetch(`${API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include', // Required for cookies
+        method: "POST",
+        credentials: "include", // Required for cookies
         headers: {
-          ...(storedToken && { 'Authorization': `Bearer ${storedToken}` }), // Fallback for Safari
+          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
         },
       });
-      
+
       // Remove stored token
       tokenStorage.removeToken();
 
       // Track logout event
       trackLogout();
-      
-      return { message: 'Logout successful' };
+
+      return { message: "Logout successful" };
     } catch (error: any) {
       throw new Error(error.message);
     }
-  }
+  },
 };
-

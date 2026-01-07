@@ -7,14 +7,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 export default function ResumeAnalyzer() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const analysisId = searchParams.get('analysisId');
+  const analysisId = searchParams.get("analysisId");
 
   useEffect(() => {
     // Redirect to the new analysis route
     if (analysisId) {
       navigate(`/resume-analysis?analysisId=${analysisId}`, { replace: true });
     } else {
-      navigate('/resume-analysis', { replace: true });
+      navigate("/resume-analysis", { replace: true });
     }
   }, [navigate, analysisId]);
 

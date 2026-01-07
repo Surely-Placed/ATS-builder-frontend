@@ -1,7 +1,7 @@
-import React from 'react';
-import type { ResumeStructure, ChangeHighlight, ViewMode } from '@/types/resume/preview';
-import { SectionWrapper } from './SectionWrapper';
-import { SectionHeader } from './SectionHeader';
+import React from "react";
+import type { ResumeStructure, ChangeHighlight, ViewMode } from "@/types/resume/preview";
+import { SectionWrapper } from "./SectionWrapper";
+import { SectionHeader } from "./SectionHeader";
 
 interface SkillsSectionProps {
   resume: ResumeStructure;
@@ -11,8 +11,14 @@ interface SkillsSectionProps {
   onToggle: () => void;
 }
 
-export const SkillsSection: React.FC<SkillsSectionProps> = ({ resume, changes, isExpanded, viewMode, onToggle }) => {
-  const isReordered = changes.some((c) => c.changeType === 'reordered');
+export const SkillsSection: React.FC<SkillsSectionProps> = ({
+  resume,
+  changes,
+  isExpanded,
+  viewMode,
+  onToggle,
+}) => {
+  const isReordered = changes.some((c) => c.changeType === "reordered");
 
   return (
     <SectionWrapper sectionKey="skills" changes={changes}>
@@ -20,18 +26,20 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ resume, changes, i
       {isExpanded ? (
         <div className="flex flex-wrap gap-2">
           {resume.skills.map((skill, index) => {
-            const skillChange = changes.find((c) => c.field === `skill_${index}` || c.field === 'order');
-            const isModified = skillChange?.changeType === 'modified';
-            
+            const skillChange = changes.find(
+              (c) => c.field === `skill_${index}` || c.field === "order"
+            );
+            const isModified = skillChange?.changeType === "modified";
+
             return (
               <span
                 key={index}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                   isModified
-                    ? 'bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 border-2 border-yellow-400 dark:border-yellow-600 shadow-sm'
+                    ? "bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 border-2 border-yellow-400 dark:border-yellow-600 shadow-sm"
                     : isReordered && index < 8
-                    ? 'bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100 border-2 border-blue-400 dark:border-blue-600 shadow-sm'
-                    : 'bg-muted text-foreground border border-border'
+                      ? "bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100 border-2 border-blue-400 dark:border-blue-600 shadow-sm"
+                      : "bg-muted text-foreground border border-border"
                 }`}
               >
                 {skill}
@@ -41,11 +49,10 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ resume, changes, i
         </div>
       ) : (
         <div className="text-muted-foreground text-sm">
-          {resume.skills.slice(0, 8).join(', ')}
+          {resume.skills.slice(0, 8).join(", ")}
           {resume.skills.length > 8 && ` +${resume.skills.length - 8} more`}
         </div>
       )}
     </SectionWrapper>
   );
 };
-

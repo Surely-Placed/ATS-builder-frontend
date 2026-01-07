@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { getFileErrorMessage } from '@/utils/fileValidation';
-import { resumeApi } from '@/services/resumeApi';
+import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { getFileErrorMessage } from "@/utils/fileValidation";
+import { resumeApi } from "@/services/resumeApi";
 
 export function useFileUpload() {
   const { toast } = useToast();
@@ -14,9 +14,9 @@ export function useFileUpload() {
     const errorMsg = getFileErrorMessage(file);
     if (errorMsg) {
       toast({
-        title: 'Invalid file',
+        title: "Invalid file",
         description: errorMsg,
-        variant: 'destructive',
+        variant: "destructive",
       });
       return;
     }
@@ -27,14 +27,14 @@ export function useFileUpload() {
       setResumeId(uploadedResumeId);
       setUploadedFile(file);
       toast({
-        title: 'File uploaded',
+        title: "File uploaded",
         description: `${file.name} uploaded successfully`,
       });
     } catch (err: any) {
       toast({
-        title: 'Upload failed',
-        description: err.message || 'Failed to upload file',
-        variant: 'destructive',
+        title: "Upload failed",
+        description: err.message || "Failed to upload file",
+        variant: "destructive",
       });
     } finally {
       setIsUploading(false);
@@ -45,7 +45,7 @@ export function useFileUpload() {
     setUploadedFile(null);
     setResumeId(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -60,4 +60,3 @@ export function useFileUpload() {
     setUploadedFile,
   };
 }
-

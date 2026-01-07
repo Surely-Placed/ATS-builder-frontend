@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import DashboardLayout from '@/components/layouts/DashboardLayout';
-import ResumePreviewWithChanges from '@/components/resume/ResumePreviewWithChanges';
-import AnalysisApiService from '@/services/analysisApi';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
+import ResumePreviewWithChanges from "@/components/resume/ResumePreviewWithChanges";
+import AnalysisApiService from "@/services/analysisApi";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function ResumePreview() {
   const { analysisId } = useParams<{ analysisId: string }>();
@@ -21,7 +21,7 @@ export default function ResumePreview() {
 
   useEffect(() => {
     if (!analysisId) {
-      setError('Analysis ID is required');
+      setError("Analysis ID is required");
       setIsLoading(false);
       return;
     }
@@ -37,12 +37,12 @@ export default function ResumePreview() {
           changes: previewResponse.changes,
         });
       } catch (err: any) {
-        const errorMessage = err.message || 'Could not load resume preview';
+        const errorMessage = err.message || "Could not load resume preview";
         setError(errorMessage);
         toast({
-          title: 'Failed to load preview',
+          title: "Failed to load preview",
           description: errorMessage,
-          variant: 'destructive',
+          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
@@ -59,23 +59,19 @@ export default function ResumePreview() {
     try {
       const pdfResponse = await AnalysisApiService.generatePDF(analysisId);
       if (pdfResponse.file_url) {
-        AnalysisApiService.downloadResume(
-          pdfResponse.file_url,
-          'optimized-resume.pdf',
-          undefined
-        );
+        AnalysisApiService.downloadResume(pdfResponse.file_url, "optimized-resume.pdf", undefined);
         toast({
-          title: 'PDF Generated & Downloaded',
-          description: 'Your optimized resume PDF has been generated and downloaded successfully',
+          title: "PDF Generated & Downloaded",
+          description: "Your optimized resume PDF has been generated and downloaded successfully",
         });
       }
       // Navigate back to comparison or optimization page
       navigate(`/resume-optimization?analysisId=${analysisId}`);
     } catch (err: any) {
       toast({
-        title: 'Failed to generate PDF',
-        description: err.message || 'Could not generate PDF',
-        variant: 'destructive',
+        title: "Failed to generate PDF",
+        description: err.message || "Could not generate PDF",
+        variant: "destructive",
       });
     } finally {
       setIsGeneratingPDF(false);
@@ -87,7 +83,7 @@ export default function ResumePreview() {
     if (analysisId) {
       navigate(`/resume-optimization?analysisId=${analysisId}`);
     } else {
-      navigate('/resume-optimization');
+      navigate("/resume-optimization");
     }
   };
 
@@ -109,7 +105,7 @@ export default function ResumePreview() {
       <DashboardLayout activeTab="Resume Optimization">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4 max-w-md text-center">
-            <p className="text-destructive">{error || 'Preview not available'}</p>
+            <p className="text-destructive">{error || "Preview not available"}</p>
             <button
               onClick={handlePreviewCancel}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
@@ -135,4 +131,3 @@ export default function ResumePreview() {
     </DashboardLayout>
   );
 }
-

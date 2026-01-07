@@ -22,17 +22,17 @@ const Header = () => {
     const handleScroll = () => {
       setIsAtTop(window.scrollY < 100);
     };
-    
+
     handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navItems = [
-    { name: 'Home', url: '#', icon: Home },
-    { name: 'Features', url: '#features', icon: Sparkles },
-    { name: 'Pricing', url: '#pricing', icon: DollarSign },
-    { name: 'Contact', url: '#contact', icon: Phone }
+    { name: "Home", url: "#", icon: Home },
+    { name: "Features", url: "#features", icon: Sparkles },
+    { name: "Pricing", url: "#pricing", icon: DollarSign },
+    { name: "Contact", url: "#contact", icon: Phone },
   ];
 
   const handleNavClick = (url: string) => {
@@ -40,10 +40,10 @@ const Header = () => {
     window.location.href = url;
   };
 
-  const mobileNavItems = navItems.map(item => ({
+  const mobileNavItems = navItems.map((item) => ({
     name: item.name,
     url: item.url,
-    icon: <item.icon className="w-5 h-5 text-primary" />
+    icon: <item.icon className="w-5 h-5 text-primary" />,
   }));
 
   return (
@@ -51,10 +51,10 @@ const Header = () => {
       {/* Top Header - Visible only at top */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
-        animate={{ 
+        animate={{
           y: isAtTop ? 0 : -20,
           opacity: isAtTop ? 1 : 0,
-          pointerEvents: isAtTop ? "auto" : "none"
+          pointerEvents: isAtTop ? "auto" : "none",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="absolute top-0 left-0 right-0 z-50 bg-transparent"
@@ -68,12 +68,15 @@ const Header = () => {
 
             {/* Center Section - Desktop Navigation */}
             <div className="hidden lg:block flex-1 max-w-2xl mx-4">
-              <NavBar items={[
-                { name: 'Home', url: '#', icon: Home },
-                { name: 'Features', url: '#features', icon: Sparkles },
-                { name: 'Pricing', url: '#pricing', icon: DollarSign },
-                { name: 'Contact', url: '#contact', icon: Phone }
-              ]} className="!fixed !top-0" />
+              <NavBar
+                items={[
+                  { name: "Home", url: "#", icon: Home },
+                  { name: "Features", url: "#features", icon: Sparkles },
+                  { name: "Pricing", url: "#pricing", icon: DollarSign },
+                  { name: "Contact", url: "#contact", icon: Phone },
+                ]}
+                className="!fixed !top-0"
+              />
             </div>
 
             {/* Right Section - Theme Toggle and Profile Dropdown */}
@@ -95,24 +98,20 @@ const Header = () => {
 
       {/* Fluid Menu - Visible when scrolled - Desktop only */}
       {!isAtTop && (
-      <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ 
-          scale: 1,
-          opacity: 1,
-          pointerEvents: "auto"
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="fixed top-6 right-6 z-50 hidden md:block"
-      >
-        <MenuContainer>
-          <FluidMenuItems 
-            items={navItems}
-            onItemClick={handleNavClick}
-            mounted={mounted}
-          />
-        </MenuContainer>
-      </motion.div>
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{
+            scale: 1,
+            opacity: 1,
+            pointerEvents: "auto",
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="fixed top-6 right-6 z-50 hidden md:block"
+        >
+          <MenuContainer>
+            <FluidMenuItems items={navItems} onItemClick={handleNavClick} mounted={mounted} />
+          </MenuContainer>
+        </motion.div>
       )}
 
       {/* Mobile Floating Menu - Visible when scrolled - Mobile only */}

@@ -1,10 +1,10 @@
-import { motion } from 'framer-motion';
-import { Zap, Target, TrendingUp, Users, Sparkles } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { SpotlightHeading } from '@/components/ui/spotlight-heading';
-import { FeatureCard } from './FeatureCard';
-import { ATSOptimizationCard } from './ATSOptimizationCard';
+import { motion } from "framer-motion";
+import { Zap, Target, TrendingUp, Users, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { SpotlightHeading } from "@/components/ui/spotlight-heading";
+import { FeatureCard } from "./FeatureCard";
+import { ATSOptimizationCard } from "./ATSOptimizationCard";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -22,7 +22,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: 'spring' as const,
+      type: "spring" as const,
       stiffness: 100,
       damping: 10,
     },
@@ -47,11 +47,11 @@ const FeaturesSection = () => {
           </span>
           <SpotlightHeading className="w-full">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 whitespace-nowrap flex flex-wrap justify-center">
-              {'Powerful Features for '.split(' ').map((word, index) => (
+              {"Powerful Features for ".split(" ").map((word, index) => (
                 <motion.span
                   key={index}
-                  initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
-                  whileInView={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                  initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+                  whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.5,
@@ -63,11 +63,11 @@ const FeaturesSection = () => {
                   {word}
                 </motion.span>
               ))}
-              {'Resume Success'.split(' ').map((word, index) => (
+              {"Resume Success".split(" ").map((word, index) => (
                 <motion.span
                   key={`gradient-${index}`}
-                  initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
-                  whileInView={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                  initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+                  whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.5,
@@ -102,7 +102,7 @@ const FeaturesSection = () => {
             variants={itemVariants}
           >
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold">3s</span>
+              <span className="text-3xl font-bold">10-20s</span>
               <span className="text-sm text-muted-foreground">average time</span>
             </div>
           </FeatureCard>
@@ -148,10 +148,10 @@ const FeaturesSection = () => {
             description="Increase your interview chances by 3x with our optimization."
             variants={itemVariants}
           >
-            <Button size="sm" className="w-full">
+            {/* <Button size="sm" className="w-full">
               <Sparkles className="w-4 h-4 mr-2" />
               Get Started
-            </Button>
+            </Button> */}
           </FeatureCard>
 
           <motion.div variants={itemVariants} className="md:col-span-2">
@@ -164,14 +164,14 @@ const FeaturesSection = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
+                  {/* {[1, 2, 3, 4].map((i) => (
                     <img
                       key={i}
                       src={`https://images.unsplash.com/photo-${1472099645785 + i}?w=40&h=40&fit=crop`}
                       alt="User"
                       className="w-8 h-8 rounded-full border-2 border-background"
                     />
-                  ))}
+                  ))} */}
                 </div>
                 <span className="text-sm font-semibold">10,000+</span>
                 <span className="text-xs text-muted-foreground">users</span>
@@ -185,4 +185,3 @@ const FeaturesSection = () => {
 };
 
 export default FeaturesSection;
-

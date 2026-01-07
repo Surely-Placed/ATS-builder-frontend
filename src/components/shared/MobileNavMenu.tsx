@@ -26,7 +26,7 @@ export const MobileNavMenu = ({
   side = "right",
   className = "",
   open: controlledOpen,
-  onOpenChange: controlledOnOpenChange
+  onOpenChange: controlledOnOpenChange,
 }: MobileNavMenuProps) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -74,4 +74,3 @@ export const MobileNavMenu = ({
     </Sheet>
   );
 };
-

@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import { OPTIMIZATION_STEPS } from '@/constants/analysis/steps';
+import { useState, useEffect, useRef } from "react";
+import { OPTIMIZATION_STEPS } from "@/constants/analysis/steps";
 
 interface UseOptimizationProgressProps {
   optimizationParams?: {
     analysisId: string;
     jobId?: string;
     progress?: number;
-    status?: 'pending' | 'running' | 'complete' | 'failed';
+    status?: "pending" | "running" | "complete" | "failed";
     error?: string;
   };
   onError?: (error: string) => void;
@@ -15,7 +15,7 @@ interface UseOptimizationProgressProps {
 interface ProgressState {
   currentStep: number;
   progress: number;
-  status: 'idle' | 'analyzing' | 'optimizing' | 'completed' | 'failed';
+  status: "idle" | "analyzing" | "optimizing" | "completed" | "failed";
   error?: string;
 }
 
@@ -26,7 +26,7 @@ export function useOptimizationProgress({
   const [progressState, setProgressState] = useState<ProgressState>({
     currentStep: 0,
     progress: 0,
-    status: 'idle',
+    status: "idle",
   });
 
   const prevStatusRef = useRef<string | undefined>(undefined);
@@ -34,7 +34,7 @@ export function useOptimizationProgress({
 
   useEffect(() => {
     if (optimizationParams) {
-      const { progress = 0, status = 'pending', error } = optimizationParams;
+      const { progress = 0, status = "pending", error } = optimizationParams;
 
       // Map progress percentage to step index
       let stepIndex = 0;
@@ -51,28 +51,28 @@ export function useOptimizationProgress({
 
       const statusChanged = prevStatusRef.current !== status;
 
-      if (status === 'failed' && statusChanged) {
+      if (status === "failed" && statusChanged) {
         setProgressState({
           currentStep: stepIndex,
           progress,
-          status: 'failed',
-          error: error || 'Optimization failed',
+          status: "failed",
+          error: error || "Optimization failed",
         });
         if (onError && error) {
           onError(error);
         }
-      } else if (status === 'complete') {
+      } else if (status === "complete") {
         setProgressState({
           currentStep: steps.length - 1,
           progress: 100,
-          status: 'completed',
+          status: "completed",
           error: undefined,
         });
       } else {
         setProgressState({
           currentStep: stepIndex,
           progress,
-          status: 'optimizing',
+          status: "optimizing",
           error: undefined,
         });
       }
@@ -83,4 +83,3 @@ export function useOptimizationProgress({
 
   return progressState;
 }
-

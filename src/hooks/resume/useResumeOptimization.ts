@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
-import { OptimizationService, AnalysisService } from '../../services/analysis';
-import { OptimizationResult } from '../../services/analysis/types';
-import { useResumeOptimizationWebSocket } from './useResumeOptimizationWebSocket';
-import { useResumeDownload } from './useResumeDownload';
+import { useState, useCallback, useRef } from "react";
+import { OptimizationService, AnalysisService } from "../../services/analysis";
+import { OptimizationResult } from "../../services/analysis/types";
+import { useResumeOptimizationWebSocket } from "./useResumeOptimizationWebSocket";
+import { useResumeDownload } from "./useResumeDownload";
 
 export interface UseResumeOptimizationOptions {
   analysisId: string;
@@ -12,7 +12,7 @@ export interface UseResumeOptimizationOptions {
 }
 
 export interface UseResumeOptimizationReturn {
-  status: 'idle' | 'starting' | 'running' | 'complete' | 'failed';
+  status: "idle" | "starting" | "running" | "complete" | "failed";
   progress: number;
   error: string | null;
   result: OptimizationResult | null;
@@ -69,12 +69,13 @@ export function useResumeOptimization({
   const startOptimization = useCallback(async () => {
     try {
       setError(null);
-      
+
       const response = await OptimizationService.startOptimization(analysisId);
       jobIdRef.current = response.jobId;
       setJobId(response.jobId);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to start optimization';
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to start optimization";
       setError(errorMessage);
       if (onError) {
         onError(errorMessage);
@@ -94,7 +95,7 @@ export function useResumeOptimization({
 
   // Combine WebSocket error with local error state
   const combinedError = wsError || error;
-  const combinedStatus = jobIdRef.current ? wsStatus : 'idle';
+  const combinedStatus = jobIdRef.current ? wsStatus : "idle";
 
   return {
     status: combinedStatus,
@@ -105,13 +106,12 @@ export function useResumeOptimization({
     startOptimization,
     fetchAnalysis,
     downloadResume,
-    isRunning: combinedStatus === 'running',
-    isComplete: combinedStatus === 'complete',
-    isFailed: combinedStatus === 'failed',
+    isRunning: combinedStatus === "running",
+    isComplete: combinedStatus === "complete",
+    isFailed: combinedStatus === "failed",
     isConnected,
   };
 }
 
 // Re-export for backward compatibility
 export { useResumeOptimization as default };
-

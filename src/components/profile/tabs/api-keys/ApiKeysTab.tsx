@@ -1,11 +1,11 @@
-import { useApiKeys } from '@/hooks/profile/api-keys';
-import { NewKeyAlert } from './NewKeyAlert';
-import { CreateKeyForm } from './CreateKeyForm';
-import { ApiKeyList } from './ApiKeyList';
-import { InfoCard } from './InfoCard';
-import { RevokeDialog } from './RevokeDialog';
-import { ReleaseDialog } from './ReleaseDialog';
-import { formatDateApiKeys } from '@/utils/profile/dateUtils';
+import { useApiKeys } from "@/hooks/profile/api-keys";
+import { NewKeyAlert } from "./NewKeyAlert";
+import { CreateKeyForm } from "./CreateKeyForm";
+import { ApiKeyList } from "./ApiKeyList";
+import { InfoCard } from "./InfoCard";
+import { RevokeDialog } from "./RevokeDialog";
+import { ReleaseDialog } from "./ReleaseDialog";
+import { formatDateApiKeys } from "@/utils/profile/dateUtils";
 
 export const ApiKeysTab = () => {
   const {
@@ -32,7 +32,8 @@ export const ApiKeysTab = () => {
       <div>
         <h2 className="text-2xl font-bold text-foreground">Extension API Keys</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Generate API keys to use with the Chrome/Edge extension. Each key can only be used on one device at a time.
+          Generate API keys to use with the Chrome/Edge extension. Each key can only be used on one
+          device at a time.
         </p>
       </div>
 
@@ -74,4 +75,3 @@ export const ApiKeysTab = () => {
     </div>
   );
 };
-

@@ -1,7 +1,7 @@
 // Token storage utility for Safari compatibility
 // Stores JWT token as fallback when cookies fail
 
-const TOKEN_KEY = 'auth_token';
+const TOKEN_KEY = "auth_token";
 
 export const tokenStorage = {
   /**
@@ -42,6 +42,5 @@ export const tokenStorage = {
    */
   hasToken(): boolean {
     return !!this.getToken();
-  }
+  },
 };
-

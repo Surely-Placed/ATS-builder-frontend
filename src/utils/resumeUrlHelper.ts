@@ -19,9 +19,14 @@ export const getResumeUrl = (
   const {
     useProxy = false,
     preferOptimized = true,
-    baseUrl = typeof window !== 'undefined' 
-      ? (import.meta.env.VITE_API_URL?.replace('/api', '') || window.location.origin.replace(':3000', ':5000').replace(':5173', ':5000').replace(':8080', ':5000')) // Frontend port to backend port
-      : (import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev')
+    baseUrl = typeof window !== "undefined"
+      ? import.meta.env.VITE_API_URL?.replace("/api", "") ||
+        window.location.origin
+          .replace(":3000", ":5000")
+          .replace(":5173", ":5000")
+          .replace(":8080", ":5000") // Frontend port to backend port
+      : import.meta.env.VITE_API_URL?.replace("/api", "") ||
+        "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev",
   } = options || {};
 
   // If using proxy, return authenticated proxy URL
@@ -30,9 +35,10 @@ export const getResumeUrl = (
   }
 
   // Get the appropriate URL (optimized or original)
-  const fileUrl = (preferOptimized && resume.optimized_file_url) 
-    ? resume.optimized_file_url 
-    : resume.original_file_url || null;
+  const fileUrl =
+    preferOptimized && resume.optimized_file_url
+      ? resume.optimized_file_url
+      : resume.original_file_url || null;
 
   // If no file URL and we have an ID, use proxy endpoint as fallback
   if (!fileUrl) {
@@ -40,17 +46,17 @@ export const getResumeUrl = (
       return `${baseUrl}/api/resume/${resume.id}/pdf`;
     }
     // If no ID either, return empty string instead of throwing
-    return '';
+    return "";
   }
 
   // If it's already a full URL (local storage), return as-is
-  if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+  if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
     return fileUrl;
   }
 
   // If it's a relative path, construct full URL
-  if (fileUrl.startsWith('/api/files/') || fileUrl.startsWith('resumes/')) {
-    const path = fileUrl.startsWith('/') ? fileUrl : `/api/files/${fileUrl}`;
+  if (fileUrl.startsWith("/api/files/") || fileUrl.startsWith("resumes/")) {
+    const path = fileUrl.startsWith("/") ? fileUrl : `/api/files/${fileUrl}`;
     return `${baseUrl}${path}`;
   }
 
@@ -61,7 +67,11 @@ export const getResumeUrl = (
  * Check if URL is a local storage URL
  */
 export const isLocalStorageUrl = (url: string): boolean => {
-  return url.includes('/api/files/resumes/') || url.includes('localhost:5000/api/files/') || url.includes('ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api/files/');
+  return (
+    url.includes("/api/files/resumes/") ||
+    url.includes("localhost:5000/api/files/") ||
+    url.includes("ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api/files/")
+  );
 };
 
 /**
@@ -69,7 +79,7 @@ export const isLocalStorageUrl = (url: string): boolean => {
  * @deprecated Cloudinary is no longer used, kept for backward compatibility only
  */
 export const isCloudinaryUrl = (url: string): boolean => {
-  return url.includes('cloudinary.com') || url.includes('res.cloudinary.com');
+  return url.includes("cloudinary.com") || url.includes("res.cloudinary.com");
 };
 
 /**
@@ -90,4 +100,3 @@ export const getPdfViewerUrl = (
   // Get the URL - local storage URLs work directly in browser PDF viewer
   return getResumeUrl(resume, options);
 };
-

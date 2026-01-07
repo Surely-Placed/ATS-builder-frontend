@@ -1,11 +1,11 @@
-import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import AnalysisApiService from '@/services/analysisApi';
-import { AnalysisResult } from '@/services/analysisApi';
-import { normalizeAnalysisResult } from '@/utils/analysisResultNormalizer';
-import { constructFallbackResult } from '@/utils/analysis/analysisResultHelpers';
-import { ViewState } from '@/hooks/useResumeAnalysisStorage';
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import AnalysisApiService from "@/services/analysisApi";
+import { AnalysisResult } from "@/services/analysisApi";
+import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
+import { constructFallbackResult } from "@/utils/analysis/analysisResultHelpers";
+import { ViewState } from "@/hooks/useResumeAnalysisStorage";
 
 interface UseAnalysisHandlersProps {
   setAnalysisResult: (result: AnalysisResult) => void;
@@ -66,10 +66,10 @@ export function useAnalysisHandlers({
                 setAnalysisId(fetchedAnalysisId);
                 setIsAnalyzing(false);
                 setShowAnalysisProgress(false);
-                setViewState('analysis');
+                setViewState("analysis");
                 saveToStorage(
                   fetchedNormalized as unknown as AnalysisResult,
-                  'analysis',
+                  "analysis",
                   fetchedAnalysisId,
                   resumeId,
                   jobTitle,
@@ -94,8 +94,15 @@ export function useAnalysisHandlers({
           setAnalysisId(fallbackAnalysisId);
           setIsAnalyzing(false);
           setShowAnalysisProgress(false);
-          setViewState('analysis');
-          saveToStorage(fallbackResult, 'analysis', fallbackAnalysisId, resumeId, jobTitle, jobDescription);
+          setViewState("analysis");
+          saveToStorage(
+            fallbackResult,
+            "analysis",
+            fallbackAnalysisId,
+            resumeId,
+            jobTitle,
+            jobDescription
+          );
 
           // Update URL with analysisId for proper routing
           navigate(`/resume-optimization?analysisId=${fallbackAnalysisId}`, { replace: true });
@@ -109,15 +116,24 @@ export function useAnalysisHandlers({
         setAnalysisId(analysisId);
         setIsAnalyzing(false);
         setShowAnalysisProgress(false);
-        setViewState('analysis');
-        saveToStorage(normalizedResult as unknown as AnalysisResult, 'analysis', analysisId, resumeId, jobTitle, jobDescription);
+        setViewState("analysis");
+        saveToStorage(
+          normalizedResult as unknown as AnalysisResult,
+          "analysis",
+          analysisId,
+          resumeId,
+          jobTitle,
+          jobDescription
+        );
 
         // Update URL with analysisId for proper routing
         navigate(`/resume-optimization?analysisId=${analysisId}`, { replace: true });
 
         if (onComplete) onComplete();
       } catch (error: any) {
-        handleAnalysisError(`Analysis completed but result structure is invalid: ${error.message || 'Unknown error'}`);
+        handleAnalysisError(
+          `Analysis completed but result structure is invalid: ${error.message || "Unknown error"}`
+        );
       }
     },
     [
@@ -141,23 +157,35 @@ export function useAnalysisHandlers({
       setIsAnalyzing(false);
       setShowAnalysisProgress(false);
       toast({
-        title: 'Analysis Failed',
+        title: "Analysis Failed",
         description: error,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
     [setAnalysisError, setIsAnalyzing, setShowAnalysisProgress, toast]
   );
 
   const handleStartAnalysis = useCallback(() => {
-    if (!resumeId || !jobTitle.trim() || !jobDescription.trim() || jobDescription.trim().length < 50) {
-      setAnalysisError('Please provide a valid job title and description (min 50 characters)');
+    if (
+      !resumeId ||
+      !jobTitle.trim() ||
+      !jobDescription.trim() ||
+      jobDescription.trim().length < 50
+    ) {
+      setAnalysisError("Please provide a valid job title and description (min 50 characters)");
       return;
     }
     setAnalysisError(null);
     setIsAnalyzing(true);
     setShowAnalysisProgress(true);
-  }, [resumeId, jobTitle, jobDescription, setAnalysisError, setIsAnalyzing, setShowAnalysisProgress]);
+  }, [
+    resumeId,
+    jobTitle,
+    jobDescription,
+    setAnalysisError,
+    setIsAnalyzing,
+    setShowAnalysisProgress,
+  ]);
 
   return {
     handleAnalysisComplete,
@@ -165,4 +193,3 @@ export function useAnalysisHandlers({
     handleStartAnalysis,
   };
 }
-

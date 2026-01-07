@@ -1,2 +1,1 @@
-export { ResumeAnalysisView } from './ResumeAnalysisView';
-
+export { ResumeAnalysisView } from "./ResumeAnalysisView";

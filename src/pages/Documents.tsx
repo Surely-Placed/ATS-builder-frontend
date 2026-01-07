@@ -4,11 +4,12 @@ import ResumeManager from "@/components/resume/ResumeManager";
 import { ResumeFilters } from "@/components/resume/ResumeFilters";
 import { useResumeFilters } from "@/hooks/useResumeFilters";
 
-type FilterType = 'all' | 'drafts' | 'published';
+type FilterType = "all" | "drafts" | "published";
 
 const Documents = () => {
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const { counts, resumes, loading, error, refetch, refetchCounts } = useResumeFilters(activeFilter);
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const { counts, resumes, loading, error, refetch, refetchCounts } =
+    useResumeFilters(activeFilter);
 
   // Refetch counts when filter changes
   useEffect(() => {

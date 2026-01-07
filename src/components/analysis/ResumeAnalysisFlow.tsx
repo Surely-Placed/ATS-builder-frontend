@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useResumeOptimization } from '@/hooks/useResumeOptimization';
-import { useResumeAnalysisStorage } from '@/hooks/useResumeAnalysisStorage';
-import ComparisonView from './ComparisonView';
-import { ResumeAnalysisFormView } from '@/components/resume/analysis-form';
-import { ResumeAnalysisView } from '@/components/resume/analysis-view';
-import { ResumeOptimizingView } from '@/components/resume/ResumeOptimizingView';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useResumeOptimization } from "@/hooks/useResumeOptimization";
+import { useResumeAnalysisStorage } from "@/hooks/useResumeAnalysisStorage";
+import ComparisonView from "./ComparisonView";
+import { ResumeAnalysisFormView } from "@/components/resume/analysis-form";
+import { ResumeAnalysisView } from "@/components/resume/analysis-view";
+import { ResumeOptimizingView } from "@/components/resume/ResumeOptimizingView";
+import { useToast } from "@/hooks/use-toast";
 import {
   useAnalysisState,
   useFileUpload,
@@ -14,8 +14,8 @@ import {
   useOptimizationHandlers,
   useDownloadHandler,
   useWebSocketConnection,
-} from '@/hooks/analysis/flow';
-import './ResumeAnalysisFlow.css';
+} from "@/hooks/analysis/flow";
+import "./ResumeAnalysisFlow.css";
 
 interface ResumeAnalysisFlowProps {
   onComplete?: () => void;
@@ -57,9 +57,9 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   const { loadFromStorage } = useResumeAnalysisStorage();
   const storedData = loadFromStorage();
-  const [jobTitle, setJobTitle] = useState(storedData?.jobTitle || '');
-  const [jobDescription, setJobDescription] = useState(storedData?.jobDescription || '');
-  
+  const [jobTitle, setJobTitle] = useState(storedData?.jobTitle || "");
+  const [jobDescription, setJobDescription] = useState(storedData?.jobDescription || "");
+
   // Load optimization result from storage on mount and restore state
   useEffect(() => {
     const restoreOptimizationState = async () => {
@@ -69,27 +69,29 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
       if (storedData?.optimizedResumeUrl && !optimizedResumeUrl) {
         setOptimizedResumeUrl(storedData.optimizedResumeUrl);
       }
-      
+
       // If we have optimization result in storage, ensure viewState is 'comparison'
       if (storedData?.optimizationResult) {
-        if (viewState !== 'comparison') {
-          setViewState('comparison');
+        if (viewState !== "comparison") {
+          setViewState("comparison");
         }
       } else if (analysisId && analysisResult) {
         // If no optimization result in storage but we have analysisId, check API
         // Check if optimization is complete by looking at analysis result
-        const hasOptimization = analysisResult.optimized_resume || 
-                                (analysisResult.analysis?.ats_score_after !== null && analysisResult.analysis?.ats_score_after !== undefined) ||
-                                analysisResult.ats_analysis?.after;
-        
-        if (hasOptimization && viewState === 'analysis') {
+        const hasOptimization =
+          analysisResult.optimized_resume ||
+          (analysisResult.analysis?.ats_score_after !== null &&
+            analysisResult.analysis?.ats_score_after !== undefined) ||
+          analysisResult.ats_analysis?.after;
+
+        if (hasOptimization && viewState === "analysis") {
           // Try to fetch optimization result from API
           try {
             const fetchedAnalysis = await fetchAnalysis();
             if (fetchedAnalysis?.optimized_resume || fetchedAnalysis?.analysis?.ats_score_after) {
               // We have optimization, but need to construct the result
               // For now, just set viewState to comparison
-              setViewState('comparison');
+              setViewState("comparison");
             }
           } catch (err) {
             // Failed to fetch - keep current state
@@ -97,7 +99,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
         }
       }
     };
-    
+
     restoreOptimizationState();
   }, []); // Only run on mount
 
@@ -112,7 +114,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     downloadResume,
     isConnected: isWebSocketConnected,
   } = useResumeOptimization({
-    analysisId: analysisId || '',
+    analysisId: analysisId || "",
     onComplete: async (result) => {
       setOptimizationResult(result);
       if (result?.optimized_resume?.file_url) {
@@ -120,11 +122,11 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
       } else if (analysisId) {
         try {
           const fetchedAnalysis = await fetchAnalysis();
-          setOptimizedResumeUrl(
+          const url =
             fetchedAnalysis?.resume?.optimized_file_url ||
-              fetchedAnalysis?.analysis?.optimized_resume_url ||
-              null
-          );
+            fetchedAnalysis?.analysis?.optimized_resume_url ||
+            null;
+          setOptimizedResumeUrl(url);
         } catch (err) {
           // Failed to fetch analysis after optimization
         }
@@ -175,11 +177,11 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   // Auto-navigate to comparison when optimization completes
   useEffect(() => {
-    if (optimizationStatus === 'complete' && optimizationResult && analysisId) {
-      setViewState('comparison');
+    if (optimizationStatus === "complete" && optimizationResult && analysisId) {
+      setViewState("comparison");
       saveToStorage(
         analysisResult,
-        'comparison',
+        "comparison",
         analysisId,
         resumeId,
         jobTitle,
@@ -206,34 +208,34 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   const handleStartNew = () => {
     // Clear all state
-    setViewState('form');
+    setViewState("form");
     setAnalysisResult(null);
     setAnalysisId(null);
-    setJobTitle('');
-    setJobDescription('');
+    setJobTitle("");
+    setJobDescription("");
     setUploadedFile(null);
     setResumeId(null);
     setOptimizationResult(null);
     setOptimizedResumeUrl(null);
-    
+
     // Clear file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
-    
+
     // Clear all storage
     clearStorage();
-    
+
     // Navigate to clean URL (remove analysisId from URL)
-    navigate('/resume-optimization', { replace: true });
+    navigate("/resume-optimization", { replace: true });
   };
 
   const handlePreview = () => {
     if (!analysisId) {
       toast({
-        title: 'Error',
-        description: 'Analysis ID not found',
-        variant: 'destructive',
+        title: "Error",
+        description: "Analysis ID not found",
+        variant: "destructive",
       });
       return;
     }
@@ -242,7 +244,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   // Save to storage whenever relevant state changes
   useEffect(() => {
-    if (analysisResult && viewState !== 'form') {
+    if (analysisResult && viewState !== "form") {
       saveToStorage(
         analysisResult,
         viewState,
@@ -268,13 +270,13 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   // Preview is now handled by separate route (/resume-preview/:analysisId)
   useEffect(() => {
-    if (viewState === 'preview' && analysisId) {
+    if (viewState === "preview" && analysisId) {
       navigate(`/resume-preview/${analysisId}`, { replace: true });
     }
   }, [viewState, analysisId, navigate]);
 
   // Render Analysis View
-  if (viewState === 'analysis' && analysisResult) {
+  if (viewState === "analysis" && analysisResult) {
     return (
       <ResumeAnalysisView
         analysisResult={analysisResult}
@@ -286,17 +288,18 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
   }
 
   // Render Optimizing View
-  if (viewState === 'optimizing' && analysisId) {
+  if (viewState === "optimizing" && analysisId) {
     const optimizationStatusMapped =
-      optimizationStatus === 'starting'
-        ? 'pending'
-        : optimizationStatus === 'running'
-        ? 'running'
-        : optimizationStatus === 'complete'
-        ? 'complete'
-        : 'failed';
+      optimizationStatus === "starting"
+        ? "pending"
+        : optimizationStatus === "running"
+          ? "running"
+          : optimizationStatus === "complete"
+            ? "complete"
+            : "failed";
 
-    const errorToPass = optimizationStatus === 'failed' ? optimizationError || undefined : undefined;
+    const errorToPass =
+      optimizationStatus === "failed" ? optimizationError || undefined : undefined;
 
     return (
       <ResumeOptimizingView
@@ -304,14 +307,14 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
         progress={optimizationProgress}
         status={optimizationStatusMapped}
         error={errorToPass}
-        onReset={() => setViewState('analysis')}
-        onComplete={() => setViewState('comparison')}
+        onReset={() => setViewState("analysis")}
+        onComplete={() => setViewState("comparison")}
         onError={(error) => {
-          if (optimizationStatus === 'failed') {
+          if (optimizationStatus === "failed") {
             toast({
-              title: 'Optimization Failed',
+              title: "Optimization Failed",
               description: error,
-              variant: 'destructive',
+              variant: "destructive",
             });
           }
         }}
@@ -320,7 +323,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
   }
 
   // Render Comparison View
-  if (viewState === 'comparison' && analysisResult && optimizationResult) {
+  if (viewState === "comparison" && analysisResult && optimizationResult) {
     return (
       <ComparisonView
         originalAnalysis={analysisResult}
@@ -361,4 +364,3 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 };
 
 export default ResumeAnalysisFlow;
-

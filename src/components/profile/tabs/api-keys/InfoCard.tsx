@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Info } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 export const InfoCard = () => {
   return (
@@ -22,7 +22,9 @@ export const InfoCard = () => {
           </li>
           <li className="flex items-start gap-2">
             <span>•</span>
-            <span>To use the same key on another device, release it from the current device first</span>
+            <span>
+              To use the same key on another device, release it from the current device first
+            </span>
           </li>
           <li className="flex items-start gap-2">
             <span>•</span>
@@ -33,4 +35,3 @@ export const InfoCard = () => {
     </Card>
   );
 };
-

@@ -5,14 +5,18 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "0.0.0.0", // Allow connections from any network interface (for mobile testing)
     port: 8080,
+    strictPort: false, // Allow using next available port if 5173 is taken
     hmr: {
       overlay: true,
+      host: "localhost", // HMR host
     },
     watch: {
       usePolling: true,
     },
+    // Enable CORS for mobile testing
+    cors: true,
   },
   plugins: [react()],
   build: {
@@ -49,7 +53,10 @@ export default defineConfig(({ mode }) => ({
             if (
               id.includes("/react/") ||
               id.includes("/react-dom/") ||
-              (id.includes("react") && !id.includes("react-router") && !id.includes("@react") && !id.includes("react-helmet"))
+              (id.includes("react") &&
+                !id.includes("react-router") &&
+                !id.includes("@react") &&
+                !id.includes("react-helmet"))
             ) {
               // Return undefined to keep React in the entry chunk
               return undefined;
@@ -104,6 +111,9 @@ export default defineConfig(({ mode }) => ({
         },
         entryFileNames: "js/[name]-[hash].js",
         assetFileNames: (assetInfo) => {
+          if (!assetInfo.name) {
+            return `assets/[name]-[hash][extname]`;
+          }
           const info = assetInfo.name.split(".");
           const ext = info[info.length - 1];
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {

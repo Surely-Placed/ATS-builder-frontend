@@ -18,7 +18,10 @@ interface ProfileTabProps {
 
 export const ProfileTab = ({ profile, onUpdate }: ProfileTabProps) => {
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({ name: profile?.name || '', email: profile?.email || '' });
+  const [formData, setFormData] = useState({
+    name: profile?.name || "",
+    email: profile?.email || "",
+  });
   const [updating, setUpdating] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +37,7 @@ export const ProfileTab = ({ profile, onUpdate }: ProfileTabProps) => {
 
   const handleCancel = () => {
     setEditing(false);
-    setFormData({ name: profile?.name || '', email: profile?.email || '' });
+    setFormData({ name: profile?.name || "", email: profile?.email || "" });
   };
 
   return (
@@ -112,7 +115,7 @@ export const ProfileTab = ({ profile, onUpdate }: ProfileTabProps) => {
                 </div>
                 <div className="flex-1">
                   <Label className="text-sm text-muted-foreground">Name</Label>
-                  <p className="text-lg font-semibold mt-1">{profile?.name || 'N/A'}</p>
+                  <p className="text-lg font-semibold mt-1">{profile?.name || "N/A"}</p>
                 </div>
               </div>
             </CardContent>
@@ -126,7 +129,7 @@ export const ProfileTab = ({ profile, onUpdate }: ProfileTabProps) => {
                 </div>
                 <div className="flex-1">
                   <Label className="text-sm text-muted-foreground">Email</Label>
-                  <p className="text-lg font-semibold mt-1">{profile?.email || 'N/A'}</p>
+                  <p className="text-lg font-semibold mt-1">{profile?.email || "N/A"}</p>
                 </div>
               </div>
             </CardContent>
@@ -136,4 +139,3 @@ export const ProfileTab = ({ profile, onUpdate }: ProfileTabProps) => {
     </div>
   );
 };
-

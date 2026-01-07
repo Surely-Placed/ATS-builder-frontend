@@ -71,4 +71,3 @@ export const ProfileHeader = ({ name, email }: ProfileHeaderProps) => {
     </motion.div>
   );
 };
-

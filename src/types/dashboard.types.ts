@@ -16,4 +16,3 @@ export interface RecentActivity {
   status: string;
   createdAt: string;
 }
-
