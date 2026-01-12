@@ -36,7 +36,10 @@ export function useResumeDownload({
       }
 
       // Priority 2: Check result.analysis.optimized_file_url
-      if (!optimizedUrl && result?.analysis?.optimized_file_url) {
+      if (
+        !optimizedUrl &&
+        typeof result?.analysis?.optimized_file_url === "string"
+      ) {
         optimizedUrl = result.analysis.optimized_file_url;
       }
 

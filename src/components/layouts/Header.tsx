@@ -31,7 +31,7 @@ const Header = () => {
   const navItems = [
     { name: "Home", url: "#", icon: Home },
     { name: "Features", url: "#features", icon: Sparkles },
-    { name: "Pricing", url: "#pricing", icon: DollarSign },
+    // { name: "Pricing", url: "#pricing", icon: DollarSign },
     { name: "Contact", url: "#contact", icon: Phone },
   ];
 
@@ -72,7 +72,7 @@ const Header = () => {
                 items={[
                   { name: "Home", url: "#", icon: Home },
                   { name: "Features", url: "#features", icon: Sparkles },
-                  { name: "Pricing", url: "#pricing", icon: DollarSign },
+                  // { name: "Pricing", url: "#pricing", icon: DollarSign },
                   { name: "Contact", url: "#contact", icon: Phone },
                 ]}
                 className="!fixed !top-0"

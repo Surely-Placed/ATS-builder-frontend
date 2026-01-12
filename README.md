@@ -1,4 +1,4 @@
-# 🚀 ResumeAI - AI-Powered ATS Resume Builder & Optimizer
+# 🚀 Jobrabbit.AI - AI-Powered ATS Resume Builder & Optimizer
 
 An intelligent web application that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS) using AI-powered analysis and optimization. Upload your resume, get instant feedback, and download an optimized, ATS-friendly PDF version.
 
@@ -337,7 +337,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, email support@resumeai.com or open an issue in the repository.
+For support, email support@Jobrabbit.AI.com or open an issue in the repository.
 
 ## 🔮 Roadmap
 

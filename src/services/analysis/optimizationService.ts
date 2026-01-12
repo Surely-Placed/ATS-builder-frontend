@@ -101,24 +101,69 @@ export class OptimizationService {
 
   /**
    * Get Optimization Job Status
-   * GET /api/analyze/job/:jobId/status
+   * GET /api/analyze/jobs/:jobId/status
    */
   static async getJobStatus(jobId: string): Promise<JobStatusResponse> {
     try {
-      const response = await analysisApiClient.get<JobStatusResponse>(
-        `/analyze/job/${jobId}/status`
-      );
+      // New route (preferred)
+      try {
+        const response = await analysisApiClient.get<any>(`/analyze/jobs/${jobId}/status`);
+        const normalized = OptimizationService.normalizeJobStatusResponse(response.data);
+        if (!normalized.success) {
+          throw new Error(normalized.error || "Failed to get job status");
+        }
+        return normalized;
+      } catch (e: any) {
+        // Backward compatible fallback route
+        const status = e?.response?.status;
+        if (status && status !== 404) throw e;
 
-      if (!response.data.success) {
-        throw new Error(response.data.error || "Failed to get job status");
+        const response = await analysisApiClient.get<any>(`/analyze/job/${jobId}/status`);
+        const normalized = OptimizationService.normalizeJobStatusResponse(response.data);
+        if (!normalized.success) {
+          throw new Error(normalized.error || "Failed to get job status");
+        }
+        return normalized;
       }
-
-      return response.data;
     } catch (error: any) {
       if (error.response?.data?.message) {
         throw new Error(error.response.data.message);
       }
       throw new Error(error.message || "Failed to get job status");
     }
+  }
+
+  private static normalizeJobStatusResponse(raw: any): JobStatusResponse {
+    // Supports both shapes:
+    // A) { success: true, status, progress, result, error, token_usage? }
+    // B) { success: true, data: { status, progress, result?, error?, token_usage? } }
+    // C) { data: { status, progress, ... } }  (some backends omit success)
+    const success =
+      typeof raw?.success === "boolean" ? raw.success : typeof raw?.data?.success === "boolean";
+
+    const payload = raw?.data?.data ?? raw?.data ?? raw;
+
+    const status = payload?.status as JobStatusResponse["status"];
+    const progress = Number(payload?.progress ?? 0);
+    const result = (payload?.result ?? null) as JobStatusResponse["result"];
+    const error = (payload?.error ?? null) as JobStatusResponse["error"];
+    const token_usage = payload?.token_usage ?? raw?.token_usage ?? raw?.data?.token_usage;
+
+    // If success isn't explicit, treat "having a status" as success.
+    const computedSuccess =
+      typeof raw?.success === "boolean"
+        ? raw.success
+        : typeof raw?.data?.success === "boolean"
+          ? raw.data.success
+          : !!status;
+
+    return {
+      success: success === true ? true : computedSuccess,
+      status,
+      progress: Number.isFinite(progress) ? progress : 0,
+      result,
+      error,
+      token_usage,
+    };
   }
 }

@@ -53,15 +53,18 @@ export interface ComprehensiveFeedback {
 }
 
 export interface AnalysisResult {
+  // Allow backends to include additional fields without breaking typing.
+  // (Previously this was `[x: string]: AnalysisResult`, which was incorrect and caused type errors.)
+  [key: string]: unknown;
   analysis: {
     id: string;
     resume_id: string;
-    job_id: string;
     ats_score_before: number;
     ats_score_after: number | null;
-    display_score_before?: number | null;
-    display_score_after?: number | null;
-    display_improvement?: number | null;
+    /**
+     * Optional quality score returned by some backends (used as a simpler UI metric).
+     */
+    quality_score?: number | null;
     created_at: string;
   };
   job: {
@@ -118,9 +121,9 @@ export interface AnalysisResult {
 
 export interface OptimizationResult {
   analysis: {
+    optimized_file_url: boolean;
     id: string;
     resume_id: string;
-    job_id: string;
     ats_score_before: number;
     ats_score_after: number;
     score_improvement: number;
@@ -131,6 +134,8 @@ export interface OptimizationResult {
     structured_data: any;
   };
   optimized_resume: {
+    url: string;
+    pdf_url: any;
     file_url: string;
     structured_data: any;
   };

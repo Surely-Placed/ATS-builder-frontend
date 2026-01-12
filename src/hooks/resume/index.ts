@@ -3,7 +3,8 @@
  */
 
 export { useResumeOptimization } from "./useResumeOptimization";
-export { useResumeOptimizationWebSocket } from "./useResumeOptimizationWebSocket";
+export { useSafePolling } from "../useSafePolling";
+export { useAnalysisPolling } from "../useAnalysisPolling";
 export { useResumeDownload } from "./useResumeDownload";
 
 export type {
@@ -11,6 +12,9 @@ export type {
   UseResumeOptimizationReturn,
 } from "./useResumeOptimization";
 
-export type { UseWebSocketOptions, UseWebSocketReturn } from "./useResumeOptimizationWebSocket";
+export type { UseSafePollingOptions, UseSafePollingReturn } from "../useSafePolling";
+
+export type { UseAnalysisPollingReturn } from "../useAnalysisPolling";
+
 
 export type { UseResumeDownloadOptions, UseResumeDownloadReturn } from "./useResumeDownload";

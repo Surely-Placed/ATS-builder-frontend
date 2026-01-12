@@ -35,3 +35,4 @@ export const highlightText = (
     <span className={`px-1 py-0.5 rounded border ${highlightClass} transition-colors`}>{text}</span>
   );
 };
+

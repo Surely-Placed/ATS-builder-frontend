@@ -5,13 +5,12 @@ export function constructFallbackResult(result: any, jobTitle: string = ""): Ana
     analysis: {
       id: result.id,
       resume_id: result.resume_id,
-      job_id: result.job_id,
       ats_score_before: result.ats_score_before,
       ats_score_after: result.ats_score_after,
       created_at: result.created_at || new Date().toISOString(),
     },
     job: result.job || {
-      id: result.job_id,
+      id: "",
       title: jobTitle || "",
       company: "",
       location: "",
@@ -47,3 +46,4 @@ export function constructFallbackResult(result: any, jobTitle: string = ""): Ana
     note: "",
   };
 }
+

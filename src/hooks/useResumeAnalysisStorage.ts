@@ -23,6 +23,8 @@ const STORAGE_KEYS = {
   JOB_DESCRIPTION: "resume_analysis_job_description",
   OPTIMIZATION_RESULT: "resume_optimization_result",
   OPTIMIZED_RESUME_URL: "resume_optimized_url",
+  ANALYSIS_IN_PROGRESS: "resume_analysis_in_progress",
+  OPTIMIZATION_STARTED_PREFIX: "optimization_started_",
 };
 
 export const useResumeAnalysisStorage = () => {
@@ -40,6 +42,19 @@ export const useResumeAnalysisStorage = () => {
       if (storedResult && storedViewState) {
         return {
           analysisResult: JSON.parse(storedResult) as AnalysisResult,
+          viewState: storedViewState,
+          analysisId: storedAnalysisId,
+          resumeId: storedResumeId,
+          jobTitle: storedJobTitle || "",
+          jobDescription: storedJobDescription || "",
+          optimizationResult: storedOptimizationResult
+            ? JSON.parse(storedOptimizationResult)
+            : null,
+          optimizedResumeUrl: storedOptimizedUrl,
+        };
+      } else if (storedViewState) {
+        // Return partial data if we have view state but no full analysis
+        return {
           viewState: storedViewState,
           analysisId: storedAnalysisId,
           resumeId: storedResumeId,
@@ -107,11 +122,69 @@ export const useResumeAnalysisStorage = () => {
 
   const clearStorage = () => {
     try {
-      Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+      // Clear all known storage keys
+      Object.values(STORAGE_KEYS).forEach((key) => {
+        if (typeof key === 'string') {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Also clear any dynamic keys that might be related to analysis
+      // These follow patterns like: optimization_started_{analysisId}, resume_*, analysis_*
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.startsWith(STORAGE_KEYS.OPTIMIZATION_STARTED_PREFIX) ||
+          key.startsWith('resume_') ||
+          key.startsWith('analysis_') ||
+          key.startsWith('optimization_')
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Also remove the analysis_in_progress flag
+      localStorage.removeItem(STORAGE_KEYS.ANALYSIS_IN_PROGRESS);
     } catch (error) {
       // Failed to clear local storage
     }
   };
 
-  return { loadFromStorage, saveToStorage, clearStorage };
+  const isAnalysisInProgress = (): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.ANALYSIS_IN_PROGRESS) === "true";
+  };
+  
+  const setAnalysisInProgress = (inProgress: boolean): void => {
+    if (inProgress) {
+      localStorage.setItem(STORAGE_KEYS.ANALYSIS_IN_PROGRESS, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ANALYSIS_IN_PROGRESS);
+    }
+  };
+  
+  const isOptimizationStarted = (analysisId: string): boolean => {
+    const key = `${STORAGE_KEYS.OPTIMIZATION_STARTED_PREFIX}${analysisId}`;
+    return localStorage.getItem(key) === 'true';
+  };
+  
+  const setOptimizationStarted = (analysisId: string, started: boolean): void => {
+    const key = `${STORAGE_KEYS.OPTIMIZATION_STARTED_PREFIX}${analysisId}`;
+    if (started) {
+      localStorage.setItem(key, 'true');
+    } else {
+      localStorage.removeItem(key);
+    }
+  };
+  
+  return { 
+    loadFromStorage, 
+    saveToStorage, 
+    clearStorage,
+    isAnalysisInProgress,
+    setAnalysisInProgress,
+    isOptimizationStarted,
+    setOptimizationStarted,
+  };
 };

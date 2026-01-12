@@ -22,6 +22,7 @@ interface UseAnalysisHandlersProps {
     jobTitle: string,
     jobDescription: string
   ) => void;
+  setAnalysisInProgress: (inProgress: boolean) => void;
   resumeId: string | null;
   jobTitle: string;
   jobDescription: string;
@@ -36,6 +37,7 @@ export function useAnalysisHandlers({
   setViewState,
   setAnalysisError,
   saveToStorage,
+  setAnalysisInProgress,
   resumeId,
   jobTitle,
   jobDescription,
@@ -117,6 +119,14 @@ export function useAnalysisHandlers({
         setIsAnalyzing(false);
         setShowAnalysisProgress(false);
         setViewState("analysis");
+        
+        // Clear the in-progress flag since analysis is complete
+        try {
+          setAnalysisInProgress(false);
+        } catch (e) {
+          // Ignore
+        }
+        
         saveToStorage(
           normalizedResult as unknown as AnalysisResult,
           "analysis",
@@ -143,6 +153,7 @@ export function useAnalysisHandlers({
       setShowAnalysisProgress,
       setViewState,
       saveToStorage,
+      setAnalysisInProgress,
       resumeId,
       jobTitle,
       jobDescription,
@@ -178,6 +189,23 @@ export function useAnalysisHandlers({
     setAnalysisError(null);
     setIsAnalyzing(true);
     setShowAnalysisProgress(true);
+    
+    // Save state immediately when analysis starts so it persists across refresh
+    try {
+      // Save form data even without analysis result yet
+      saveToStorage(
+        null, // analysisResult
+        "form", // viewState - we're starting analysis
+        null, // analysisId
+        resumeId,
+        jobTitle,
+        jobDescription
+      );
+      // Save a flag to indicate analysis is in progress
+      setShowAnalysisProgress(true);
+    } catch (error) {
+      // Failed to save - non-critical
+    }
   }, [
     resumeId,
     jobTitle,

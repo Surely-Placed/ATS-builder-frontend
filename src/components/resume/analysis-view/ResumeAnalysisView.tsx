@@ -10,14 +10,14 @@ import { OptimizeButton } from "../OptimizeButton";
 
 interface ResumeAnalysisViewProps {
   analysisResult: AnalysisResult;
-  isWebSocketConnected: boolean;
+  isStatusUpdatesConnected: boolean;
   onStartOptimization: () => void;
   onStartNew: () => void;
 }
 
 export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
   analysisResult,
-  isWebSocketConnected,
+  isStatusUpdatesConnected,
   onStartOptimization,
   onStartNew,
 }) => {
@@ -61,7 +61,6 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
         )}
 
         <OptimizeButton
-          isWebSocketConnected={isWebSocketConnected}
           onStartOptimization={onStartOptimization}
         />
       </div>

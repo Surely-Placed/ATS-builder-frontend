@@ -16,10 +16,10 @@ const Disclaimer = () => {
   return (
     <>
       <Helmet>
-        <title>Disclaimer - AI Resume Genius</title>
+        <title>Disclaimer - Jobrabbit.AI</title>
         <meta
           name="description"
-          content="Disclaimer for AI Resume Genius. Important information about the limitations and use of our AI-powered resume optimization service."
+          content="Disclaimer for Jobrabbit.AI. Important information about the limitations and use of our AI-powered resume optimization service."
         />
       </Helmet>
 
@@ -43,7 +43,7 @@ const Disclaimer = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">1. General Information</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  The information contained on AI Resume Genius ("Service") is for general
+                  The information contained on Jobrabbit.AI ("Service") is for general
                   information purposes only. While we strive to provide accurate and up-to-date
                   information, we make no representations or warranties of any kind, express or
                   implied, about the completeness, accuracy, reliability, suitability, or
@@ -55,7 +55,7 @@ const Disclaimer = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">2. No Guarantee of Results</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  AI Resume Genius provides AI-powered resume optimization tools and
+                  Jobrabbit.AI provides AI-powered resume optimization tools and
                   recommendations. However, we do not guarantee, warrant, or represent that:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
@@ -197,7 +197,7 @@ const Disclaimer = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">8. Limitation of Liability</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  To the maximum extent permitted by applicable law, AI Resume Genius, its officers,
+                  To the maximum extent permitted by applicable law, Jobrabbit.AI, its officers,
                   directors, employees, agents, and affiliates shall not be liable for any direct,
                   indirect, incidental, special, consequential, or punitive damages, including but
                   not limited to:
@@ -217,7 +217,7 @@ const Disclaimer = () => {
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   Reference to any specific company, product, process, or service by trade name,
                   trademark, manufacturer, or otherwise does not constitute or imply endorsement,
-                  recommendation, or favoring by AI Resume Genius. Any such references are for
+                  recommendation, or favoring by Jobrabbit.AI. Any such references are for
                   informational purposes only.
                 </p>
               </section>
@@ -266,14 +266,14 @@ const Disclaimer = () => {
                   <p className="text-muted-foreground mb-2">
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:support@airesumegenius.com"
+                      href="mailto:support@jobrabbit.ai"
                       className="text-primary hover:underline"
                     >
-                      support@airesumegenius.com
+                      support@jobrabbit.ai
                     </a>
                   </p>
                   <p className="text-muted-foreground">
-                    <strong>Address:</strong> AI Resume Genius, Support Department
+                    <strong>Address:</strong> Jobrabbit.AI, Support Department
                     <br />
                     Gandhinagar, Gujarat, India
                     <br />

@@ -30,7 +30,7 @@ export const Logo = ({ className = "", showText = true, size = "md" }: LogoProps
       </div>
       {showText && (
         <span className={`${textSizes[size]} font-bold text-foreground whitespace-nowrap`}>
-          Resume<span className="text-primary">AI</span>
+          Jobrabbit<span className="text-primary">.AI</span>
         </span>
       )}
     </Link>

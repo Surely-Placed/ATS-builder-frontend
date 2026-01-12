@@ -8,7 +8,7 @@ const Footer = () => {
   const quickLinks = [
     { href: "#", label: "Home" },
     { href: "#features", label: "Features" },
-    { href: "#pricing", label: "Pricing" },
+    // { href: "#pricing", label: "Pricing" },
     { href: "#contact", label: "Contact" },
   ];
 
@@ -48,7 +48,7 @@ const Footer = () => {
                 <FileText className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="text-2xl font-bold">
-                Resume<span className="text-gradient">AI</span>
+                Jobrabbit<span className="text-gradient">.AI</span>
               </span>
             </a>
             <p className="text-muted-foreground mb-6 max-w-sm">
@@ -149,7 +149,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Copyright */}
             <p className="text-sm text-muted-foreground text-center md:text-left">
-              © {currentYear} ResumeAI. All rights reserved. Built with ❤️ for job seekers.
+              © {currentYear} Jobrabbit.AI. All rights reserved. Built with ❤️ for job seekers.
             </p>
 
             {/* Social Links */}

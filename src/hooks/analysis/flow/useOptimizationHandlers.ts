@@ -5,14 +5,12 @@ import { ViewState } from "@/hooks/useResumeAnalysisStorage";
 
 interface UseOptimizationHandlersProps {
   analysisId: string | null;
-  isWebSocketConnected: boolean;
   startOptimization: () => Promise<void>;
   setViewState: (state: ViewState) => void;
 }
 
 export function useOptimizationHandlers({
   analysisId,
-  isWebSocketConnected,
   startOptimization,
   setViewState,
 }: UseOptimizationHandlersProps) {
@@ -27,19 +25,20 @@ export function useOptimizationHandlers({
       });
       return;
     }
-    if (!isWebSocketConnected) {
-      toast({
-        title: "Connection Error",
-        description:
-          "WebSocket is not connected. Please check your internet connection or try again.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     try {
       await startOptimization();
       setViewState("optimizing");
+      
+      // Save state immediately when optimization starts so it persists across refresh
+      try {
+        localStorage.setItem("resume_analysis_view_state", "optimizing");
+        if (analysisId) {
+          localStorage.setItem("resume_analysis_id", analysisId);
+        }
+      } catch (error) {
+        // Failed to save - non-critical
+      }
     } catch (err: any) {
       const errorMsg = err.message || "Failed to start optimization";
       toast({
@@ -48,7 +47,7 @@ export function useOptimizationHandlers({
         variant: "destructive",
       });
     }
-  }, [analysisId, isWebSocketConnected, startOptimization, setViewState, toast]);
+  }, [analysisId, startOptimization, setViewState, toast]);
 
   return {
     handleStartOptimization,

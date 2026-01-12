@@ -90,7 +90,9 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary flex items-center justify-center">
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-base sm:text-lg">AI Resume Genius</span>
+              <span className="font-semibold text-base sm:text-lg">
+                Jobrabbit<span className="text-primary">.AI</span>
+              </span>
             </div>
 
             <div className="flex-1" />

@@ -59,7 +59,7 @@ export const ANALYSIS_STEPS: Step[] = [
   },
 ];
 
-// Optimization Steps (async - real-time via WebSocket)
+// Optimization Steps (async - progress updates via polling)
 export const OPTIMIZATION_STEPS: Step[] = [
   {
     id: "starting",

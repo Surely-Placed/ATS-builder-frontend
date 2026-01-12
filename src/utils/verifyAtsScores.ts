@@ -139,3 +139,4 @@ export const getAtsScores = (result: AnalysisResult) => {
     improvement,
   };
 };
+

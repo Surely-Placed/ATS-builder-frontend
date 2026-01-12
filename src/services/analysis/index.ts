@@ -16,6 +16,7 @@ export { AnalysisService } from "./analysisService";
 export { OptimizationService } from "./optimizationService";
 export { DownloadService } from "./downloadService";
 export { PreviewService } from "./previewService";
+export { analyzeAndOptimize } from "./analyzeAndOptimize";
 
 // Main service class that combines all services (for backward compatibility)
 import { AnalysisService } from "./analysisService";
