@@ -31,6 +31,7 @@ export function useAnalysisProgress({
   });
 
   const analysisIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const startTimeRef = useRef<number>(0);
   const steps = ANALYSIS_STEPS;
   const totalEstimatedTime = steps.reduce((sum, step) => sum + step.estimatedTime, 0);
@@ -43,11 +44,20 @@ export function useAnalysisProgress({
 
     const startAnalysis = async () => {
       try {
-        const apiCallPromise = AnalysisApiService.analyzeResume({
-          resume_id: analysisParams.resumeId,
-          job_description: analysisParams.jobDescription,
-          job_title: analysisParams.jobTitle,
-        });
+        // Create an AbortController for this analysis so it can be cancelled
+        if (abortControllerRef.current) {
+          try { abortControllerRef.current.abort(); } catch (e) {}
+        }
+        abortControllerRef.current = new AbortController();
+
+        const apiCallPromise = AnalysisApiService.analyzeResume(
+          {
+            resume_id: analysisParams.resumeId,
+            job_description: analysisParams.jobDescription,
+            job_title: analysisParams.jobTitle,
+          },
+          { signal: abortControllerRef.current.signal }
+        );
 
         analysisIntervalRef.current = setInterval(() => {
           const elapsedTime = Date.now() - startTimeRef.current;
@@ -130,8 +140,24 @@ export function useAnalysisProgress({
       if (analysisIntervalRef.current) {
         clearInterval(analysisIntervalRef.current);
       }
+      if (abortControllerRef.current) {
+        try { abortControllerRef.current.abort(); } catch (e) {}
+        abortControllerRef.current = null;
+      }
     };
   }, []);
 
-  return progressState;
+  const cancelAnalysis = useCallback(() => {
+    if (analysisIntervalRef.current) {
+      clearInterval(analysisIntervalRef.current);
+      analysisIntervalRef.current = null;
+    }
+    if (abortControllerRef.current) {
+      try { abortControllerRef.current.abort(); } catch (e) {}
+      abortControllerRef.current = null;
+    }
+    setProgressState({ currentStep: 0, progress: 0, status: 'idle' });
+  }, []);
+
+  return { ...progressState, cancelAnalysis };
 }

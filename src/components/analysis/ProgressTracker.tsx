@@ -25,6 +25,7 @@ interface ProgressTrackerProps {
     status?: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
     error?: string;
   };
+  onCancelAvailable?: (cancel: () => void) => void;
 }
 
 export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
@@ -33,8 +34,9 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   onError,
   analysisParams,
   optimizationParams,
+  onCancelAvailable,
 }) => {
-  const analysisProgress = useAnalysisProgress({
+  const analysisProgressRaw = useAnalysisProgress({
     analysisParams: type === "analysis" ? analysisParams : undefined,
     onComplete,
     onError,
@@ -44,8 +46,18 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
     optimizationParams: type === "optimization" ? optimizationParams : undefined,
     onError,
   });
+  // analysisProgressRaw now returns progress fields plus cancelAnalysis when type=analysis
+  const progressState: any = type === "analysis" ? analysisProgressRaw : optimizationProgress;
+  const cancelAnalysisFn = type === "analysis" ? (analysisProgressRaw as any).cancelAnalysis : undefined;
 
-  const progressState = type === "analysis" ? analysisProgress : optimizationProgress;
+  // Expose cancel function to parent if provided
+  if (onCancelAvailable && cancelAnalysisFn) {
+    try {
+      onCancelAvailable(cancelAnalysisFn);
+    } catch (e) {
+      // ignore
+    }
+  }
   const isActive = progressState.status === "analyzing" || progressState.status === "optimizing";
   const isCompleted = progressState.status === "completed";
   const isFailed = progressState.status === "failed";

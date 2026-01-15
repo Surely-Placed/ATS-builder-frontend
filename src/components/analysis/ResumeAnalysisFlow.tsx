@@ -96,6 +96,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     fetchAnalysis,
     downloadResume,
     isConnected: isStatusUpdatesConnected,
+    cancelOptimization,
   } = useResumeOptimization({
     analysisId: analysisId || "",
     onComplete: async (result) => {
@@ -116,6 +117,13 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
       }
     },
   });
+
+  // Ref to hold cancel function for analysis progress
+  const cancelAnalysisRef = useRef<(() => void) | null>(null);
+
+  const handleCancelAvailable = (cancelFn: () => void) => {
+    cancelAnalysisRef.current = cancelFn;
+  };
 
     // extract the big restore-on-mount logic into a hook
     useRestoreOptimizationState({
@@ -191,6 +199,8 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     fileInputRef,
     navigate,
     toast,
+    cancelOptimization,
+    cancelAnalysis: () => cancelAnalysisRef.current && cancelAnalysisRef.current(),
   });
 
 
@@ -216,11 +226,13 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     optimizationStatus,
   });
   if (viewState === "analysis" && analysisResult) {
+    const isOptimizingFlag = optimizationStatus === 'starting' || optimizationStatus === 'running';
     return (
       <ResumeAnalysisView
         analysisResult={analysisResult}
         isStatusUpdatesConnected={isStatusUpdatesConnected}
         onStartOptimization={handleStartOptimization}
+        isOptimizing={isOptimizingFlag}
         onStartNew={handleStartNew}
       />
     );
@@ -278,6 +290,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
         onReset={handleStartNew}
         onAnalysisComplete={handleAnalysisComplete}
         onAnalysisError={handleAnalysisError}
+        onCancelAvailable={handleCancelAvailable}
       />
     </div>
   );

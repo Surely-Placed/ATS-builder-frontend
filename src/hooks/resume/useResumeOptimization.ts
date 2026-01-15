@@ -26,6 +26,7 @@ export interface UseResumeOptimizationReturn {
   isComplete: boolean;
   isFailed: boolean;
   isConnected: boolean;
+  cancelOptimization: () => void;
 }
 
 /**
@@ -137,6 +138,9 @@ export function useResumeOptimization({
 
   // Start optimization
   const startOptimization = useCallback(async () => {
+    // Prevent concurrent starts
+    if ((startOptimization as any)._inFlight) return;
+    (startOptimization as any)._inFlight = true;
     // Reset completed flag when starting new optimization
     hasCompletedRef.current = false;
     
@@ -169,12 +173,34 @@ export function useResumeOptimization({
       if (onErrorRef.current) {
         onErrorRef.current(errorMessage);
       }
-      // Resume header updates on failure
-      try {
-        usageCtx.resumeHeaderUpdates();
-      } catch (e) {}
+      // Intentionally DO NOT resume header updates here. We only resume
+      // updates when the server reports the optimization is completed so
+      // that the free-trial count is not decreased while optimization is
+      // in-flight. Resuming here could allow an intermediate response to
+      // update usage prematurely.
+      (startOptimization as any)._inFlight = false;
     }
   }, [analysisId, startPolling, usageCtx]);
+
+  const cancelOptimization = useCallback(() => {
+    try {
+      // Stop polling and reset state
+      stopPolling();
+    } catch (e) {
+      // ignore
+    }
+    hasCompletedRef.current = false;
+    setStatus('idle');
+    setProgress(0);
+    setError(null);
+    setResult(null);
+    setOptimizedResumeUrl(null);
+    try {
+      usageCtx.resumeHeaderUpdates();
+    } catch (e) {
+      // ignore
+    }
+  }, [stopPolling, usageCtx]);
 
   // Fetch latest analysis data
   const fetchAnalysis = useCallback(async () => {
@@ -190,13 +216,10 @@ export function useResumeOptimization({
   const combinedError = pollError || error;
 
   // If polling reports an error (e.g., optimization failed), ensure header updates are resumed
-  useEffect(() => {
-    if (pollError) {
-      try {
-        usageCtx.resumeHeaderUpdates();
-      } catch (e) {}
-    }
-  }, [pollError, usageCtx]);
+  // NOTE: We deliberately avoid resuming header updates on polling errors
+  // since the authoritative usage should only be fetched once the
+  // optimization completes. This prevents accidental decrements while the
+  // operation is still being processed.
 
   return {
     status,
@@ -211,6 +234,7 @@ export function useResumeOptimization({
     isComplete: status === "complete",
     isFailed: status === "failed",
     isConnected: isLoading,
+    cancelOptimization,
   };
 }
 

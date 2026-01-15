@@ -65,7 +65,15 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       (refresh as any)._inFlight = null;
       // backend may return { success: true, data: { plan, usage }} or direct data
       const payload = res?.data || res;
+      // Diagnostic log: show payload shape so we can confirm backend values
       console.debug("UsageContext.refresh: raw payload ->", payload);
+      // Also log the x-usage-remaining header if present on the response object
+      try {
+        const hdr = (res?.headers && (res.headers['x-usage-remaining'] || res.headers['X-Usage-Remaining'])) || null;
+        if (hdr !== null) console.debug('UsageContext.refresh: x-usage-remaining header from response ->', hdr);
+      } catch (e) {
+        // ignore
+      }
       const plan = payload?.plan ?? null;
       const usage = payload?.usage || payload?.usageInfo || null;
       if (usage) {

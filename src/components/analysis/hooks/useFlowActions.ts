@@ -17,6 +17,9 @@ export function useFlowActions(params: any) {
     fileInputRef,
     navigate,
     toast,
+    // optional cancel functions from optimization and analysis hooks
+    cancelOptimization,
+    cancelAnalysis,
   } = params;
 
   useEffect(() => {
@@ -35,6 +38,28 @@ export function useFlowActions(params: any) {
   }, [optimizationStatus, optimizationResult, analysisId]);
 
   const handleStartNew = () => {
+    // Mark fresh start so state restoration hooks ignore existing analysisId
+    try {
+      sessionStorage.setItem('resume_fresh_start', 'true');
+    } catch (e) {
+      // ignore
+    }
+
+    // Replace URL immediately (remove query params) to avoid race with view-state enforcement
+    const target = '/resume-analysis';
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.replaceState(window.history.state, '', target);
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    try {
+      navigate && navigate(target, { replace: true });
+    } catch (e) {
+      // ignore
+    }
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -58,7 +83,13 @@ export function useFlowActions(params: any) {
       try { fileInputRef.current.value = ''; } catch (e) { /* noop */ }
     }
 
-    navigate && navigate('/resume-analysis', { replace: true });
+    // Cancel any in-progress optimization/polling to ensure clean state
+    try {
+      cancelOptimization && cancelOptimization();
+      cancelAnalysis && cancelAnalysis();
+    } catch (e) {
+      // ignore
+    }
   };
 
   const handlePreview = () => {

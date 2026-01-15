@@ -18,7 +18,13 @@ const apiClient = axios.create({
 
 // Response interceptor: handle errors (no token handling here - cookie-based auth only)
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    try {
+      const hdr = response.headers && (response.headers['x-usage-remaining'] || response.headers['X-Usage-Remaining']);
+      if (typeof hdr !== 'undefined') console.debug('apiClient interceptor: x-usage-remaining ->', hdr);
+    } catch (e) {}
+    return response;
+  },
   (error: AxiosError) => {
     if (!error.response) return Promise.reject(error);
     if (error.response?.status === 401) {

@@ -25,6 +25,7 @@ interface ResumeAnalysisFormViewProps {
   onReset: () => void;
   onAnalysisComplete: (result: any) => void;
   onAnalysisError: (error: string) => void;
+  onCancelAvailable?: (cancel: () => void) => void;
 }
 
 export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
@@ -45,6 +46,7 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
   onReset,
   onAnalysisComplete,
   onAnalysisError,
+  onCancelAvailable,
 }) => {
   const canStartAnalysis =
     !!resumeId &&
@@ -96,6 +98,7 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
             }}
             onComplete={onAnalysisComplete}
             onError={onAnalysisError}
+            onCancelAvailable={onCancelAvailable}
           />
         )}
 

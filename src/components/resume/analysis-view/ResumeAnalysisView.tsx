@@ -12,6 +12,7 @@ interface ResumeAnalysisViewProps {
   isStatusUpdatesConnected: boolean;
   onStartOptimization: () => void;
   onStartNew: () => void;
+  isOptimizing?: boolean;
 }
 
 export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
@@ -19,6 +20,7 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
   isStatusUpdatesConnected,
   onStartOptimization,
   onStartNew,
+  isOptimizing,
 }) => {
   const { scoreBefore } = getDisplayScores(analysisResult);
 
@@ -58,6 +60,7 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
 
         <OptimizeButton
           onStartOptimization={onStartOptimization}
+          isOptimizing={isOptimizing}
         />
       </div>
     </div>

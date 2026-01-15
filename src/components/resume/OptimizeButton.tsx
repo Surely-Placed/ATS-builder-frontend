@@ -7,10 +7,12 @@ import PricingDialog from '@/components/shared/PricingDialog';
 
 interface OptimizeButtonProps {
   onStartOptimization: () => void;
+  isOptimizing?: boolean;
 }
 
 export const OptimizeButton = ({
   onStartOptimization,
+  isOptimizing,
 }: OptimizeButtonProps) => {
   const { state } = useUsage();
   const remainingRaw = state.remaining;
@@ -32,6 +34,7 @@ export const OptimizeButton = ({
       setTimeout(() => setClicked(false), 600);
       return;
     }
+    if (isOptimizing) return; // prevent duplicate starts
     setClicked(true);
     onStartOptimization();
     setTimeout(() => setClicked(false), 1200);
@@ -41,7 +44,7 @@ export const OptimizeButton = ({
     <>
       <Card className="optimize-action">
         <CardContent className="pt-6">
-          <Button onClick={handleClick} size="lg" className="btn-optimize w-full">
+          <Button onClick={handleClick} size="lg" className="btn-optimize w-full" disabled={isOptimizing}>
             <Sparkles className="w-5 h-5 mr-2" />
             Optimize Resume & Generate New Version
             {clicked && (

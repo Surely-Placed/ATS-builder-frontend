@@ -12,13 +12,15 @@ export class AnalysisService {
    * Quick Analysis (synchronous)
    * POST /api/analyze
    */
-  static async analyzeResume(data: StartAnalysisRequest): Promise<AnalysisResult> {
+  static async analyzeResume(data: StartAnalysisRequest, options?: { signal?: AbortSignal }): Promise<AnalysisResult> {
     try {
       // Track analysis start
       trackAnalysisStart(data.resume_id, data.job_title);
 
       // Rely solely on cookie-based auth. Axios instance is configured with `withCredentials: true`.
-      const response = await analysisApiClient.post<AnalysisResponse>("/analyze", data);
+      const response = await analysisApiClient.post<AnalysisResponse>("/analyze", data, {
+        signal: options?.signal,
+      });
 
       if (!response.data.success) {
         throw new Error("Failed to analyze resume");
