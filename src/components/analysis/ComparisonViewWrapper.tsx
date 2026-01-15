@@ -1,9 +1,10 @@
+import React, { useEffect } from "react";
 import ComparisonView from "./ComparisonView";
 import { AnalysisResult, OptimizationResult } from "@/services/analysisApi";
 
 interface ComparisonViewWrapperProps {
-  analysisResult: AnalysisResult;
-  optimizationResult: OptimizationResult;
+  analysisResult: AnalysisResult | null;
+  optimizationResult: OptimizationResult | null;
   handleDownload: () => void;
   handleStartNew: () => void;
   handlePreview: () => void;
@@ -33,15 +34,21 @@ export const ComparisonViewWrapper: React.FC<ComparisonViewWrapperProps> = ({
     );
   }
 
-  // If comparison state requested but optimization result isn't available yet,
-  // show a persistent placeholder/loading state instead of falling back to the form.
-  return (
-    <div className="optimizing-placeholder w-full flex items-center justify-center min-h-[300px]">
-      <div className="text-center">
-        <div className="loader mb-4" aria-hidden />
-        <h2 className="text-lg font-medium">Preparing comparison...</h2>
-        <p className="text-sm text-muted-foreground mt-2">Finishing up optimization — this may take a few seconds.</p>
-      </div>
-    </div>
-  );
+  // If optimization result is missing, treat this as a signal to clean up and
+  // send the user back to the analysis form. This avoids showing a persistent
+  // "Preparing comparison..." placeholder when the user clicks "Analyze Another".
+  useEffect(() => {
+    // Defensive: ensure we only call the cleanup if a handler is provided
+    try {
+      handleStartNew && handleStartNew();
+    } catch (e) {
+      // ignore
+    }
+    // We intentionally run this effect when the component mounts and when
+    // optimizationResult changes to null/undefined.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optimizationResult]);
+
+  // Render nothing while navigation/cleanup happens
+  return null;
 };

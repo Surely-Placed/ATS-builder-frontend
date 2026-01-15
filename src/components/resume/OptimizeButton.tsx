@@ -15,7 +15,7 @@ export const OptimizeButton = ({
   const { state } = useUsage();
   const remainingRaw = state.remaining;
   const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
-  const trialBlocked = remaining !== null && remaining <= 0;
+  const trialBlocked = (state.plan === 'free') && remaining !== null && remaining <= 0;
   const [showPricing, setShowPricing] = useState(false);
   const [clicked, setClicked] = useState(false);
 

@@ -11,7 +11,7 @@ export default function ResumeOptimization() {
   const { state } = useUsage();
   const remainingRaw = state.remaining;
   const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
-  const trialBlocked = remaining !== null && remaining <= 0;
+  const trialBlocked = (state.plan === 'free') && remaining !== null && remaining <= 0;
   const [showPricing, setShowPricing] = React.useState(false);
 
   // Always render the optimization flow and show the pricing dialog if needed

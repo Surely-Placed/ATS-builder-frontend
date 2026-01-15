@@ -35,7 +35,9 @@ export default function SubscriptionBadges() {
       const reset = new Date(s.resetsAt);
       const now = new Date();
       const msPerDay = 24 * 60 * 60 * 1000;
-      const diff = Math.ceil((reset.getTime() - now.getTime()) / msPerDay);
+      const raw = (reset.getTime() - now.getTime()) / msPerDay;
+      const diff = Math.ceil(raw);
+      if (!Number.isFinite(diff)) return null;
       return diff <= 0 ? 0 : diff;
     }
     return null;
@@ -55,11 +57,19 @@ export default function SubscriptionBadges() {
     if (!status) return <span className="text-xs text-muted-foreground">Unknown</span>;
 
     if (status.plan === 'free') {
-      const remaining = typeof status.usage?.remaining === 'number' ? status.usage!.remaining : (status.usage as any)?.remaining ?? 0;
+      const raw = (status.usage as any)?.remaining;
       const total = 10; // fixed total for free trial
+      const remaining = raw === 'unlimited'
+        ? 'unlimited'
+        : (typeof raw === 'number'
+          ? (Number.isFinite(raw) ? Math.max(0, raw) : 0)
+          : (parseInt(String(raw || '0'), 10) || 0));
+      const displayRemaining = remaining === 'unlimited'
+        ? '∞'
+        : (typeof remaining === 'number' ? (Number.isFinite(remaining) ? String(remaining) : '0') : String(remaining));
       return (
         <Badge variant="secondary" className="text-sm rounded-full px-2 py-0.5">
-          {remaining}/{total}
+          {displayRemaining}/{total}
         </Badge>
       );
     }

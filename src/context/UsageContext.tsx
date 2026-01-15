@@ -4,7 +4,7 @@ import { updateUsageFromHeader, readUsageFromStorage } from "@/utils/usage";
 
 // Simple React context store for usage
 export type UsageState = { plan: 'free' | 'premium' | 'enterprise' | null; remaining: number | "unlimited" | null; limit: number | null };
-const UsageContext = React.createContext<{ state: UsageState; refresh: () => Promise<void> } | null>(null);
+const UsageContext = React.createContext<{ state: UsageState; refresh: () => Promise<void>; suspendHeaderUpdates: () => void; resumeHeaderUpdates: () => void } | null>(null);
 
 export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = React.useState<UsageState>({ plan: null, remaining: null, limit: null });
@@ -17,6 +17,11 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updateUsageFromHeader(headerValue);
     } catch (e) {
       // ignore
+    }
+    // If updates are suspended, ignore header updates
+    if ((suspendCountRef.current ?? 0) > 0) {
+      console.debug("UsageContext: header update ignored because updates are suspended");
+      return;
     }
     if (headerValue === "unlimited") {
       const newState = { ...(({} as any) as UsageState), remaining: "unlimited", limit: null } as any;
@@ -82,6 +87,22 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
+  const suspendCountRef = React.useRef(0);
+
+  const suspendHeaderUpdates = React.useCallback(() => {
+    suspendCountRef.current = (suspendCountRef.current || 0) + 1;
+    console.debug('UsageContext: suspendHeaderUpdates ->', suspendCountRef.current);
+  }, []);
+
+  const resumeHeaderUpdates = React.useCallback(() => {
+    suspendCountRef.current = Math.max(0, (suspendCountRef.current || 0) - 1);
+    console.debug('UsageContext: resumeHeaderUpdates ->', suspendCountRef.current);
+    // When resuming, refresh authoritative usage from server
+    if (suspendCountRef.current === 0) {
+      refresh().catch(() => {});
+    }
+  }, [refresh]);
+
   // install interceptor to capture X-Usage-Remaining header from any request
   React.useEffect(() => {
     const id = analysisApiClient.interceptors.response.use(
@@ -134,7 +155,11 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [refresh]);
 
-  return <UsageContext.Provider value={{ state, refresh }}>{children}</UsageContext.Provider>;
+  return (
+    <UsageContext.Provider value={{ state, refresh, suspendHeaderUpdates, resumeHeaderUpdates }}>
+      {children}
+    </UsageContext.Provider>
+  );
 };
 
 // Hook to consume usage state
@@ -147,12 +172,16 @@ export function useUsage() {
 // Small UI component example
 export function UsageBadge() {
   const { state } = useUsage();
-  const remaining = state.remaining === "unlimited" ? "∞" : state.remaining ?? "-";
   const limit = state.limit ?? 10;
-  const used = state.remaining === "unlimited" || state.remaining === null ? 0 : Math.max(0, limit - state.remaining);
+  const remainingRaw = state.remaining;
+  const remaining = remainingRaw === "unlimited"
+    ? "∞"
+    : (typeof remainingRaw === 'number'
+      ? (Number.isFinite(remainingRaw) ? Math.max(0, remainingRaw) : 0)
+      : 0);
   return (
     <div style={{ padding: 6, borderRadius: 12, background: "#666", color: "#fff", fontSize: 12 }}>
-      <strong style={{ marginRight: 6 }}>{used}/{remaining}</strong> Free left
+      <strong style={{ marginRight: 6 }}>{remaining}/{limit}</strong> Free left
     </div>
   );
 }

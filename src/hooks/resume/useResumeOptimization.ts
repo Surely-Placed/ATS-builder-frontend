@@ -4,6 +4,7 @@ import { OptimizationService, AnalysisService } from "../../services/analysis";
 import { OptimizationResult } from "../../services/analysis/types";
 import { useAnalysisPolling } from "../../hooks/useAnalysisPolling";
 import { useResumeDownload } from "./useResumeDownload";
+import { useUsage } from '@/context/UsageContext';
 
 export interface UseResumeOptimizationOptions {
   analysisId: string;
@@ -62,6 +63,8 @@ export function useResumeOptimization({
     stopPolling,
     isLoading
   } = useAnalysisPolling();
+
+  const usageCtx = useUsage();
   
   // Do not fetch existing optimization state automatically. Callers can use `fetchAnalysis()` when desired.
   
@@ -107,6 +110,12 @@ export function useResumeOptimization({
         onCompleteRef.current(analysisStatus);
       }
       
+      // Resume header updates now that optimization is complete so usage reflects server state
+      try {
+        usageCtx.resumeHeaderUpdates();
+      } catch (e) {
+        // ignore
+      }
       // No localStorage cleanup
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,6 +145,14 @@ export function useResumeOptimization({
       setStatus('starting');
       setProgress(0);
 
+      // Suspend header-based usage updates while the optimization is in-flight so the UI doesn't
+      // immediately decrement the free-trial count. We'll resume updates when optimization completes.
+      try {
+        usageCtx.suspendHeaderUpdates();
+      } catch (e) {
+        // ignore if usage context not available
+      }
+
       const response = await OptimizationService.startOptimization(analysisId);
       
       // No localStorage logic
@@ -152,8 +169,12 @@ export function useResumeOptimization({
       if (onErrorRef.current) {
         onErrorRef.current(errorMessage);
       }
+      // Resume header updates on failure
+      try {
+        usageCtx.resumeHeaderUpdates();
+      } catch (e) {}
     }
-  }, [analysisId, startPolling]);
+  }, [analysisId, startPolling, usageCtx]);
 
   // Fetch latest analysis data
   const fetchAnalysis = useCallback(async () => {
@@ -167,6 +188,15 @@ export function useResumeOptimization({
 
   // Combine polling error with local error state
   const combinedError = pollError || error;
+
+  // If polling reports an error (e.g., optimization failed), ensure header updates are resumed
+  useEffect(() => {
+    if (pollError) {
+      try {
+        usageCtx.resumeHeaderUpdates();
+      } catch (e) {}
+    }
+  }, [pollError, usageCtx]);
 
   return {
     status,
