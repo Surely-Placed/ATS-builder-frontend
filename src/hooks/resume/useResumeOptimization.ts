@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useResumeAnalysisStorage } from "../../hooks/useResumeAnalysisStorage";
+
 import { OptimizationService, AnalysisService } from "../../services/analysis";
 import { OptimizationResult } from "../../services/analysis/types";
 import { useAnalysisPolling } from "../../hooks/useAnalysisPolling";
@@ -63,67 +63,7 @@ export function useResumeOptimization({
     isLoading
   } = useAnalysisPolling();
   
-  // Check for existing optimization state on initialization - RUN ONLY ONCE
-  useEffect(() => {
-    if (hasCheckedInitialState.current || !analysisId) return;
-    hasCheckedInitialState.current = true;
-    
-    const { isOptimizationStarted } = useResumeAnalysisStorage();
-    
-    const checkExistingOptimization = async () => {
-      try {
-        // Check if optimization was started for this analysis
-        const optimizationStarted = isOptimizationStarted(analysisId);
-        
-        // Fetch the analysis to see the current state
-        const analysis: any = await AnalysisService.getAnalysis(analysisId);
-        
-        // Check if optimization is complete by looking for optimized content
-        const hasOptimization = 
-          analysis?.optimized_resume?.file_url ||
-          analysis?.optimized_resume?.pdf_url ||
-          analysis?.optimized_resume?.url ||
-          (analysis?.analysis?.ats_score_after !== null && 
-           analysis?.analysis?.ats_score_after !== undefined) ||
-          analysis?.ats_analysis?.after;
-        
-        if (hasOptimization) {
-          // Optimization is already complete - don't start polling
-          hasCompletedRef.current = true;
-          setStatus('complete');
-          setProgress(100);
-          setResult(analysis);
-          
-          const url = analysis.optimized_resume?.file_url || 
-                      analysis.optimized_resume?.pdf_url || 
-                      analysis.optimized_resume?.url;
-          if (url) {
-            setOptimizedResumeUrl(url);
-          }
-          
-          if (onCompleteRef.current) {
-            onCompleteRef.current(analysis as any);
-          }
-          
-          // Clean up the started flag from localStorage
-          const { setOptimizationStarted } = useResumeAnalysisStorage();
-          setOptimizationStarted(analysisId, false);
-        } else if (optimizationStarted) {
-          // Optimization was started but is not complete, resume polling
-          setStatus('running');
-          setProgress(50);
-          startPolling(analysisId);
-        }
-        // If neither complete nor started, stay idle
-      } catch (err) {
-        // If fetching analysis fails, it might not exist yet or there could be network issues
-        // Don't start polling automatically
-      }
-    };
-    
-    checkExistingOptimization();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [analysisId]); // Only depend on analysisId, not on startPolling
+  // Do not fetch existing optimization state automatically. Callers can use `fetchAnalysis()` when desired.
   
   // Handle polling updates - only process when analysisStatus changes
   useEffect(() => {
@@ -167,11 +107,7 @@ export function useResumeOptimization({
         onCompleteRef.current(analysisStatus);
       }
       
-      // Clean up the started flag from localStorage on completion
-      if (analysisId) {
-        const { setOptimizationStarted } = useResumeAnalysisStorage();
-        setOptimizationStarted(analysisId, false);
-      }
+      // No localStorage cleanup
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analysisStatus, analysisId]); // Don't include stopPolling in deps
@@ -202,9 +138,7 @@ export function useResumeOptimization({
 
       const response = await OptimizationService.startOptimization(analysisId);
       
-      // Store the fact that optimization started for this analysis ID
-      const { setOptimizationStarted } = useResumeAnalysisStorage();
-      setOptimizationStarted(analysisId, true);
+      // No localStorage logic
       
       // Start polling for status updates
       startPolling(analysisId);

@@ -3,7 +3,6 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { authService } from "../services/authService";
 import { identifyUser, resetMixpanel, setUserProperties } from "../config/mixpanel";
-import { tokenStorage } from "../utils/tokenStorage";
 import { apiClient } from "../services/resumeApi";
 import { analysisApiClient } from "../services/analysis/apiClient";
 
@@ -33,30 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // ✅ Initialize token in axios defaults on app load (Safari compatibility)
-    const token = tokenStorage.getToken();
-    if (token) {
-      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      analysisApiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-      delete apiClient.defaults.headers.common["Authorization"];
-      delete analysisApiClient.defaults.headers.common["Authorization"];
-    }
-
-    // Listen to auth state changes - this will automatically restore the session
-    // from localStorage if the user was previously logged in
+    // Listen to auth state changes; backend cookie is the source of truth for auth
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
 
-      // ✅ Ensure token is set in axios defaults when user is authenticated
       if (firebaseUser) {
-        const currentToken = tokenStorage.getToken();
-        if (currentToken) {
-          apiClient.defaults.headers.common["Authorization"] = `Bearer ${currentToken}`;
-          analysisApiClient.defaults.headers.common["Authorization"] = `Bearer ${currentToken}`;
-        }
-
         // Update Mixpanel when auth state changes
         identifyUser(firebaseUser.uid);
         setUserProperties({
@@ -64,9 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: firebaseUser.displayName || undefined,
         });
       } else {
-        // Remove token from axios defaults on logout
-        delete apiClient.defaults.headers.common["Authorization"];
-        delete analysisApiClient.defaults.headers.common["Authorization"];
+        // Reset Mixpanel on logout
         resetMixpanel();
       }
     });
@@ -131,9 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       await authService.logout();
       setUser(null);
-      // Remove token from axios defaults
-      delete apiClient.defaults.headers.common["Authorization"];
-      delete analysisApiClient.defaults.headers.common["Authorization"];
       // Reset Mixpanel on logout
       resetMixpanel();
     } catch (err: any) {

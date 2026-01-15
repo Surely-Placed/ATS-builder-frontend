@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { navigate } from "@/utils/navigation";
 
 interface Props {
   children: ReactNode;
@@ -55,7 +56,7 @@ class ErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
     });
-    window.location.href = "/";
+    navigate("/", { replace: true });
   };
 
   render() {

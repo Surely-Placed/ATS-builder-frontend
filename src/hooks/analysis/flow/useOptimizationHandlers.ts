@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ViewState } from "@/hooks/useResumeAnalysisStorage";
+
+type ViewState = "form" | "analysis" | "optimizing" | "comparison" | "preview";
 
 interface UseOptimizationHandlersProps {
   analysisId: string | null;

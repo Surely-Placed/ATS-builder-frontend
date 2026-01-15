@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 interface AnalysisStatus {
   analysisId: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'initial_processed' | 'initial_failed' | 'optimization_pending' | 'optimization_processing' | 'optimization_completed' | 'optimization_failed';
   atsScoreBefore?: number;
   atsScoreAfter?: number;
   createdAt: Date;
@@ -50,6 +50,9 @@ export const useOptimizedAnalysisPolling = (config: Partial<PollingConfig> = {})
   const [fullAnalysisData, setFullAnalysisData] = useState<Record<string, FullAnalysisData>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Get API base URL from env or fallback
+  const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin + '/api' : '/api');
+
   const pollStatus = async (analysisId: string) => {
     const state = pollingStates.current[analysisId];
     if (!state || !state.isActive) return;
@@ -83,11 +86,10 @@ export const useOptimizedAnalysisPolling = (config: Partial<PollingConfig> = {})
 
     try {
       // Use the dedicated status endpoint for polling
-      const response = await fetch(`/api/analyze/${analysisId}/status`, {
-        headers: { 
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-          'Content-Type': 'application/json'
-        }
+      const statusUrl = API_BASE_URL.replace(/\/+$/, '') + `/analyze/${analysisId}/status`;
+      const response = await fetch(statusUrl, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -112,15 +114,14 @@ export const useOptimizedAnalysisPolling = (config: Partial<PollingConfig> = {})
       const data: AnalysisStatus = await response.json();
       
       // Check for terminal states
-      if (data.status === 'completed' || data.status === 'failed') {
+      if (data.status === 'optimization_completed' || data.status === 'optimization_failed' || data.status === 'initial_failed') {
         // Once completed, fetch full analysis data once
         if (!state.hasCompleted) {
           try {
-            const fullResponse = await fetch(`/api/analyze/${analysisId}`, {
-              headers: { 
-                'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-                'Content-Type': 'application/json'
-              }
+            const fullUrl = API_BASE_URL.replace(/\/+$/, '') + `/analyze/${analysisId}`;
+            const fullResponse = await fetch(fullUrl, {
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
             });
             
             if (fullResponse.ok) {

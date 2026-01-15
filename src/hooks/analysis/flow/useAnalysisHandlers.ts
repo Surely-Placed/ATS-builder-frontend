@@ -5,7 +5,8 @@ import AnalysisApiService from "@/services/analysisApi";
 import { AnalysisResult } from "@/services/analysisApi";
 import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 import { constructFallbackResult } from "@/utils/analysis/analysisResultHelpers";
-import { ViewState } from "@/hooks/useResumeAnalysisStorage";
+
+type ViewState = "form" | "analysis" | "optimizing" | "comparison" | "preview";
 
 interface UseAnalysisHandlersProps {
   setAnalysisResult: (result: AnalysisResult) => void;
@@ -14,15 +15,6 @@ interface UseAnalysisHandlersProps {
   setShowAnalysisProgress: (value: boolean) => void;
   setViewState: (state: ViewState) => void;
   setAnalysisError: (error: string | null) => void;
-  saveToStorage: (
-    result: AnalysisResult,
-    viewState: ViewState,
-    analysisId: string,
-    resumeId: string | null,
-    jobTitle: string,
-    jobDescription: string
-  ) => void;
-  setAnalysisInProgress: (inProgress: boolean) => void;
   resumeId: string | null;
   jobTitle: string;
   jobDescription: string;
@@ -36,8 +28,6 @@ export function useAnalysisHandlers({
   setShowAnalysisProgress,
   setViewState,
   setAnalysisError,
-  saveToStorage,
-  setAnalysisInProgress,
   resumeId,
   jobTitle,
   jobDescription,
@@ -68,18 +58,25 @@ export function useAnalysisHandlers({
                 setAnalysisId(fetchedAnalysisId);
                 setIsAnalyzing(false);
                 setShowAnalysisProgress(false);
-                setViewState("analysis");
-                saveToStorage(
-                  fetchedNormalized as unknown as AnalysisResult,
-                  "analysis",
-                  fetchedAnalysisId,
-                  resumeId,
-                  jobTitle,
-                  jobDescription
-                );
+                // Only switch to the analysis view if we're not currently on the optimization/comparison page
+                if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
+                  setViewState("analysis");
+                }
+                // Removed saveToStorage
 
-                // Update URL with analysisId for proper routing
-                navigate(`/resume-optimization?analysisId=${fetchedAnalysisId}`, { replace: true });
+                // Update URL with analysisId for proper routing (preserve originating route)
+                // If we're already on the optimization or comparison page, avoid navigating (preserve user's current view)
+                if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
+                  // Ensure query param is present without forcing a navigation
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('analysisId', fetchedAnalysisId);
+                  window.history.replaceState(window.history.state, '', url.toString());
+                  // preserved optimization route, set analysisId query
+                } else {
+                  const targetPath = '/resume-analysis';
+                  // navigating to analysis route
+                  navigate(`${targetPath}?analysisId=${fetchedAnalysisId}`, { replace: true });
+                }
 
                 if (onComplete) onComplete();
                 return;
@@ -96,18 +93,22 @@ export function useAnalysisHandlers({
           setAnalysisId(fallbackAnalysisId);
           setIsAnalyzing(false);
           setShowAnalysisProgress(false);
-          setViewState("analysis");
-          saveToStorage(
-            fallbackResult,
-            "analysis",
-            fallbackAnalysisId,
-            resumeId,
-            jobTitle,
-            jobDescription
-          );
+          // Preserve optimization/comparison flow if user is on the optimization page
+          if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
+            setViewState("analysis");
+          }
+          // Removed saveToStorage
 
-          // Update URL with analysisId for proper routing
-          navigate(`/resume-optimization?analysisId=${fallbackAnalysisId}`, { replace: true });
+          // Update URL with analysisId for proper routing (preserve originating route)
+          if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('analysisId', fallbackAnalysisId);
+            window.history.replaceState(window.history.state, '', url.toString());
+            // preserved optimization route (fallback), set analysisId
+          } else {
+            // navigating to analysis route (fallback)
+            navigate(`/resume-analysis?analysisId=${fallbackAnalysisId}`, { replace: true });
+          }
 
           if (onComplete) onComplete();
           return;
@@ -118,26 +119,24 @@ export function useAnalysisHandlers({
         setAnalysisId(analysisId);
         setIsAnalyzing(false);
         setShowAnalysisProgress(false);
-        setViewState("analysis");
-        
-        // Clear the in-progress flag since analysis is complete
-        try {
-          setAnalysisInProgress(false);
-        } catch (e) {
-          // Ignore
+        // Don't force navigation away from the optimization/comparison flow; only switch to analysis view
+        // when not currently on the optimization/comparison page.
+        if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
+          setViewState("analysis");
         }
         
-        saveToStorage(
-          normalizedResult as unknown as AnalysisResult,
-          "analysis",
-          analysisId,
-          resumeId,
-          jobTitle,
-          jobDescription
-        );
+        // Removed setAnalysisInProgress and saveToStorage
 
-        // Update URL with analysisId for proper routing
-        navigate(`/resume-optimization?analysisId=${analysisId}`, { replace: true });
+        // Update URL with analysisId for proper routing (preserve originating route)
+        if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('analysisId', analysisId);
+          window.history.replaceState(window.history.state, '', url.toString());
+          // preserved optimization route, set analysisId
+        } else {
+          // navigating to analysis route
+          navigate(`/resume-analysis?analysisId=${analysisId}`, { replace: true });
+        }
 
         if (onComplete) onComplete();
       } catch (error: any) {
@@ -152,8 +151,7 @@ export function useAnalysisHandlers({
       setIsAnalyzing,
       setShowAnalysisProgress,
       setViewState,
-      saveToStorage,
-      setAnalysisInProgress,
+      // removed
       resumeId,
       jobTitle,
       jobDescription,
@@ -190,22 +188,7 @@ export function useAnalysisHandlers({
     setIsAnalyzing(true);
     setShowAnalysisProgress(true);
     
-    // Save state immediately when analysis starts so it persists across refresh
-    try {
-      // Save form data even without analysis result yet
-      saveToStorage(
-        null, // analysisResult
-        "form", // viewState - we're starting analysis
-        null, // analysisId
-        resumeId,
-        jobTitle,
-        jobDescription
-      );
-      // Save a flag to indicate analysis is in progress
-      setShowAnalysisProgress(true);
-    } catch (error) {
-      // Failed to save - non-critical
-    }
+    // Removed saveToStorage and setAnalysisInProgress
   }, [
     resumeId,
     jobTitle,

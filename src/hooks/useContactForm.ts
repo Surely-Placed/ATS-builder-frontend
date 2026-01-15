@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import confetti from "canvas-confetti";
 import { API_BASE_URL } from "@/config/api";
 
@@ -27,10 +28,10 @@ export interface UseContactFormReturn {
  */
 export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
   const endpoint = useMemo(() => `${API_BASE_URL.replace(/\/$/, "")}/contact`, []);
+  const location = useLocation();
   const sourceUrl = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return window.location.href;
-  }, []);
+    return `${window.location.origin}${location.pathname}${location.search}`;
+  }, [location]);
 
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
@@ -108,6 +109,7 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
 
         const res = await fetch(endpoint, {
           method: "POST",
+          credentials: 'include',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });

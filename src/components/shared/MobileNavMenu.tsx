@@ -1,4 +1,5 @@
 import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -31,13 +32,17 @@ export const MobileNavMenu = ({
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
+  const navigate = useNavigate();
 
   const handleClick = (url: string) => {
     setOpen(false);
     if (onItemClick) {
       onItemClick(url);
-    } else {
+    } else if (url.startsWith("#")) {
+      // Handle anchor links
       window.location.href = url;
+    } else {
+      navigate(url);
     }
   };
 

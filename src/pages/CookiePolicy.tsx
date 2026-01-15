@@ -16,10 +16,10 @@ const CookiePolicy = () => {
   return (
     <>
       <Helmet>
-        <title>Cookie Policy - Jobrabbit.AI</title>
+        <title>Cookie Policy - Jobrabbit</title>
         <meta
           name="description"
-          content="Cookie Policy for Jobrabbit.AI. Learn about how we use cookies and similar technologies on our website."
+          content="Cookie Policy for Jobrabbit. Learn about how we use cookies and similar technologies on our website."
         />
       </Helmet>
 
@@ -54,7 +54,7 @@ const CookiePolicy = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">2. How We Use Cookies</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Jobrabbit.AI uses cookies and similar tracking technologies to enhance your
+                  Jobrabbit uses cookies and similar tracking technologies to enhance your
                   experience on our Service. We use cookies for the following purposes:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
@@ -342,14 +342,14 @@ const CookiePolicy = () => {
                   <p className="text-muted-foreground mb-2">
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:privacy@jobrabbit.ai"
+                      href="mailto:privacy@Jobrabbit"
                       className="text-primary hover:underline"
                     >
-                      privacy@jobrabbit.ai
+                      privacy@Jobrabbit
                     </a>
                   </p>
                   <p className="text-muted-foreground">
-                    <strong>Address:</strong> Jobrabbit.AI, Privacy Department
+                    <strong>Address:</strong> Jobrabbit, Privacy Department
                     <br />
                     Gandhinagar, Gujarat, India
                     <br />

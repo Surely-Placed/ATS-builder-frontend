@@ -16,10 +16,10 @@ const PrivacyPolicy = () => {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - Jobrabbit.AI</title>
+        <title>Privacy Policy - Jobrabbit</title>
         <meta
           name="description"
-          content="Privacy Policy for Jobrabbit.AI. Learn how we collect, use, and protect your personal information."
+          content="Privacy Policy for Jobrabbit. Learn how we collect, use, and protect your personal information."
         />
       </Helmet>
 
@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Jobrabbit.AI ("we," "our," or "us") is committed to protecting your privacy.
+                  Jobrabbit ("we," "our," or "us") is committed to protecting your privacy.
                   This Privacy Policy explains how we collect, use, disclose, and safeguard your
                   information when you use our AI-powered resume optimization service ("Service").
                   Please read this Privacy Policy carefully. By using our Service, you agree to the
@@ -200,10 +200,10 @@ const PrivacyPolicy = () => {
                 <p className="text-muted-foreground leading-relaxed mt-4">
                   To exercise these rights, please contact us at{" "}
                   <a
-                    href="mailto:privacy@jobrabbit.ai"
+                    href="mailto:privacy@Jobrabbit"
                     className="text-primary hover:underline"
                   >
-                    privacy@jobrabbit.ai
+                    privacy@Jobrabbit
                   </a>
                 </p>
               </section>
@@ -247,14 +247,14 @@ const PrivacyPolicy = () => {
                   <p className="text-muted-foreground mb-2">
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:privacy@jobrabbit.ai"
+                      href="mailto:privacy@Jobrabbit"
                       className="text-primary hover:underline"
                     >
-                      privacy@jobrabbit.ai
+                      privacy@Jobrabbit
                     </a>
                   </p>
                   <p className="text-muted-foreground">
-                    <strong>Address:</strong> Jobrabbit.AI, Privacy Department
+                    <strong>Address:</strong> Jobrabbit, Privacy Department
                     <br />
                     Gandhinagar, Gujarat, India
                     <br />

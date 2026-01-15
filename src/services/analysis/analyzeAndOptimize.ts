@@ -2,7 +2,7 @@ import { AnalysisService } from "./analysisService";
 import { OptimizationService } from "./optimizationService";
 
 export type JobStatus = {
-  status: "pending" | "running" | "complete" | "failed";
+  status: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
   progress: number;
   result?: any;
   error?: string;
@@ -41,10 +41,10 @@ export async function analyzeAndOptimize(
       error: job.error ?? undefined,
     };
 
-    if (s.status === "complete") {
+    if (s.status === "optimization_completed") {
       return { analysisId, jobId, qualityScore, result: s.result };
     }
-    if (s.status === "failed") {
+    if (s.status === "optimization_failed") {
       throw new Error(s.error || "Optimization failed");
     }
 

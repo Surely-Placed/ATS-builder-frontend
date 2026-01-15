@@ -1,11 +1,20 @@
+import React from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import ResumeAnalysisFlow from "@/components/analysis/ResumeAnalysisFlow";
+import { useUsage } from '@/context/UsageContext';
+import PricingDialog from '@/components/shared/PricingDialog';
 
 export default function ResumeOptimization() {
   const handleAnalysisComplete = () => {
     // Handle completion if needed (e.g., show notification, update dashboard stats, etc.)
   };
+  const { state } = useUsage();
+  const remainingRaw = state.remaining;
+  const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
+  const trialBlocked = remaining !== null && remaining <= 0;
+  const [showPricing, setShowPricing] = React.useState(false);
 
+  // Always render the optimization flow and show the pricing dialog if needed
   return (
     <DashboardLayout activeTab="Resume Optimization">
       <div className="space-y-4 sm:space-y-6">

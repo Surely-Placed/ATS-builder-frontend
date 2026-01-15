@@ -15,6 +15,7 @@ export const useDashboard = () => {
     const retryDelay = 500; // Start with 500ms delay
 
     try {
+      console.debug('useDashboard: fetchDashboardStats start, retryCount=', retryCount);
       setLoading(true);
       setError(null);
 
@@ -26,61 +27,95 @@ export const useDashboard = () => {
 
       if (response.data.success) {
         const rawData = response.data.data as any;
+        console.debug('useDashboard: /dashboard/stats response ->', rawData);
+                
         let statsData: DashboardStats;
-
+      
         // Handle snake_case to camelCase conversion if needed
         if (rawData.recent_activity && !rawData.recentActivity) {
+          const mappedOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
+                  
           statsData = {
             recentActivity: rawData.recent_activity.map((activity: any) => ({
               id: activity.id,
-              resumeId: activity.resume_id || activity.resumeId,
-              jobId: activity.job_id || activity.jobId,
-              jobTitle: activity.job_title || activity.jobTitle,
-              atsScoreBefore: activity.ats_score_before ?? activity.atsScoreBefore ?? 0,
-              atsScoreAfter: activity.ats_score_after ?? activity.atsScoreAfter ?? null,
-              scoreImprovement: activity.score_improvement ?? activity.scoreImprovement ?? null,
-              status: activity.status,
-              createdAt: activity.created_at || activity.createdAt,
+                resumeId: activity.resume_id || activity.resumeId,
+                jobId: activity.job_id || activity.jobId,
+                jobTitle: activity.job_title || activity.jobTitle,
+                atsScoreBefore:
+                  activity.ats_score_before ??
+                  (activity.atsScoreBefore !== undefined ? activity.atsScoreBefore : null),
+                atsScoreAfter: activity.ats_score_after ?? activity.atsScoreAfter ?? null,
+                scoreImprovement: activity.score_improvement ?? activity.scoreImprovement ?? null,
+                status: activity.status,
+                createdAt: activity.created_at || activity.createdAt,
             })),
             averageAtsScore: rawData.average_ats_score ?? rawData.averageAtsScore ?? null,
             resumesAnalyzed: rawData.resumes_analyzed ?? rawData.resumesAnalyzed ?? 0,
-            optimizations: rawData.optimizations ?? 0,
+            optimizations: mappedOptimizations,
           };
         } else {
+          const directOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
           statsData = rawData as DashboardStats;
+          statsData.optimizations = directOptimizations;
         }
-
-        // If ATS scores are 0 or missing, try to fetch them from individual analyses
+      
+        // Always enrich activity data and compute optimizations count from actual data
+        let optimizationsCount = 0;
         const enrichedActivity = await Promise.all(
           statsData.recentActivity.map(async (activity) => {
-            // Check if score is 0, null, or undefined - fetch from analysis details
-            const needsFetch = !activity.atsScoreBefore || activity.atsScoreBefore === 0;
+            let enrichedAct = activity;
 
-            if (needsFetch) {
-              try {
-                const analysisResult = await AnalysisService.getAnalysis(activity.id);
+            // Always try to fetch fresh data for accuracy
+            try {
+              const analysisResult = await AnalysisService.getAnalysis(activity.id);
 
-                // Use getDisplayScores to properly extract scores (handles all formats)
-                const displayScores = getDisplayScores({
-                  analysis: analysisResult.analysis,
-                  ats_analysis: analysisResult.ats_analysis,
-                });
+              // Use getDisplayScores to properly extract scores (handles all formats)
+              const displayScores = getDisplayScores({
+                analysis: analysisResult.analysis,
+                ats_analysis: analysisResult.ats_analysis,
+              });
 
-                return {
-                  ...activity,
-                  atsScoreBefore: displayScores.scoreBefore,
-                  atsScoreAfter: displayScores.scoreAfter,
-                  scoreImprovement: displayScores.improvement,
-                };
-              } catch (err) {
-                // Return original activity if fetch fails
-                return activity;
+              enrichedAct = {
+                ...activity,
+                atsScoreBefore: displayScores.scoreBefore,
+                atsScoreAfter: displayScores.scoreAfter,
+                scoreImprovement: displayScores.improvement,
+              };
+
+              // Count this as an optimization if it has an after score
+              if (displayScores.scoreAfter !== null && displayScores.scoreAfter !== undefined) {
+                optimizationsCount++;
+              }
+            } catch (err) {
+              // If fetch fails, check existing data
+              if (activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined) {
+                optimizationsCount++;
               }
             }
 
-            return activity;
+            return enrichedAct;
           })
         );
+
+        // Override the optimizations count with our computed value
+        statsData.optimizations = optimizationsCount;
+
+        // Attempt to read the authoritative total optimizations from the profile stats
+        try {
+          const profileResp = await apiClient.get<{ success: boolean; data: any }>(
+            "/profile/stats"
+          );
+          if (profileResp.data?.success && profileResp.data.data?.totalOptimizations !== undefined) {
+            const profileOptimizations = profileResp.data.data.totalOptimizations;
+            console.debug('useDashboard: profile.totalOptimizations ->', profileOptimizations, 'computedOptimizations=', optimizationsCount);
+            // Prefer profile's totalOptimizations as the authoritative value
+            statsData.optimizations = profileOptimizations;
+          }
+        } catch (e) {
+          // ignore - fall back to computed value
+        }
+
+        console.debug('useDashboard: enrichedActivity ->', enrichedActivity, 'optimizationsCount=', optimizationsCount);
 
         setStats({
           ...statsData,

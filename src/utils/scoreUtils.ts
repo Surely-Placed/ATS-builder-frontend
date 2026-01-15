@@ -201,6 +201,32 @@ export function getScoreColor(score: number): string {
   return "#ef4444"; // red-500
 }
 
+// --- Presentation helpers (Tailwind class helpers) ---
+export function getScoreColorClass(score: number): string {
+  if (score >= 80) return "text-green-600 dark:text-green-400";
+  if (score >= 60) return "text-blue-600 dark:text-blue-400";
+  if (score >= 40) return "text-amber-600 dark:text-amber-400";
+  return "text-red-600 dark:text-red-400";
+}
+
+export function getScoreBgClass(score: number): string {
+  if (score >= 80) return "bg-green-500/10 border-green-500/20";
+  if (score >= 60) return "bg-blue-500/10 border-blue-500/20";
+  if (score >= 40) return "bg-amber-500/10 border-amber-500/20";
+  return "bg-red-500/10 border-red-500/20";
+}
+
+export function getLevelBadgeClass(level: string): string {
+  const styles: Record<string, string> = {
+    Excellent: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    Good: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+    Average: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    "Needs Improvement": "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+    Strong: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+  };
+  return styles[level] || "bg-muted text-muted-foreground";
+}
+
 export const getScoreLevel = (score: number): string => {
   if (score >= 80) return "excellent";
   if (score >= 60) return "good";

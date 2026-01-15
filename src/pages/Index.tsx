@@ -10,7 +10,7 @@ import { CTASection } from "@/components/sections/cta";
 import Footer from "@/components/layouts/Footer";
 import { HowItWorks } from "@/components/ui/how-it-works";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
-// import PricingSection from "@/components/sections/PricingSection";
+import PricingSection from "@/components/sections/PricingSection";
 import { LoginModal } from "@/components/ui/login-modal";
 import { SignupModal } from "@/components/ui/signup-modal";
 import { ForgotPasswordModal } from "@/components/ui/forgot-password-modal";
@@ -61,10 +61,10 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Jobrabbit.AI - AI-Powered ATS Resume Builder & Optimizer</title>
+        <title>Jobrabbit - AI-Powered ATS Resume Builder & Optimizer</title>
         <meta
           name="description"
-          content="Upload your resume, let AI fix ATS compatibility issues, and download a perfectly optimized PDF. No manual editing required. Get more interviews with Jobrabbit.AI."
+          content="Upload your resume, let AI fix ATS compatibility issues, and download a perfectly optimized PDF. No manual editing required. Get more interviews with Jobrabbit."
         />
         <meta
           name="keywords"
@@ -95,7 +95,7 @@ const Index = () => {
           <FeaturesSection />
           <HowItWorks />
           <BrandsSection />
-          {/* <PricingSection /> */}
+          <PricingSection />
           <TestimonialsSection />
           <StatsSection />
           <CTASection />

@@ -86,37 +86,24 @@ export const useAnalysisPolling = () => {
       if (jobId) {
         // Poll job status
         data = await OptimizationService.getJobStatus(jobId);
-        isCompleted = data.status === 'complete' || data.status === 'failed';
+        isCompleted = data.status === 'optimization_completed' || data.status === 'optimization_failed';
+        setProgress(Math.min(data.progress || 0, 100));
       } else {
-        // Poll analysis status - use the FULL endpoint to get complete data
-        // This is needed because optimization updates the analysis record
-        data = await AnalysisService.getAnalysis(analysisId);
+        // Poll analysis status using the /status endpoint (lightweight)
+        const statusResult = await AnalysisService.getAnalysisStatus(analysisId);
+        isCompleted = statusResult.isCompleted;
+        setProgress(statusResult.progress);
         
-        // Check if optimization is complete
-        isCompleted = !!(
-          data?.optimized_resume?.file_url || 
-          data?.optimized_resume?.pdf_url ||
-          data?.optimized_resume?.url ||
-          (data?.analysis?.ats_score_after !== null && data?.analysis?.ats_score_after !== undefined) ||
-          data?.ats_analysis?.after
-        );
-        
+        // If completed, fetch full analysis data
+        if (isCompleted && statusResult.status === 'optimization_completed') {
+          data = await AnalysisService.getAnalysis(analysisId);
+        } else {
+          // Use status data or set placeholder
+          data = statusResult.data || { status: statusResult.status, progress: statusResult.progress };
         }
+      }
 
       setAnalysisStatus(data);
-
-      // Handle progress updates based on analysis data
-      if (!jobId && data?.analysis) {
-        // Calculate progress based on whether after scores exist
-        if (data.analysis.ats_score_after !== null && data.analysis.ats_score_after !== undefined) {
-          setProgress(100); // Optimization complete
-        } else {
-          // If we know optimization was started but not complete, set intermediate progress
-          setProgress(50); // Halfway progress
-        }
-      } else if (jobId && data.progress !== undefined) {
-        setProgress(Math.min(data.progress, 100)); // Cap at 100%
-      }
 
       // CRITICAL: Stop polling if complete
       if (isCompleted) {

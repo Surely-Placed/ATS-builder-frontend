@@ -11,11 +11,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Menu, FileText, Sparkles, FolderOpen } from "lucide-react";
+import { Menu, Sparkles, FolderOpen, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { HeaderActions } from "@/components/shared/HeaderActions";
 import { DashboardSidebar } from "@/components/shared/DashboardSidebar";
+import { Logo } from "@/components/shared/Logo";
+import DashboardSubscription from "@/components/subscription/DashboardSubscription";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -30,12 +32,12 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const tabs = [
-    { id: "Dashboard", label: "Dashboard", path: "/dashboard", icon: FileText },
+    { id: "Dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { id: "Documents", label: "Documents", path: "/documents", icon: FolderOpen },
     {
       id: "Resume Optimization",
       label: "Resume Optimization",
-      path: "/resume-optimization",
+      path: "/resume-analysis",
       icon: Sparkles,
     },
   ];
@@ -68,6 +70,7 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {activeTab !== "Profile" && (
+        <>
         <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-4 px-4 sm:px-6">
             {/* Sidebar */}
@@ -86,21 +89,29 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
             />
 
             {/* Logo/Brand in header */}
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary flex items-center justify-center">
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-base sm:text-lg">
-                Jobrabbit<span className="text-primary">.AI</span>
-              </span>
-            </div>
+            <Logo size="md" />
 
             <div className="flex-1" />
 
-            {/* Right side actions */}
-            <HeaderActions themeToggleVariant="icon" />
+            {/* Right side actions: on small screens stack count below profile */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <HeaderActions themeToggleVariant="icon" />
+                {/* Show count in header only on 2xl+; for smaller screens (including laptop) show below header */}
+                <div className="hidden 2xl:block">
+                  <DashboardSubscription />
+                </div>
+              </div>
+            </div>
           </div>
         </header>
+        {/* Show count below header for screens smaller than 2xl (mobile & laptop) so profile remains inside header */}
+        <div className="2xl:hidden px-4 sm:px-6">
+          <div className="flex justify-end py-2">
+            <DashboardSubscription />
+          </div>
+        </div>
+        </>
       )}
 
       <div className="flex flex-1">

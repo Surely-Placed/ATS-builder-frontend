@@ -16,7 +16,8 @@ export default function ResumeAnalyzer() {
     } else {
       navigate("/resume-analysis", { replace: true });
     }
-  }, [navigate, analysisId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisId]);
 
   return null; // Component will redirect immediately
 }

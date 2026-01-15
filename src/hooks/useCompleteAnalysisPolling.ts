@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 interface AnalysisStatus {
   analysisId: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'initial_processed' | 'initial_failed' | 'optimization_pending' | 'optimization_processing' | 'optimization_completed' | 'optimization_failed';
   atsScoreBefore?: number;
   atsScoreAfter?: number;
   createdAt: Date;
@@ -122,12 +122,10 @@ export const useCompleteAnalysisPolling = (config: Partial<PollingConfig> = {}) 
     }
 
     try {
-      // Use the dedicated status endpoint for polling
+      // Use the dedicated status endpoint for polling (cookie-based auth)
       const response = await fetch(`/api/analyze/${analysisId}/status`, {
-        headers: { 
-          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-          'Content-Type': 'application/json'
-        }
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -155,16 +153,14 @@ export const useCompleteAnalysisPolling = (config: Partial<PollingConfig> = {}) 
       setAnalysisStatus(prev => ({ ...prev, [analysisId]: data }));
 
       // Check for terminal states
-      if (data.status === 'completed' || data.status === 'failed') {
+      if (data.status === 'optimization_completed' || data.status === 'optimization_failed' || data.status === 'initial_failed') {
         // Once completed, fetch full analysis data once
         if (!state.hasFetchedFullData) {
           setLoadingStates(prev => ({ ...prev, [analysisId]: true }));
           try {
             const fullResponse = await fetch(`/api/analyze/${analysisId}`, {
-              headers: { 
-                'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
-                'Content-Type': 'application/json'
-              }
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
             });
             
             if (fullResponse.ok) {

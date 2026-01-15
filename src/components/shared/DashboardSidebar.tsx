@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { FileText, LogOut, LucideIcon } from "lucide-react";
+import { LogOut, LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SidebarThemeToggle } from "./SidebarThemeToggle";
+import { Logo } from "@/components/shared/Logo";
 
 interface Tab {
   id: string;
@@ -50,12 +51,7 @@ export const DashboardSidebar = ({
         <div className="flex flex-col gap-6 pt-6">
           {/* Logo/Brand */}
           <div className="flex items-center gap-2 pb-4">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <FileText className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-lg">
-              Jobrabbit<span className="text-primary">.AI</span>
-            </span>
+            <Logo size="md" />
           </div>
 
           <Separator />

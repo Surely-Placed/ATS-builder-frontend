@@ -4,7 +4,6 @@ import { AnalysisResult } from "@/services/analysisApi";
 import { getDisplayScores } from "@/utils/scoreUtils";
 import { ResumeQualityFeedback } from "@/components/analysis/ResumeQualityFeedback";
 import { ScoreCard } from "../ScoreCard";
-import { BreakdownCards } from "../BreakdownCards";
 import { AIInsights } from "../AIInsights";
 import { OptimizeButton } from "../OptimizeButton";
 
@@ -23,7 +22,6 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
 }) => {
   const { scoreBefore } = getDisplayScores(analysisResult);
 
-  const breakdown = analysisResult?.ats_analysis?.before?.breakdown;
   const strengths = analysisResult?.ats_analysis?.ai_insights?.strengths || [];
   const weaknesses = analysisResult?.ats_analysis?.ai_insights?.weaknesses || [];
   const recommendations = analysisResult?.ats_analysis?.ai_insights?.recommendations || [];
@@ -32,19 +30,17 @@ export const ResumeAnalysisView: React.FC<ResumeAnalysisViewProps> = ({
   const hasAtsAnalysis = !!analysisResult?.ats_analysis;
 
   return (
-    <div className="resume-analysis-flow">
-      <div className="analysis-view">
+    <div className="resume-analysis-flow w-full px-2 sm:px-4 md:px-0">
+      <div className="analysis-view w-full">
         {/* Header */}
-        <div className="view-header">
-          <h1>Resume Analysis Complete</h1>
-          <Button onClick={onStartNew} variant="outline">
+        <div className="view-header flex flex-col sm:flex-row gap-3 sm:gap-0">
+          <h1 className="text-lg sm:text-xl md:text-2xl">Resume Analysis Complete</h1>
+          <Button onClick={onStartNew} variant="outline" className="w-full sm:w-auto text-sm sm:text-base">
             ← Start New Analysis
           </Button>
         </div>
 
         <ScoreCard score={scoreBefore} />
-
-        {hasAtsAnalysis && <BreakdownCards breakdown={breakdown} />}
 
         <ResumeQualityFeedback
           qualityScore={resumeQuality || null}

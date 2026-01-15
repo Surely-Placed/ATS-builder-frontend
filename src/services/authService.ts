@@ -99,33 +99,19 @@ export const authService = {
 
       const firebaseToken = await user.getIdToken();
 
-      // Get stored token if available (for Safari fallback)
-      const { tokenStorage } = await import("../utils/tokenStorage");
-      const storedToken = tokenStorage.getToken();
-
+      // Send firebase token to backend; backend sets httpOnly cookie on success
       const response = await fetch(`${API_URL}/auth/firebase`, {
         method: "POST",
-        credentials: "include", // Required for cookies
-        headers: {
-          "Content-Type": "application/json",
-          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firebase_token: firebaseToken }),
       });
+
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
 
-      // ✅ CRITICAL: Store token from response for Safari compatibility
-      // Backend returns: { success: true, data: { token: "...", user: {...} } }
-      const token = data.data?.token || data.token;
-      if (token) {
-        const { tokenStorage } = await import("../utils/tokenStorage");
-        tokenStorage.setToken(token);
-        // Also set it in axios defaults for immediate use
-        const { apiClient } = await import("./resumeApi");
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
+      // Do NOT return or store token in frontend. Backend will set httpOnly cookie.
 
       // Track login event
       trackLogin("email");
@@ -147,33 +133,18 @@ export const authService = {
       const result = await signInWithPopup(auth, provider);
       const firebaseToken = await result.user.getIdToken();
 
-      // Get stored token if available (for Safari fallback)
-      const { tokenStorage } = await import("../utils/tokenStorage");
-      const storedToken = tokenStorage.getToken();
-
       const response = await fetch(`${API_URL}/auth/firebase`, {
         method: "POST",
-        credentials: "include", // Required for cookies
-        headers: {
-          "Content-Type": "application/json",
-          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firebase_token: firebaseToken }),
       });
+
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Google sign-in failed");
 
-      // ✅ CRITICAL: Store token from response for Safari compatibility
-      // Backend returns: { success: true, data: { token: "...", user: {...} } }
-      const token = data.data?.token || data.token;
-      if (token) {
-        const { tokenStorage } = await import("../utils/tokenStorage");
-        tokenStorage.setToken(token);
-        // Also set it in axios defaults for immediate use
-        const { apiClient } = await import("./resumeApi");
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
+      // Do NOT store token in frontend; backend will set httpOnly cookie.
 
       // Track Google sign-in event (could be login or signup)
       trackLogin("google");
@@ -215,20 +186,10 @@ export const authService = {
   async logout() {
     try {
       await signOut(auth);
-      // Get stored token for logout request (Safari fallback)
-      const { tokenStorage } = await import("../utils/tokenStorage");
-      const storedToken = tokenStorage.getToken();
-
       await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
-        credentials: "include", // Required for cookies
-        headers: {
-          ...(storedToken && { Authorization: `Bearer ${storedToken}` }), // Fallback for Safari
-        },
+        credentials: "include",
       });
-
-      // Remove stored token
-      tokenStorage.removeToken();
 
       // Track logout event
       trackLogout();

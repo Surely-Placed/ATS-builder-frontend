@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { useCompleteAnalysisPolling } from '../../hooks/useCompleteAnalysisPolling';
+import React from 'react';
+import { useUnifiedAnalysisPolling } from '../../hooks/useUnifiedAnalysisPolling';
+import { renderField } from '@/utils/analysis/renderField';
 
 interface CompleteAnalysisDisplayProps {
   analysisId: string;
@@ -11,17 +12,19 @@ export const CompleteAnalysisDisplay: React.FC<CompleteAnalysisDisplayProps> = (
     errors, 
     isLoading, 
     startPolling, 
-    isDataComplete,
     hasError 
-  } = useCompleteAnalysisPolling();
+  } = useUnifiedAnalysisPolling({fetchFullDataOnComplete: true});
   
   const data = fullAnalysisData[analysisId];
 
-  useEffect(() => {
-    if (analysisId) {
-      startPolling(analysisId);
-    }
-  }, [analysisId, startPolling]);
+  // Do not automatically start polling on mount. Require explicit user action.
+
+  const handleStart = () => {
+    if (analysisId) startPolling(analysisId);
+  };
+
+  // stop is not exposed by the hook; provide a no-op for the UI
+  const handleStop = () => {};
 
   if (hasError(analysisId)) {
     return <div className="text-red-500">Error: {errors[analysisId]}</div>;
@@ -37,18 +40,18 @@ export const CompleteAnalysisDisplay: React.FC<CompleteAnalysisDisplayProps> = (
   }
 
   if (!data) {
-    return <div>Loading analysis data...</div>;
+    return (
+      <div className="p-4">
+        <p>Complete analysis not loaded.</p>
+        <div className="mt-3">
+          <button className="btn-primary mr-2" onClick={handleStart}>Load Complete Analysis</button>
+        </div>
+      </div>
+    );
   }
 
-  // Helper function to render field with fallback
-  const renderField = (value: any, label: string, fallback: string = "Not Available") => {
-    if (value === null || value === undefined || 
-        (Array.isArray(value) && value.length === 0) ||
-        (typeof value === 'object' && Object.keys(value).length === 0)) {
-      return <span className="text-gray-500 italic">{fallback}</span>;
-    }
-    return <span>{value.toString()}</span>;
-  };
+  // Import the shared renderField utility function
+  // This was extracted to utils/analysis/renderField.tsx for reusability
 
   return (
     <div className="analysis-complete-display p-6">

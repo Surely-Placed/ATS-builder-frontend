@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { ANALYSIS_STEPS, OPTIMIZATION_STEPS } from "@/constants/analysis/steps";
 import { useAnalysisProgress } from "@/hooks/analysis/progress/useAnalysisProgress";
 import { useOptimizationProgress } from "@/hooks/analysis/progress/useOptimizationProgress";
@@ -22,7 +22,7 @@ interface ProgressTrackerProps {
     analysisId: string;
     jobId?: string;
     progress?: number;
-    status?: "pending" | "running" | "complete" | "failed";
+    status?: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
     error?: string;
   };
 }
@@ -46,28 +46,32 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   });
 
   const progressState = type === "analysis" ? analysisProgress : optimizationProgress;
-  const steps = type === "analysis" ? ANALYSIS_STEPS : OPTIMIZATION_STEPS;
-
-  const currentStep = steps[progressState.currentStep];
   const isActive = progressState.status === "analyzing" || progressState.status === "optimizing";
   const isCompleted = progressState.status === "completed";
   const isFailed = progressState.status === "failed";
 
+  // Use appropriate steps based on type
+  const steps = type === "analysis" ? ANALYSIS_STEPS : OPTIMIZATION_STEPS;
+  const currentStep = steps[progressState.currentStep];
+
   return (
-    <div className="w-full">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Loader2 className={`w-5 h-5 ${isActive ? "animate-spin" : ""} text-primary`} />
+    <div className="w-full px-2 sm:px-0">
+      <Card className="w-full">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            {isActive && <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary" />}
+            {isCompleted && <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />}
+            {isFailed && <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />}
+            {!isActive && !isCompleted && !isFailed && <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />}
             {type === "analysis" ? "Analyzing Your Resume" : "Optimizing Your Resume"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             {type === "analysis"
               ? "Please wait while we analyze your resume against the job description"
               : "Please wait while we optimize your resume for better ATS compatibility"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
           <ProgressCircle
             progress={progressState.progress}
             isActive={isActive}

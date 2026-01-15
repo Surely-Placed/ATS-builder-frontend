@@ -1,5 +1,6 @@
-import { FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface LogoProps {
   className?: string;
@@ -8,10 +9,17 @@ interface LogoProps {
 }
 
 export const Logo = ({ className = "", showText = true, size = "md" }: LogoProps) => {
-  const iconSizes = {
-    sm: "w-4 h-4",
-    md: "w-4 h-4 sm:w-5 sm:h-5",
-    lg: "w-5 h-5 sm:w-6 sm:h-6",
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const logoSizes = {
+    sm: "h-5 w-5",
+    md: "h-6 w-6 sm:h-7 sm:w-7",
+    lg: "h-8 w-8 sm:h-9 sm:w-9",
   };
 
   const textSizes = {
@@ -20,17 +28,24 @@ export const Logo = ({ className = "", showText = true, size = "md" }: LogoProps
     lg: "text-lg sm:text-xl lg:text-2xl",
   };
 
+  // Use dark logo in dark mode, regular logo in light mode
+  const logoSrc = mounted && resolvedTheme === "dark" ? "/rabbit-dark.svg" : "/rabbit.svg";
+
   return (
-    <Link to="/" className={`flex items-center gap-1.5 sm:gap-2 group min-w-0 ${className}`}>
-      <div
-        className={`relative p-1.5 sm:p-2 rounded-xl bg-primary/10 border border-primary/20 group-hover:border-primary/40 transition-colors flex-shrink-0`}
-      >
-        <FileText className={`${iconSizes[size]} text-primary`} />
-        <div className="absolute inset-0 rounded-xl bg-primary/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-      </div>
+    <Link to="/" className={`flex items-center group min-w-0 ${className}`}>
       {showText && (
         <span className={`${textSizes[size]} font-bold text-foreground whitespace-nowrap`}>
-          Jobrabbit<span className="text-primary">.AI</span>
+          Job
+        </span>
+      )}
+      <img 
+        src={logoSrc} 
+        alt="Jobrabbit Logo" 
+        className={`${logoSizes[size]} mx-0.5`}
+      />
+      {showText && (
+        <span className={`${textSizes[size]} font-bold text-foreground whitespace-nowrap`}>
+          rabbit
         </span>
       )}
     </Link>

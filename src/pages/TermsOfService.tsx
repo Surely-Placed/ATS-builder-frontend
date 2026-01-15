@@ -16,10 +16,10 @@ const TermsOfService = () => {
   return (
     <>
       <Helmet>
-        <title>Terms of Service - Jobrabbit.AI</title>
+        <title>Terms of Service - Jobrabbit</title>
         <meta
           name="description"
-          content="Terms of Service for Jobrabbit.AI. Read our terms and conditions for using our AI-powered resume optimization service."
+          content="Terms of Service for Jobrabbit. Read our terms and conditions for using our AI-powered resume optimization service."
         />
       </Helmet>
 
@@ -43,7 +43,7 @@ const TermsOfService = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">1. Agreement to Terms</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  By accessing or using Jobrabbit.AI ("Service"), you agree to be bound by these
+                  By accessing or using Jobrabbit ("Service"), you agree to be bound by these
                   Terms of Service ("Terms"). If you disagree with any part of these Terms, you may
                   not access or use the Service. These Terms apply to all visitors, users, and
                   others who access or use the Service.
@@ -53,7 +53,7 @@ const TermsOfService = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">2. Description of Service</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Jobrabbit.AI is an AI-powered resume optimization platform that helps users
+                  Jobrabbit is an AI-powered resume optimization platform that helps users
                   improve their resumes for better compatibility with Applicant Tracking Systems
                   (ATS) and enhanced job application success. Our Service includes:
                 </p>
@@ -170,7 +170,7 @@ const TermsOfService = () => {
                 <h2 className="text-2xl font-semibold mb-4">7. Intellectual Property Rights</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   The Service and its original content, features, and functionality are owned by
-                  Jobrabbit.AI and are protected by international copyright, trademark, patent,
+                  Jobrabbit and are protected by international copyright, trademark, patent,
                   trade secret, and other intellectual property laws. You may not copy, modify,
                   distribute, sell, or lease any part of our Service without our prior written
                   consent.
@@ -197,7 +197,7 @@ const TermsOfService = () => {
 
                 <h3 className="text-xl font-semibold mb-3 mt-6">8.3 Limitation of Liability</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  TO THE MAXIMUM EXTENT PERMITTED BY LAW, JOBRABBIT.AI SHALL NOT BE LIABLE FOR
+                  TO THE MAXIMUM EXTENT PERMITTED BY LAW, Jobrabbit SHALL NOT BE LIABLE FOR
                   ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS
                   OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF
                   DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES RESULTING FROM YOUR USE OF THE
@@ -208,7 +208,7 @@ const TermsOfService = () => {
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">9. Indemnification</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  You agree to defend, indemnify, and hold harmless Jobrabbit.AI and its
+                  You agree to defend, indemnify, and hold harmless Jobrabbit and its
                   officers, directors, employees, and agents from and against any claims,
                   liabilities, damages, losses, and expenses, including reasonable legal fees,
                   arising out of or in any way connected with your use of the Service, your
@@ -259,14 +259,14 @@ const TermsOfService = () => {
                   <p className="text-muted-foreground mb-2">
                     <strong>Email:</strong>{" "}
                     <a
-                      href="mailto:legal@jobrabbit.ai"
+                      href="mailto:legal@Jobrabbit"
                       className="text-primary hover:underline"
                     >
-                      legal@jobrabbit.ai
+                      legal@Jobrabbit
                     </a>
                   </p>
                   <p className="text-muted-foreground">
-                    <strong>Address:</strong> Jobrabbit.AI, Legal Department
+                    <strong>Address:</strong> Jobrabbit, Legal Department
                     <br />
                     Gandhinagar, Gujarat, India
                     <br />

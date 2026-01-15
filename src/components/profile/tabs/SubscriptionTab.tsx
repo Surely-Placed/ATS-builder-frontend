@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Crown, Calendar, Clock, XCircle, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { portal } from '@/services/subscription';
+import { trackBillingPortalOpen } from '@/utils/analytics';
 
 interface Subscription {
   plan: string;
@@ -93,24 +95,43 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
             <Card className="border border-destructive/50 bg-muted/30 hover:bg-muted/50 transition-colors md:col-span-2 lg:col-span-1">
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Subscription Management</h3>
-                <Button
-                  onClick={onCancel}
-                  variant="destructive"
-                  disabled={cancelling}
-                  className="w-full gap-2"
-                >
-                  {cancelling ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Cancelling...
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="w-4 h-4" />
-                      Cancel Subscription
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const url = await portal();
+                        if (url) {
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                          trackBillingPortalOpen();
+                        }
+                      } catch (err) {
+                        console.error('Failed to open billing portal', err);
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    Manage Billing
+                  </Button>
+
+                  <Button
+                    onClick={onCancel}
+                    variant="destructive"
+                    disabled={cancelling}
+                    className="w-full gap-2"
+                  >
+                    {cancelling ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Cancelling...
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4" />
+                        Cancel Subscription
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}

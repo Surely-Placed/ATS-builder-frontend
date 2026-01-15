@@ -19,9 +19,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
+import { User as UserIcon } from "lucide-react";
 
 interface Profile {
   name: string;
@@ -47,6 +58,7 @@ export function ProfileDropdown({ data, className, ...props }: ProfileDropdownPr
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = React.useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = React.useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -85,9 +97,15 @@ export function ProfileDropdown({ data, className, ...props }: ProfileDropdownPr
       await logout();
       navigate("/");
       setIsOpen(false);
+      setShowSignOutDialog(false);
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const handleSignOutClick = () => {
+    setIsOpen(false);
+    setShowSignOutDialog(true);
   };
 
   // Get avatar fallback initial
@@ -133,8 +151,8 @@ export function ProfileDropdown({ data, className, ...props }: ProfileDropdownPr
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs">
-                        {getInitials(profileData.name, profileData.email)}
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white">
+                        <UserIcon className="w-5 h-5" />
                       </div>
                     )}
                   </div>
@@ -240,7 +258,7 @@ export function ProfileDropdown({ data, className, ...props }: ProfileDropdownPr
             <DropdownMenuItem asChild>
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={handleSignOutClick}
                 className="w-full flex items-center gap-3 p-3 duration-200 bg-red-500/10 rounded-xl hover:bg-red-500/20 cursor-pointer border border-transparent hover:border-red-500/30 hover:shadow-sm transition-all group"
               >
                 <LogOut className="w-4 h-4 text-red-500 group-hover:text-red-600" />
@@ -252,6 +270,27 @@ export function ProfileDropdown({ data, className, ...props }: ProfileDropdownPr
           </DropdownMenuContent>
         </div>
       </DropdownMenu>
+
+      {/* Sign Out Confirmation Dialog */}
+      <AlertDialog open={showSignOutDialog} onOpenChange={setShowSignOutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign Out</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to sign out? You'll need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Sign Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -268,3 +268,13 @@ export const trackConversion = (
     }
   }
 };
+
+// Generic modal open tracking
+export const trackModalOpen = (modalName: string) => {
+  safeLogEvent("modal_open", { modal: modalName });
+};
+
+// Billing portal open tracking
+export const trackBillingPortalOpen = () => {
+  safeLogEvent("billing_portal_open");
+};

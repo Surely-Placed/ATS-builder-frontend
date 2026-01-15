@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 interface ResumeOptimizingViewProps {
   analysisId: string;
   progress: number;
-  status: "pending" | "running" | "complete" | "failed";
+  status: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
   error: string | undefined;
   onReset: () => void;
   onComplete: (result: any) => void;
@@ -23,14 +23,20 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
   onError,
 }) => {
   return (
-    <div className="resume-analysis-flow relative w-full">
+    <div className="resume-analysis-flow relative w-full px-2 sm:px-4 md:px-0">
       {/* Reset Button - Top Right */}
-      <Button onClick={onReset} variant="outline" size="sm" className="absolute top-0 right-0 z-10">
-        <X className="w-4 h-4 mr-2" />
-        Reset
+      <Button 
+        onClick={onReset} 
+        variant="outline" 
+        size="sm" 
+        className="absolute top-0 right-2 sm:right-0 z-10 text-xs sm:text-sm"
+      >
+        <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+        <span className="hidden sm:inline">Reset</span>
+        <span className="sm:hidden">×</span>
       </Button>
 
-      <div className="optimizing-view">
+      <div className="optimizing-view pt-10 sm:pt-8">
         <ProgressTracker
           type="optimization"
           optimizationParams={{
@@ -43,7 +49,7 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
           onError={onError}
         />
         {error && (
-          <Button onClick={onReset} variant="outline" className="mt-4 w-full">
+          <Button onClick={onReset} variant="outline" className="mt-4 w-full text-sm sm:text-base">
             ← Go Back to Analysis
           </Button>
         )}

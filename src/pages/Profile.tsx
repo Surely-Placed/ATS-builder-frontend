@@ -3,20 +3,23 @@ import { useAuth } from "@/context/AuthContext";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { apiClient } from "@/services/resumeApi";
 import { useToast } from "@/hooks/use-toast";
+import { getStatus } from '@/services/subscription';
+import { useUsage } from '@/context/UsageContext';
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import ProfileLayout from "@/components/layouts/ProfileLayout";
+import ProfileSubscription from "@/components/profile/ProfileSubscription";
 
 // Components
-import { OverviewTab } from "@/components/profile/tabs/OverviewTab";
+import { OverviewTab } from "@/components/profile/tabs/overview";
 import { ProfileTab } from "@/components/profile/tabs/ProfileTab";
 import { ResumeTab } from "@/components/profile/tabs/ResumeTab";
 import { SubscriptionTab } from "@/components/profile/tabs/SubscriptionTab";
 import { PurchasesTab } from "@/components/profile/tabs/PurchasesTab";
 import { ActivityTab } from "@/components/profile/tabs/ActivityTab";
 import { SettingsTab } from "@/components/profile/tabs/SettingsTab";
-import { ApiKeysTab } from "@/components/profile/tabs/ApiKeysTab";
+import { ApiKeysTab } from "@/components/profile/tabs/api-keys";
 
 // Types
 interface Profile {
@@ -173,7 +176,8 @@ const Profile = () => {
     if (location.pathname === "/profile" || location.pathname === "/profile/") {
       navigate("/profile/overview", { replace: true });
     }
-  }, [location.pathname, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   const setActiveTab = (tab: string) => {
     navigate(`/profile/${tab}`);
@@ -219,12 +223,29 @@ const Profile = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: Subscription }>(
-        "/profile/subscription"
-      );
-      if (response.data.success) {
-        setSubscription(response.data.data);
+      // Use shared subscription status API to keep overview in sync with subscription page
+      const s = await getStatus();
+      // Map SubStatus -> Subscription shape used by overview
+      const mapped: Subscription = {
+        plan: s.plan,
+        active: s.plan !== 'free',
+        startDate: undefined,
+        endDate: s.resetsAt ?? undefined,
+        isExpired: false,
+        daysRemaining: null,
+      };
+      if (s.resetsAt) {
+        const reset = new Date(s.resetsAt);
+        const now = new Date();
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const diff = Math.ceil((reset.getTime() - now.getTime()) / msPerDay);
+        mapped.daysRemaining = diff <= 0 ? 0 : diff;
       }
+      setSubscription(mapped);
+      // Also refresh shared usage context
+      try {
+        (useUsage().refresh || (async () => {}))();
+      } catch (_) {}
     } catch (err: any) {
       console.error("Failed to load subscription:", err);
     }
@@ -327,6 +348,22 @@ const Profile = () => {
     }
     if (activeTab === "settings") fetchPreferences();
   }, [activeTab]);
+
+  // Refresh subscription info when window/tab regains focus or becomes visible
+  useEffect(() => {
+    const onFocus = () => {
+      fetchSubscription();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') fetchSubscription();
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
 
   // Update profile handler
   const handleUpdateProfile = async (data: { name: string; email: string }) => {
@@ -636,11 +673,7 @@ const Profile = () => {
             )}
 
             {activeTab === "subscription" && (
-              <SubscriptionTab
-                subscription={subscription}
-                onCancel={handleCancelSubscription}
-                cancelling={cancelling}
-              />
+              <ProfileSubscription />
             )}
 
             {activeTab === "purchases" && <PurchasesTab transactions={transactions} />}

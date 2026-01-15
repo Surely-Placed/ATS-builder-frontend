@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
+import { useState } from "react";
+import PricingDialog from '@/components/shared/PricingDialog';
 import type { Subscription } from "@/types/profile/overview";
 
 interface SubscriptionCardProps {
@@ -9,6 +11,7 @@ interface SubscriptionCardProps {
 }
 
 export const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
+  const [showPricing, setShowPricing] = useState(false);
   return (
     <Card className="border rounded-xl shadow-sm">
       <CardContent className="p-6">
@@ -37,9 +40,15 @@ export const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
               </Badge>
             </div>
             {!subscription.active && (
-              <Button className="w-full mt-5 bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg text-sm font-semibold">
-                Upgrade Plan
-              </Button>
+              <>
+                <Button
+                  onClick={() => setShowPricing(true)}
+                  className="w-full mt-5 bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg text-sm font-semibold"
+                >
+                  Upgrade Plan
+                </Button>
+                <PricingDialog open={showPricing} onClose={() => setShowPricing(false)} />
+              </>
             )}
           </div>
         ) : (
@@ -56,9 +65,15 @@ export const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
                 Inactive
               </Badge>
             </div>
-            <Button className="w-full mt-5 bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg text-sm font-semibold">
-              Upgrade Plan
-            </Button>
+            <>
+              <Button
+                onClick={() => setShowPricing(true)}
+                className="w-full mt-5 bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg text-sm font-semibold"
+              >
+                Upgrade Plan
+              </Button>
+              <PricingDialog open={showPricing} onClose={() => setShowPricing(false)} />
+            </>
           </div>
         )}
       </CardContent>

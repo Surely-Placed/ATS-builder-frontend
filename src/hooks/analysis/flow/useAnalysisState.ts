@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnalysisResult } from "@/services/analysisApi";
-import { ViewState, useResumeAnalysisStorage } from "@/hooks/useResumeAnalysisStorage";
+
+type ViewState = "form" | "analysis" | "optimizing" | "comparison" | "preview";
 import AnalysisApiService from "@/services/analysisApi";
 import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 
 export function useAnalysisState() {
   const [searchParams] = useSearchParams();
-  const { loadFromStorage } = useResumeAnalysisStorage();
+
   
   // Check if this is a fresh start (user clicked "Analyze Another Resume")
   const isFreshStart = sessionStorage.getItem('resume_fresh_start') === 'true';
@@ -17,67 +18,32 @@ export function useAnalysisState() {
     sessionStorage.removeItem('resume_fresh_start');
   }
   
-  // Don't load from storage if this is a fresh start
-  const storedData = isFreshStart ? null : loadFromStorage();
+  // No localStorage or storedData logic
   const urlAnalysisId = isFreshStart ? null : searchParams.get("analysisId");
 
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    isFreshStart ? null : (storedData?.analysisResult || null)
-  );
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
-  // Determine initial viewState - check if optimization is complete
-  const getInitialViewState = (): ViewState => {
-    if (isFreshStart) {
-      return "form";
+  const [viewState, setViewStateInternal] = useState<ViewState>("form");
+  // Guarded setter: prevent switching back to the analysis view when the user
+  // is currently on the optimization route. This avoids race-condition flips
+  // where other logic navigates or restores state and hides the comparison UI.
+  const setViewState = (newState: ViewState) => {
+    try {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if ((pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison')) && newState === 'analysis') {
+        // Ignore attempts to force 'analysis' while on the optimization/comparison page
+        return;
+      }
+    } catch (e) {
+      // If anything goes wrong, fall back to normal behavior
     }
-    if (storedData?.viewState) {
-      // If we have a stored viewState, use it
-      return storedData.viewState;
-    }
-    // Check if optimization result exists in storage
-    if (storedData?.optimizationResult) {
-      return "comparison";
-    }
-    // Check if analysis result exists
-    if (storedData?.analysisResult) {
-      return "analysis";
-    }
-    return "form";
+
+    // setViewState called
+    setViewStateInternal(newState);
   };
-
-  const [viewState, setViewState] = useState<ViewState>(getInitialViewState());
-  const [analysisId, setAnalysisId] = useState<string | null>(() => {
-    // If fresh start, don't restore anything
-    if (isFreshStart) {
-      return null;
-    }
-    
-    // Check if the URL has an analysisId parameter
-    const hasUrlAnalysisId = urlAnalysisId !== null;
-    
-    // Only use stored analysisId if there's also an analysisId in the URL
-    // This prevents restoring old analysis when user navigates to clean URL
-    if (hasUrlAnalysisId) {
-      return urlAnalysisId || storedData?.analysisId || null;
-    } else {
-      // If no URL analysisId, don't restore from storage to allow fresh start
-      return null;
-    }
-  });
-  // Restore analyzing state from storage if analysis was in progress
-  const [isAnalyzing, setIsAnalyzing] = useState(() => {
-    if (isFreshStart) return false;
-    // Check if analysis was in progress (has flag or has params but no result)
-    const analysisInProgress = localStorage.getItem("resume_analysis_in_progress") === "true";
-    const hasParamsButNoResult = storedData?.resumeId && storedData?.jobTitle && storedData?.jobDescription && !storedData?.analysisResult;
-    return analysisInProgress || hasParamsButNoResult || false;
-  });
-  const [showAnalysisProgress, setShowAnalysisProgress] = useState(() => {
-    if (isFreshStart) return false;
-    const analysisInProgress = localStorage.getItem("resume_analysis_in_progress") === "true";
-    const hasParamsButNoResult = storedData?.resumeId && storedData?.jobTitle && storedData?.jobDescription && !storedData?.analysisResult;
-    return analysisInProgress || hasParamsButNoResult || false;
-  });
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showAnalysisProgress, setShowAnalysisProgress] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   // Check and restore analysis state on mount (handles page refresh scenarios)
@@ -90,7 +56,7 @@ export function useAnalysisState() {
       
       // If we have analysisId but no analysisResult, try to fetch it
       // This handles page refresh during or after analysis
-      const currentAnalysisId = urlAnalysisId || storedData?.analysisId || analysisId;
+      const currentAnalysisId = urlAnalysisId || analysisId;
       
       if (currentAnalysisId && !analysisResult) {
         try {
@@ -109,21 +75,14 @@ export function useAnalysisState() {
               normalized.ats_analysis?.after;
 
             if (hasOptimization) {
-              const stored = loadFromStorage();
-              if (stored?.optimizationResult) {
-                setViewState("comparison");
-              } else if (
-                (normalized.analysis?.ats_score_after !== null &&
-                  normalized.analysis?.ats_score_after !== undefined) ||
-                normalized.ats_analysis?.after
-              ) {
                 setViewState("comparison");
               } else {
-                setViewState("analysis");
+                // If the user is currently on the optimization page, prefer keeping them
+                // in an optimizing state instead of flipping back to the analysis view.
+                const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+                const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison');
+                setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
               }
-            } else {
-              setViewState("analysis");
-            }
             
             // Reset analyzing states since analysis is complete
             setIsAnalyzing(false);
@@ -167,8 +126,7 @@ export function useAnalysisState() {
       } else if (!currentAnalysisId) {
         // Check if analysis was in progress
         const analysisInProgress = localStorage.getItem("resume_analysis_in_progress") === "true";
-        const hasParamsButNoResult = storedData?.resumeId && storedData?.jobTitle && storedData?.jobDescription && !storedData?.analysisResult;
-        if (analysisInProgress || hasParamsButNoResult) {
+        if (analysisInProgress) {
           // Analysis might have been just started - keep analyzing state
           setIsAnalyzing(true);
           setShowAnalysisProgress(true);
@@ -204,25 +162,14 @@ export function useAnalysisState() {
                 normalized.ats_analysis?.after;
 
               if (hasOptimization) {
-                // Try to load optimization result from storage first
-                const stored = loadFromStorage();
-                if (stored?.optimizationResult) {
-                  setViewState("comparison");
-                } else {
-                  // Check if we can determine optimization status from the analysis
-                  // If ats_score_after exists, optimization is likely complete
-                  if (
-                    (normalized.analysis?.ats_score_after !== null &&
-                      normalized.analysis?.ats_score_after !== undefined) ||
-                    normalized.ats_analysis?.after
-                  ) {
-                    setViewState("comparison");
-                  } else {
-                    setViewState("analysis");
-                  }
-                }
+                setViewState("comparison");
               } else {
-                setViewState("analysis");
+                // Respect the current route: if user landed on the optimization path,
+                // don't immediately switch them to the analysis view when optimization
+                // data isn't yet visible (prevents race with eventual consistency).
+                const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+                const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison');
+                setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
               }
             }
           } catch (error) {
@@ -237,7 +184,7 @@ export function useAnalysisState() {
       setAnalysisId(null);
       setAnalysisResult(null);
     }
-  }, [urlAnalysisId, analysisId, analysisResult, loadFromStorage]);
+  }, [urlAnalysisId, analysisId, analysisResult]);
 
   return {
     analysisResult,

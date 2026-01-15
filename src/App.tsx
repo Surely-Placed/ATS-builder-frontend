@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,8 +7,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./context/AuthContext";
+import { UsageProvider } from "./context/UsageContext";
 import ErrorBoundary from "@/components/system/ErrorBoundary";
 import { PageViewTracker } from "@/components/system/PageViewTracker";
+import { NavigationSetter } from "@/components/system/NavigationSetter";
 
 // Lazy load pages for code splitting with error handling
 const lazyWithRetry = (componentImport: () => Promise<any>) => {
@@ -33,10 +35,13 @@ const Index = lazyWithRetry(() => import("./pages/Index"));
 const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 const VerifyEmail = lazyWithRetry(() => import("./pages/VerifyEmail"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
+const SubscriptionSuccess = lazyWithRetry(() => import("./pages/SubscriptionSuccess"));
+const SubscriptionCancel = lazyWithRetry(() => import("./pages/SubscriptionCancel"));
 const Documents = lazyWithRetry(() => import("./pages/Documents"));
 const ResumeAnalysis = lazyWithRetry(() => import("./pages/ResumeAnalysis"));
 const ResumeOptimization = lazyWithRetry(() => import("./pages/ResumeOptimization"));
 const ResumePreview = lazyWithRetry(() => import("./pages/ResumePreview"));
+const ResumeComparison = lazyWithRetry(() => import("./pages/ResumeComparison"));
 const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
@@ -83,8 +88,10 @@ const App = () => (
                 v7_relativeSplatPath: true,
               }}
             >
+              <NavigationSetter />
               <PageViewTracker />
               <AuthProvider>
+                <UsageProvider>
                 <ErrorBoundary
                   fallback={
                     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -113,7 +120,13 @@ const App = () => (
                       <Route path="/documents" element={<Documents />} />
                       <Route path="/resume-analysis" element={<ResumeAnalysis />} />
                       <Route path="/resume-optimization" element={<ResumeOptimization />} />
+                      <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+                      <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
+                      {/* Legacy/alternate billing callback URLs (payment provider redirects) */}
+                      <Route path="/billing/success" element={<SubscriptionSuccess />} />
+                      <Route path="/billing/cancel" element={<SubscriptionCancel />} />
                       <Route path="/resume-preview/:analysisId" element={<ResumePreview />} />
+                      <Route path="/resume-comparison" element={<ResumeComparison />} />
                       <Route path="/profile/*" element={<Profile />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/terms-of-service" element={<TermsOfService />} />
@@ -124,6 +137,7 @@ const App = () => (
                     </Routes>
                   </Suspense>
                 </ErrorBoundary>
+                </UsageProvider>
               </AuthProvider>
             </BrowserRouter>
           </TooltipProvider>

@@ -12,7 +12,7 @@ export const NewKeyAlert = ({ newKey, onCopy }: NewKeyAlertProps) => {
     <Alert className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20">
       <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
       <AlertTitle className="text-yellow-900 dark:text-yellow-100">
-        ⚠️ Save This API Key Now!
+         Save This API Key Now!
       </AlertTitle>
       <AlertDescription className="text-yellow-800 dark:text-yellow-200 mt-2">
         <p className="mb-4">

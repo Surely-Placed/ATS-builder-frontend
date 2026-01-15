@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Home, Sparkles, DollarSign, Phone, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import { NavBar } from "@/components/ui/tubelight-navbar";
@@ -28,6 +29,8 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navigate = useNavigate();
+
   const navItems = [
     { name: "Home", url: "#", icon: Home },
     { name: "Features", url: "#features", icon: Sparkles },
@@ -37,7 +40,12 @@ const Header = () => {
 
   const handleNavClick = (url: string) => {
     setMobileMenuOpen(false);
-    window.location.href = url;
+    if (url.startsWith("#")) {
+      // Handle anchor links
+      window.location.href = url;
+    } else {
+      navigate(url);
+    }
   };
 
   const mobileNavItems = navItems.map((item) => ({

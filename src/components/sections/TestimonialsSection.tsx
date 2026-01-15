@@ -4,7 +4,7 @@ import { SpotlightHeading } from "@/components/ui/spotlight-heading";
 
 const testimonials = [
   {
-    text: "Jobrabbit.AI helped me land my dream job at Google! The ATS optimization was spot-on, and I got 3x more interview calls.",
+    text: "Jobrabbit helped me land my dream job at Google! The ATS optimization was spot-on, and I got 3x more interview calls.",
     image: "https://randomuser.me/api/portraits/women/1.jpg",
     name: "Sarah Johnson",
     role: "Software Engineer at Google",
@@ -28,7 +28,7 @@ const testimonials = [
     role: "UX Designer at Apple",
   },
   {
-    text: "As a career switcher, I needed my resume to stand out. Jobrabbit.AI transformed it into an ATS-friendly masterpiece.",
+    text: "As a career switcher, I needed my resume to stand out. Jobrabbit transformed it into an ATS-friendly masterpiece.",
     image: "https://randomuser.me/api/portraits/women/5.jpg",
     name: "Priya Patel",
     role: "Marketing Manager at Netflix",
@@ -40,7 +40,7 @@ const testimonials = [
     role: "HR Director at Microsoft",
   },
   {
-    text: "I landed interviews at 5 Fortune 500 companies in 2 weeks. The difference was night and day after using Jobrabbit.AI.",
+    text: "I landed interviews at 5 Fortune 500 companies in 2 weeks. The difference was night and day after using Jobrabbit.",
     image: "https://randomuser.me/api/portraits/men/7.jpg",
     name: "David Kim",
     role: "Sales Director at Salesforce",
@@ -99,7 +99,7 @@ const TestimonialsSection = () => {
             </h2>
           </SpotlightHeading>
           <p className="text-center mt-5 opacity-75">
-            Join thousands of job seekers who landed their dream roles with Jobrabbit.AI.
+            Join thousands of job seekers who landed their dream roles with Jobrabbit.
           </p>
         </motion.div>
 

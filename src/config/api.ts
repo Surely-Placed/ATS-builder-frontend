@@ -4,12 +4,8 @@ export const API_BASE_URL =
   "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api";
 
 // Helper to get auth token
-export const getAuthToken = (): string => {
-  return localStorage.getItem("token") || "";
-};
-
-// Helper to get auth headers
+// Cookie-based auth: do not read tokens from localStorage or send Authorization headers
+export const getAuthToken = (): string => "";
 export const getAuthHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${getAuthToken()}`,
 });

@@ -7,115 +7,126 @@ import NumberFlow from "@number-flow/react";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { SpotlightHeading } from "@/components/ui/spotlight-heading";
+import { checkout } from "@/services/subscription";
+import { useNavigate } from "react-router-dom";
+import { useToast } from '@/hooks/use-toast';
+import { useUsage } from '@/context/UsageContext';
 
 const plans = [
   {
-    name: "Starter",
-    description: "Perfect for individuals getting started with AI resume optimization",
-    price: 19,
-    yearlyPrice: 15,
-    buttonText: "Get started",
+    name: "Free Trial",
+    planKey: "free" as const,
+    description: "Get started with AI-powered resume optimization at no cost",
+    price: 0,
+    buttonText: "Start Free",
     buttonVariant: "outline" as const,
     includes: [
-      "Free includes:",
-      "5 Resume optimizations",
-      "Basic ATS compatibility",
-      "PDF export",
-      "Standard templates",
-      "Email support",
+      "What's included:",
+      "10 Resume analyses per month",
+      "10 Resume optimizations per month",
+      "ATS compatibility scoring",
+      "10 PDF exports per month",
+      "Advanced ATS optimization",
+      "AI-powered keyword suggestions",
     ],
   },
   {
-    name: "Professional",
-    description: "Best for serious job seekers who need advanced features and unlimited access",
-    price: 49,
-    yearlyPrice: 39,
-    buttonText: "Start Free Trial",
+    name: "Premium",
+    planKey: "premium" as const,
+    description: "Unlimited access for serious job seekers who want to maximize their chances",
+    price: 29,
+    buttonText: "Upgrade to Premium",
     buttonVariant: "default" as const,
     popular: true,
     includes: [
-      "Everything in Starter, plus:",
-      "Unlimited optimizations",
-      "Advanced ATS compatibility",
-      "AI-powered suggestions",
-      "Premium templates",
-      "Cover letter generator",
-      "Priority support",
-      "LinkedIn optimization",
+      "Everything in Free Trial, plus:",
+      "Unlimited resume analyses",
+      "Unlimited resume optimizations",
+      "ATS compatibility scoring",
+      "Unlimited PDF exports",
+      "Advanced ATS optimization",
+      "AI-powered keyword suggestions",
     ],
   },
   {
     name: "Enterprise",
-    description: "Advanced plan for teams and agencies with custom needs and unlimited access",
-    price: 99,
-    yearlyPrice: 79,
-    buttonText: "Contact Sales",
+    planKey: "enterprise" as const,
+    description: "Let our expert team handle everything for you — sit back and land interviews",
+    price: 119,
+    buttonText: "Get Started",
     buttonVariant: "outline" as const,
     includes: [
-      "Everything in Professional, plus:",
-      "Team collaboration",
-      "Custom branding",
-      "API access",
-      "Dedicated account manager",
-      "SLA guarantee",
-      "Custom integrations",
-      "Advanced analytics",
+      "Everything in Premium, plus:",
+      "Unlimited resume analyses",
+      "Unlimited resume optimizations",
+      "Advanced ATS optimization",
+      "AI-powered keyword suggestions",
+      "Dedicated resume specialist",
+      "Full resume rewrite service",
+      "Personalized optimization strategy",
+      "1-on-1 consultation calls",
     ],
   },
 ];
 
-const PricingSwitch = ({ onSwitch }: { onSwitch: (value: string) => void }) => {
-  const [selected, setSelected] = useState("0");
+import { useAuth } from "@/context/AuthContext";
 
-  const handleSwitch = (value: string) => {
-    setSelected(value);
-    onSwitch(value);
-  };
+interface PricingSection4Props {
+  hideFreeTrial?: boolean;
+}
 
-  return (
-    <div className="flex justify-center">
-      <div className="relative z-10 mx-auto flex w-fit rounded-full bg-neutral-900 border border-gray-700 p-1">
-        <button
-          onClick={() => handleSwitch("0")}
-          className={cn(
-            "relative z-10 w-fit h-10 rounded-full sm:px-6 px-3 sm:py-2 py-1 font-medium transition-colors",
-            selected === "0" ? "text-white" : "text-gray-200"
-          )}
-        >
-          {selected === "0" && (
-            <motion.span
-              layoutId={"switch"}
-              className="absolute top-0 left-0 h-10 w-full rounded-full border-4 shadow-sm shadow-blue-600 border-blue-600 bg-gradient-to-t from-blue-500 to-blue-600"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <span className="relative">Monthly</span>
-        </button>
-
-        <button
-          onClick={() => handleSwitch("1")}
-          className={cn(
-            "relative z-10 w-fit h-10 flex-shrink-0 rounded-full sm:px-6 px-3 sm:py-2 py-1 font-medium transition-colors",
-            selected === "1" ? "text-white" : "text-gray-200"
-          )}
-        >
-          {selected === "1" && (
-            <motion.span
-              layoutId={"switch"}
-              className="absolute top-0 left-0 h-10 w-full rounded-full border-4 shadow-sm shadow-blue-600 border-blue-600 bg-gradient-to-t from-blue-500 to-blue-600"
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <span className="relative flex items-center gap-2">Yearly</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default function PricingSection4() {
-  const [isYearly, setIsYearly] = useState(false);
+export default function PricingSection4({ hideFreeTrial = false }: PricingSection4Props) {
   const pricingRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { state: usageState } = useUsage();
+    
+  
+  const handlePlanClick = async (planKey: 'free' | 'premium' | 'enterprise') => {
+    if (planKey !== 'free' && !user) {
+      // Redirect to signup/login for non-free plans if not authenticated
+      navigate('/signup');
+      return;
+    }
+    
+    setLoadingPlan(planKey);
+    try {
+      if (planKey === 'free') {
+        // If user is logged in and has exhausted their free trial, show toast
+        if (user) {
+          const remaining = usageState?.remaining;
+          const isExhausted = typeof remaining === 'number' ? remaining <= 0 : false;
+          if (isExhausted) {
+            toast({
+              title: 'Free trial exhausted',
+              description: 'Your free trial limit has been exhausted — purchase a plan or use your existing plan.',
+            });
+            setLoadingPlan(null);
+            return;
+          }
+          navigate('/dashboard');
+        } else {
+          navigate('/signup');
+        }
+      } else {
+        // Prevent subscribing to the same plan again
+        if (usageState?.plan === planKey) {
+          toast({
+            title: 'Already subscribed',
+            description: `You are already subscribed to the ${planKey} plan.`,
+          });
+          setLoadingPlan(null);
+          return;
+        }
+
+        await checkout(planKey);
+      }
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   const revealVariants = {
     visible: (i: number) => ({
@@ -134,7 +145,63 @@ export default function PricingSection4() {
     },
   };
 
-  const togglePricingPeriod = (value: string) => setIsYearly(Number.parseInt(value) === 1);
+  if (hideFreeTrial) {
+    // Compact modal layout: center only paid plans with larger CTAs
+    const filtered = plans.filter((p) => p.planKey !== "free");
+    return (
+      <div className="w-full py-6 px-4">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-semibold text-gray-900 dark:text-white">Plans that works best for you</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">Trusted by millions. Explore which option is right for you.</p>
+        </div>
+
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+          {filtered.map((plan) => (
+            <div key={plan.name} className="bg-white dark:bg-card border border-gray-200 dark:border-neutral-800 rounded-xl p-6 shadow-md">
+              <div className="flex flex-col h-full">
+                <div className="mb-4">
+                  <h3 className="text-2xl font-medium text-gray-900 dark:text-white">{plan.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{plan.description}</p>
+                </div>
+
+                <div className="flex items-baseline gap-3 mb-6">
+                  <span className="text-4xl font-semibold text-gray-900 dark:text-white">${plan.price}</span>
+                  <span className="text-sm text-gray-500">/month</span>
+                </div>
+
+                <div className="mt-auto">
+                  <button
+                    onClick={() => handlePlanClick(plan.planKey)}
+                    className={
+                      plan.popular
+                        ? "px-6 py-3 rounded-lg bg-black text-white text-lg shadow-lg"
+                        : "px-5 py-2 rounded-md bg-white border text-gray-900 text-base"
+                    }
+                    >
+                    {plan.buttonText}
+                    {loadingPlan === plan.planKey && (
+                      <span className="ml-3 inline-flex items-center" aria-hidden>
+                        <span className="w-4 h-4 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" />
+                      </span>
+                    )}
+                  </button>
+
+                  <div className="mt-5 border-t pt-4 text-sm text-gray-600 dark:text-gray-300">
+                    <h4 className="font-medium mb-2">{plan.includes[0]}</h4>
+                    <ul className="space-y-1">
+                      {plan.includes.slice(1).map((f, i) => (
+                        <li key={i} className="text-sm">• {f}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -218,15 +285,6 @@ export default function PricingSection4() {
           Trusted by millions. We help teams all around the world. Explore which option is right for
           you.
         </TimelineContent>
-
-        <TimelineContent
-          as="div"
-          animationNum={1}
-          timelineRef={pricingRef}
-          customVariants={revealVariants}
-        >
-          <PricingSwitch onSwitch={togglePricingPeriod} />
-        </TimelineContent>
       </article>
 
       {/* Radial gradient effect - dark mode only */}
@@ -240,7 +298,9 @@ export default function PricingSection4() {
       />
 
       <div className="grid md:grid-cols-3 max-w-5xl gap-4 py-6 mx-auto px-4">
-        {plans.map((plan, index) => (
+        {plans
+          .filter((p) => (hideFreeTrial ? p.planKey !== 'free' : true))
+          .map((plan, index) => (
           <TimelineContent
             key={plan.name}
             as="div"
@@ -266,12 +326,12 @@ export default function PricingSection4() {
                       format={{
                         currency: "USD",
                       }}
-                      value={isYearly ? plan.yearlyPrice : plan.price}
+                      value={plan.price}
                       className="text-4xl font-semibold"
                     />
                   </span>
                   <span className="text-gray-500 dark:text-gray-300 ml-1">
-                    /{isYearly ? "year" : "month"}
+                    /month
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
@@ -279,6 +339,7 @@ export default function PricingSection4() {
 
               <CardContent className="pt-0">
                 <button
+                  onClick={() => handlePlanClick(plan.planKey)}
                   className={`w-full mb-6 p-4 text-xl rounded-xl transition-all ${
                     plan.popular
                       ? "bg-gray-900 text-white hover:bg-gray-800 dark:bg-gradient-to-t dark:from-blue-500 dark:to-blue-600 dark:text-white shadow-lg dark:shadow-blue-800 border border-gray-900 dark:border-blue-500"
@@ -288,6 +349,11 @@ export default function PricingSection4() {
                   }`}
                 >
                   {plan.buttonText}
+                  {loadingPlan === plan.planKey && (
+                    <span className="ml-3 inline-flex items-center" aria-hidden>
+                      <span className="w-4 h-4 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" />
+                    </span>
+                  )}
                 </button>
 
                 <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-neutral-700">

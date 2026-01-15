@@ -213,11 +213,11 @@ export function useResumeOptimizationPolling({
     let stopped = false;
 
     const mapStatus = (
-      s: "pending" | "running" | "complete" | "failed"
+      s: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed"
     ): "idle" | "starting" | "running" | "complete" | "failed" => {
-      if (s === "pending") return "starting";
-      if (s === "running") return "running";
-      if (s === "complete") return "complete";
+      if (s === "optimization_pending") return "starting";
+      if (s === "optimization_processing") return "running";
+      if (s === "optimization_completed") return "complete";
       return "failed";
     };
 
@@ -237,7 +237,7 @@ export function useResumeOptimizationPolling({
           setProgress(nextProgress);
           if (onProgress) onProgress(nextProgress);
 
-          if (job.status === "failed") {
+          if (job.status === "optimization_failed") {
             const errMsg = job.error || "Optimization failed";
             trackOptimizationFailed(analysisId, errMsg);
             setError(errMsg);
@@ -246,7 +246,7 @@ export function useResumeOptimizationPolling({
             return;
           }
 
-          if (job.status === "complete") {
+          if (job.status === "optimization_completed") {
             const optimizationResult = (job.result || null) as OptimizationResult | null;
             if (optimizationResult) {
               setResult(optimizationResult);

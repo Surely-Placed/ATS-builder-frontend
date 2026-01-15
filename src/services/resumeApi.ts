@@ -1,6 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { trackResumeUpload, trackResumeDelete, trackConversion } from "../utils/analytics";
-import { tokenStorage } from "../utils/tokenStorage";
+import { navigate } from "../utils/navigation";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
@@ -16,56 +16,21 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor: Add Authorization header with token (Safari fallback)
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = tokenStorage.getToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor: Extract and store token, handle errors
+// Response interceptor: handle errors (no token handling here - cookie-based auth only)
 apiClient.interceptors.response.use(
-  (response) => {
-    // ✅ Extract token from response if present (backend may return it)
-    // Backend structure: { success: true, data: { token: "...", ... } }
-    const token = (response.data as any)?.data?.token || (response.data as any)?.token;
-    if (token) {
-      tokenStorage.setToken(token);
-      // Set in axios defaults for immediate use
-      apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-    return response;
-  },
+  (response) => response,
   (error: AxiosError) => {
-    // Handle network errors (no response received)
-    if (!error.response) {
-      // Don't redirect on network errors - let the component handle it
-      return Promise.reject(error);
-    }
-
-    // Handle 401 Unauthorized - redirect to login
+    if (!error.response) return Promise.reject(error);
     if (error.response?.status === 401) {
-      tokenStorage.removeToken();
-      // Clear token from axios defaults
-      delete apiClient.defaults.headers.common["Authorization"];
-      window.location.href = "/";
+      // For cookie-based auth, just redirect to login on 401
+      navigate("/", { replace: true });
     }
-
-    // Handle 403 Forbidden - email not verified
     if (error.response?.status === 403) {
       const data = error.response.data as any;
       if (data?.code === "EMAIL_NOT_VERIFIED") {
-        window.location.href = "/verify-email";
+        navigate("/verify-email", { replace: true });
       }
     }
-
     return Promise.reject(error);
   }
 );

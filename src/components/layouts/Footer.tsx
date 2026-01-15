@@ -1,6 +1,7 @@
-import { FileText, Mail, Phone, MapPin, Twitter, Linkedin, Github, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Twitter, Linkedin, Github, Instagram } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Logo } from "@/components/shared/Logo";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -43,14 +44,7 @@ const Footer = () => {
             transition={{ duration: 0.5 }}
             className="lg:col-span-2"
           >
-            <a href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/50 shadow-lg">
-                <FileText className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold">
-                Jobrabbit<span className="text-gradient">.AI</span>
-              </span>
-            </a>
+            <Logo size="lg" className="mb-4" />
             <p className="text-muted-foreground mb-6 max-w-sm">
               Transform your career with AI-powered resume optimization. Get past ATS systems and
               land your dream job faster.
@@ -149,7 +143,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Copyright */}
             <p className="text-sm text-muted-foreground text-center md:text-left">
-              © {currentYear} Jobrabbit.AI. All rights reserved. Built with ❤️ for job seekers.
+              © {currentYear} Jobrabbit. All rights reserved. Built with ❤️ for job seekers.
             </p>
 
             {/* Social Links */}

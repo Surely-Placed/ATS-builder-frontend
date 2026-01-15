@@ -11,10 +11,11 @@ export interface UseSafePollingOptions {
   onProgress?: (progress: number) => void;
   pollingInterval?: number;
   maxRetries?: number;
+  autoStart?: boolean;
 }
 
 export interface UseSafePollingReturn {
-  status: 'idle' | 'starting' | 'running' | 'complete' | 'failed';
+  status: 'idle' | 'starting' | 'running' | 'optimization_completed' | 'optimization_failed';
   progress: number;
   error: string | null;
   result: any;
@@ -30,8 +31,9 @@ export function useSafePolling({
   onProgress,
   pollingInterval = 2000,
   maxRetries = 3
+  , autoStart = false
 }: UseSafePollingOptions): UseSafePollingReturn {
-  const [status, setStatus] = useState<'idle' | 'starting' | 'running' | 'complete' | 'failed'>('idle');
+  const [status, setStatus] = useState<'idle' | 'starting' | 'running' | 'optimization_completed' | 'optimization_failed'>('idle');
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
@@ -91,8 +93,8 @@ export function useSafePolling({
         setProgress(jobProgress);
         if (onProgress) onProgress(jobProgress);
         
-        if (jobStatus === 'complete') {
-          setStatus('complete');
+        if (jobStatus === 'optimization_completed') {
+          setStatus('optimization_completed');
           setResult(jobResponse.result);
           if (jobResponse.result?.optimized_resume?.file_url) {
             setOptimizedResumeUrl(jobResponse.result.optimized_resume.file_url);
@@ -100,8 +102,8 @@ export function useSafePolling({
           if (onComplete) onComplete(jobResponse.result);
           cleanup();
           return;
-        } else if (jobStatus === 'failed') {
-          setStatus('failed');
+        } else if (jobStatus === 'optimization_failed') {
+          setStatus('optimization_failed');
           const errMsg = jobResponse.error || 'Optimization failed';
           setError(errMsg);
           if (onError) onError(errMsg);
@@ -121,7 +123,7 @@ export function useSafePolling({
           analysisResponse?.ats_analysis?.after;
           
         if (hasOptimization) {
-          setStatus('complete');
+          setStatus('optimization_completed');
           setResult(analysisResponse);
           if (onComplete) onComplete(analysisResponse);
           cleanup();
@@ -152,7 +154,7 @@ export function useSafePolling({
         if (retryCount.current <= maxRetries) {
           pollingRef.current = window.setTimeout(executePoll, backoffTime);
         } else {
-          setStatus('failed');
+          setStatus('optimization_failed');
           setError('Too many requests - optimization may be taking longer than expected');
           if (onError) onError('Rate limit exceeded');
           cleanup();
@@ -164,7 +166,7 @@ export function useSafePolling({
           console.warn(`Polling error (attempt ${retryCount.current}):`, err.message);
           pollingRef.current = window.setTimeout(executePoll, pollingInterval);
         } else {
-          setStatus('failed');
+          setStatus('optimization_failed');
           setError(err.message || 'Failed to get status');
           if (onError) onError(err.message || 'Failed to get status');
           cleanup();
@@ -173,8 +175,12 @@ export function useSafePolling({
     }
   }, [analysisId, jobId, pollingInterval, maxRetries, onComplete, onError, onProgress]);
   
-  // Initialize polling
+  // Initialize polling (only if autoStart is enabled)
   useEffect(() => {
+    if (!autoStart) {
+      // Do not initiate any network activity until user opts in
+      return;
+    }
     isMounted.current = true;
     setIsConnected(true);
       
@@ -205,13 +211,13 @@ export function useSafePolling({
             if (jobId) {
               // Type the response as JobStatusResponse
               const jobResponse = response as any;
-              if (jobResponse.status === 'complete') {
-                setStatus('complete');
+              if (jobResponse.status === 'optimization_completed') {
+                setStatus('optimization_completed');
                 setResult(jobResponse.result);
                 if (onComplete) onComplete(jobResponse.result);
                 clearInterval(checkInterval);
-              } else if (jobResponse.status === 'failed') {
-                setStatus('failed');
+              } else if (jobResponse.status === 'optimization_failed') {
+                setStatus('optimization_failed');
                 const errMsg = jobResponse.error || 'Optimization failed';
                 setError(errMsg);
                 if (onError) onError(errMsg);
@@ -227,7 +233,7 @@ export function useSafePolling({
                 analysisResponse?.ats_analysis?.after;
                   
               if (hasOptimization) {
-                setStatus('complete');
+                setStatus('optimization_completed');
                 setResult(analysisResponse);
                 if (onComplete) onComplete(analysisResponse);
                 clearInterval(checkInterval);
@@ -253,7 +259,7 @@ export function useSafePolling({
       isMounted.current = false;
       cleanup();
     };
-  }, [analysisId, jobId, executePoll, onComplete, onError]);
+  }, [analysisId, jobId, executePoll, onComplete, onError, autoStart]);
   
   return {
     status,

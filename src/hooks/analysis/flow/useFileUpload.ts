@@ -2,24 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { getFileErrorMessage } from "@/utils/fileValidation";
 import { resumeApi } from "@/services/resumeApi";
-import { useResumeAnalysisStorage } from "@/hooks/useResumeAnalysisStorage";
+
 
 export function useFileUpload() {
   const { toast } = useToast();
-  const { loadFromStorage } = useResumeAnalysisStorage();
+
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Restore resumeId from storage on mount
-  useEffect(() => {
-    const storedData = loadFromStorage();
-    if (storedData?.resumeId && !resumeId) {
-      setResumeId(storedData.resumeId);
-      // Note: We can't restore the File object, but resumeId is enough to continue
-    }
-  }, []);
+  // No persistence: do not restore resumeId from storage on mount
 
   const handleFileSelect = async (file: File) => {
     const errorMsg = getFileErrorMessage(file);

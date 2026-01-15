@@ -19,7 +19,7 @@ export interface OptimizationJobResponse {
 
 export interface JobStatusResponse {
   success: boolean;
-  status: "pending" | "running" | "complete" | "failed";
+  status: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
   progress: number;
   result: OptimizationResult | null;
   error: string | null;
@@ -80,6 +80,9 @@ export interface AnalysisResult {
   };
   ats_analysis: {
     before: {
+      [x: string]: number;
+      display_score: number;
+      display_score: number;
       score: number;
       real_score?: number;
       label: string;
@@ -120,6 +123,9 @@ export interface AnalysisResult {
 }
 
 export interface OptimizationResult {
+  atsScoreAfter: number;
+  atsScoreAfter: number;
+  atsScoreAfter: any;
   analysis: {
     optimized_file_url: boolean;
     id: string;
@@ -147,6 +153,9 @@ export interface OptimizationResult {
       missing_skills: string[];
     };
     after: {
+      display_score: number;
+      display_score: number;
+      display_score: number;
       score: number;
       improvement: number;
     };

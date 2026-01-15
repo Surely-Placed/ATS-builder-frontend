@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Target, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useUsage } from '@/context/UsageContext';
+import PricingDialog from '@/components/shared/PricingDialog';
 
 interface AnalysisActionsProps {
   canStartAnalysis: boolean;
@@ -20,6 +23,29 @@ export const AnalysisActions = ({
   onStartAnalysis,
   onReset,
 }: AnalysisActionsProps) => {
+  const { state } = useUsage();
+  const remainingRaw = state.remaining;
+  const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
+  const trialBlocked = remaining !== null && remaining <= 0;
+  const [showPricing, setShowPricing] = useState(false);
+  const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    if (!isAnalyzing) {
+      setClicked(false);
+    }
+  }, [isAnalyzing]);
+
+  const handleStart = () => {
+    if (trialBlocked) {
+      setClicked(true);
+      setShowPricing(true);
+      setTimeout(() => setClicked(false), 600);
+      return;
+    }
+    setClicked(true);
+    onStartAnalysis();
+  };
   return (
     <>
       {analysisError && (
@@ -33,7 +59,7 @@ export const AnalysisActions = ({
 
       <div className="flex gap-3">
         <Button
-          onClick={onStartAnalysis}
+          onClick={handleStart}
           disabled={!canStartAnalysis || isAnalyzing || isUploading}
           className="flex-1"
         >
@@ -46,6 +72,11 @@ export const AnalysisActions = ({
             <>
               <Target className="w-4 h-4 mr-2" />
               Start Analysis
+              {(clicked) && (
+                <span className="ml-2 inline-flex items-center" aria-hidden>
+                  <span className="w-4 h-4 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" />
+                </span>
+              )}
             </>
           )}
         </Button>
@@ -54,6 +85,7 @@ export const AnalysisActions = ({
             Reset
           </Button>
         )}
+        <PricingDialog open={showPricing} onClose={() => setShowPricing(false)} hideFreeTrial={trialBlocked} />
       </div>
     </>
   );

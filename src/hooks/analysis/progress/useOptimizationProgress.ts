@@ -6,7 +6,7 @@ interface UseOptimizationProgressProps {
     analysisId: string;
     jobId?: string;
     progress?: number;
-    status?: "pending" | "running" | "complete" | "failed";
+    status?: "optimization_pending" | "optimization_processing" | "optimization_completed" | "optimization_failed";
     error?: string;
   };
   onError?: (error: string) => void;
@@ -19,6 +19,21 @@ interface ProgressState {
   error?: string;
 }
 
+// Map backend progress percentage to step index (0-5 for 6 steps)
+const getStepFromProgress = (progress: number, status: string): number => {
+  if (status === "optimization_completed") return OPTIMIZATION_STEPS.length - 1; // Last step
+  if (status === "optimization_failed") return 0;
+  
+  // Map progress 0-100 to step indices 0-5
+  // Step 0: 0-16%, Step 1: 17-33%, Step 2: 34-50%, Step 3: 51-66%, Step 4: 67-83%, Step 5: 84-100%
+  const stepPercentage = 100 / OPTIMIZATION_STEPS.length;
+  const stepIndex = Math.min(
+    Math.floor(progress / stepPercentage),
+    OPTIMIZATION_STEPS.length - 1
+  );
+  return stepIndex;
+};
+
 export function useOptimizationProgress({
   optimizationParams,
   onError,
@@ -30,28 +45,16 @@ export function useOptimizationProgress({
   });
 
   const prevStatusRef = useRef<string | undefined>(undefined);
-  const steps = OPTIMIZATION_STEPS;
 
   useEffect(() => {
     if (optimizationParams) {
-      const { progress = 0, status = "pending", error } = optimizationParams;
+      const { progress = 0, status = "optimization_pending", error } = optimizationParams;
 
-      // Map progress percentage to step index
-      let stepIndex = 0;
-      if (progress >= 95) stepIndex = steps.length - 1;
-      else if (progress >= 85) stepIndex = 8;
-      else if (progress >= 80) stepIndex = 7;
-      else if (progress >= 70) stepIndex = 6;
-      else if (progress >= 60) stepIndex = 5;
-      else if (progress >= 50) stepIndex = 4;
-      else if (progress >= 40) stepIndex = 3;
-      else if (progress >= 30) stepIndex = 2;
-      else if (progress >= 20) stepIndex = 1;
-      else stepIndex = 0;
-
+      // Use backend progress directly - map to step index for UI display
+      const stepIndex = getStepFromProgress(progress, status);
       const statusChanged = prevStatusRef.current !== status;
 
-      if (status === "failed" && statusChanged) {
+      if (status === "optimization_failed" && statusChanged) {
         setProgressState({
           currentStep: stepIndex,
           progress,
@@ -61,9 +64,9 @@ export function useOptimizationProgress({
         if (onError && error) {
           onError(error);
         }
-      } else if (status === "complete") {
+      } else if (status === "optimization_completed") {
         setProgressState({
-          currentStep: steps.length - 1,
+          currentStep: OPTIMIZATION_STEPS.length - 1, // Last step
           progress: 100,
           status: "completed",
           error: undefined,
@@ -79,7 +82,7 @@ export function useOptimizationProgress({
 
       prevStatusRef.current = status;
     }
-  }, [optimizationParams, steps, onError]);
+  }, [optimizationParams, onError]);
 
   return progressState;
 }

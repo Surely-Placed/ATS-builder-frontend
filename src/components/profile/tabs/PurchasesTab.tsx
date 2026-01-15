@@ -14,8 +14,10 @@ interface Transaction {
 }
 
 interface PurchasesTabProps {
-  transactions: Transaction[];
+  transactions?: Transaction[];
 }
+
+import TransactionHistory from '@/components/profile/TransactionHistory';
 
 export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
   const getStatusBadge = (status: string) => {
@@ -30,7 +32,7 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
 
   return (
     <div className="space-y-6 pl-0 pr-0">
-      {transactions.length > 0 ? (
+      {transactions && transactions.length > 0 ? (
         <Card className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
@@ -67,7 +69,17 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
                         {tx.plan || "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        ${tx.amount.toFixed(2)} {tx.currency}
+                        {
+                          (() => {
+                            const raw = tx.amount as any;
+                            const num = typeof raw === 'number' ? raw : parseFloat(String(raw));
+                            if (Number.isFinite(num)) {
+                              return <>${num.toFixed(2)} {tx.currency}</>;
+                            }
+                            // fallback to rendering the raw value
+                            return <>{String(raw)} {tx.currency}</>;
+                          })()
+                        }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(tx.status)}</td>
                     </tr>
@@ -78,12 +90,17 @@ export const PurchasesTab = ({ transactions }: PurchasesTabProps) => {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
-          <CardContent className="p-12 text-center">
-            <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No purchase history available</p>
-          </CardContent>
-        </Card>
+        // If parent didn't pass transactions, let TransactionHistory fetch them
+        transactions === undefined ? (
+          <TransactionHistory />
+        ) : (
+          <Card className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
+            <CardContent className="p-12 text-center">
+              <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No purchase history available</p>
+            </CardContent>
+          </Card>
+        )
       )}
     </div>
   );

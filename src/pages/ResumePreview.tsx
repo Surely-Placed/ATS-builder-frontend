@@ -66,7 +66,15 @@ export default function ResumePreview() {
         });
       }
       // Navigate back to comparison or optimization page
-      navigate(`/resume-optimization?analysisId=${analysisId}`);
+      // returning to optimization page
+      try {
+        const url = new URL(window.location.href);
+        url.pathname = '/resume-comparison';
+        url.searchParams.set('analysisId', analysisId);
+        window.history.replaceState(window.history.state, '', url.toString());
+      } catch (e) {
+        navigate(`/resume-comparison?analysisId=${analysisId}`);
+      }
     } catch (err: any) {
       toast({
         title: "Failed to generate PDF",
@@ -81,9 +89,17 @@ export default function ResumePreview() {
   const handlePreviewCancel = () => {
     // Navigate back to optimization page
     if (analysisId) {
-      navigate(`/resume-optimization?analysisId=${analysisId}`);
+      // cancel -> return to comparison page
+      try {
+        const url = new URL(window.location.href);
+        url.pathname = '/resume-comparison';
+        url.searchParams.set('analysisId', analysisId);
+        window.history.replaceState(window.history.state, '', url.toString());
+      } catch (e) {
+        navigate(`/resume-comparison?analysisId=${analysisId}`);
+      }
     } else {
-      navigate("/resume-optimization");
+      navigate("/resume-comparison");
     }
   };
 

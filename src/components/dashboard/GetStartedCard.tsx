@@ -21,7 +21,7 @@ export const GetStartedCard = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate("/resume-optimization")}
+            onClick={() => navigate("/resume-analysis")}
             className="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground rounded-lg text-sm sm:text-base font-medium hover:bg-primary/90 transition-colors shrink-0"
           >
             Get Started
