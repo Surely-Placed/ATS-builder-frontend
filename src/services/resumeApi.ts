@@ -4,7 +4,7 @@ import { navigate } from "../utils/navigation";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api";
+  "https://api.jobrabbit.ai/api";
 
 // Create axios instance with cookie and token authentication (Safari compatible)
 const apiClient = axios.create({

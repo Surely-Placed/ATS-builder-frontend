@@ -75,12 +75,13 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
             {isCompleted && <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />}
             {isFailed && <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />}
             {!isActive && !isCompleted && !isFailed && <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />}
-            {type === "analysis" ? "Analyzing Your Resume" : "Optimizing Your Resume"}
+            {type === "analysis" ? " Analyzing Your Resume" : " Optimizing Your Resume"}
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             {type === "analysis"
               ? "Please wait while we analyze your resume against the job description"
               : "Please wait while we optimize your resume for better ATS compatibility"}
+
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
@@ -96,6 +97,8 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
             isActive={isActive}
             isCompleted={isCompleted}
             isFailed={isFailed}
+            progress={progressState.progress}
+            type={type}
           />
 
           <StepsList steps={steps} currentStep={progressState.currentStep} isActive={isActive} />

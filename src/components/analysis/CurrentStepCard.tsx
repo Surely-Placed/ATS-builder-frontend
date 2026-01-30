@@ -7,6 +7,8 @@ interface CurrentStepCardProps {
   isActive: boolean;
   isCompleted: boolean;
   isFailed: boolean;
+  progress?: number;
+  type?: "analysis" | "optimization";
 }
 
 export const CurrentStepCard: React.FC<CurrentStepCardProps> = ({
@@ -14,7 +16,27 @@ export const CurrentStepCard: React.FC<CurrentStepCardProps> = ({
   isActive,
   isCompleted,
   isFailed,
+  progress = 0,
+  type = "analysis",
 }) => {
+  // Show "Starting optimization..." when progress is very low or step is undefined
+  const isStarting = !step || (progress === 0 && isActive);
+  
+  if (isStarting && type === "optimization" && isActive) {
+    return (
+      <div className="mb-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🚀</span>
+          <div className="flex-1">
+            <h3 className="font-semibold">Starting Optimization</h3>
+            <p className="text-sm text-muted-foreground">Preparing to optimize your resume...</p>
+          </div>
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
   if (!step) return null;
 
   return (
@@ -22,7 +44,8 @@ export const CurrentStepCard: React.FC<CurrentStepCardProps> = ({
       <div className="flex items-center gap-3">
         <span className="text-2xl">{step.icon}</span>
         <div className="flex-1">
-          <h3 className="font-semibold">{step.title}</h3>
+          <h3 className="font-semibold"> {step.title}</h3>
+
           <p className="text-sm text-muted-foreground">{step.description}</p>
         </div>
         {isActive && <Loader2 className="w-6 h-6 animate-spin text-primary" />}

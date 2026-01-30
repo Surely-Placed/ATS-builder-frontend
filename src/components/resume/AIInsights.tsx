@@ -19,7 +19,7 @@ export const AIInsights = ({ strengths, weaknesses, recommendations }: AIInsight
       <CardContent>
         <div className="insights-grid">
           <div className="insight-card strengths">
-            <h3>✅ Strengths</h3>
+            <h3> Strengths</h3>
             {strengths.length > 0 ? (
               <ul>
                 {strengths.map((strength, idx) => (
@@ -32,7 +32,7 @@ export const AIInsights = ({ strengths, weaknesses, recommendations }: AIInsight
           </div>
 
           <div className="insight-card weaknesses">
-            <h3>⚠️ Weaknesses</h3>
+            <h3> Weaknesses</h3>
             {weaknesses.length > 0 ? (
               <ul>
                 {weaknesses.map((weakness, idx) => (

@@ -80,8 +80,6 @@ export interface AnalysisResult {
   };
   ats_analysis: {
     before: {
-      [x: string]: number;
-      display_score: number;
       display_score: number;
       score: number;
       real_score?: number;
@@ -118,14 +116,17 @@ export interface AnalysisResult {
   section_analysis: null;
   resume_quality?: ResumeQualityScore | null;
   comprehensive_feedback?: ComprehensiveFeedback | null;
-  optimized_resume: null;
+  optimized_resume: {
+    url?: string;
+    file_url?: string;
+    pdf_url?: string;
+    structured_data?: any;
+  } | null;
   note: string;
 }
 
 export interface OptimizationResult {
   atsScoreAfter: number;
-  atsScoreAfter: number;
-  atsScoreAfter: any;
   analysis: {
     optimized_file_url: boolean;
     id: string;
@@ -153,8 +154,6 @@ export interface OptimizationResult {
       missing_skills: string[];
     };
     after: {
-      display_score: number;
-      display_score: number;
       display_score: number;
       score: number;
       improvement: number;

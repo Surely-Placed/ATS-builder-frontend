@@ -8,12 +8,17 @@ export type JobStatus = {
   error?: string;
 };
 
+/**
+ * Two-step analysis and optimization function
+ * First analyzes the resume, then starts optimization
+ * Note: This will be triggered automatically by the UI, no manual button click needed
+ */
 export async function analyzeAndOptimize(
   resumeId: string,
   jobTitle: string,
   jobDescription: string
 ): Promise<{ analysisId: string; jobId: string; qualityScore: number | null; result: any }> {
-  // 1) Quick analyze (DO NOT send job_id)
+  // 1) First, analyze the resume
   const analyzed = await AnalysisService.analyzeResume({
     resume_id: resumeId,
     job_title: jobTitle,
@@ -25,7 +30,7 @@ export async function analyzeAndOptimize(
 
   const qualityScore: number | null = (analyzed as any)?.analysis?.quality_score ?? null;
 
-  // 2) Start optimization (async)
+  // 2) Then, start optimization (async)
   const opt = await OptimizationService.startOptimization(analysisId);
   const jobId = opt?.jobId;
   if (!jobId) throw new Error("Optimization start succeeded but no jobId was returned");

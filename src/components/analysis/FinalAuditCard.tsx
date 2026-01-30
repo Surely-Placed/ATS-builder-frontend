@@ -32,7 +32,7 @@ export const FinalAuditCard: React.FC<FinalAuditCardProps> = ({ finalAudit }) =>
           <div className="audit-item">
             <strong>Ready for Submission:</strong>{" "}
             <Badge variant="default" className="bg-green-500">
-              ✅ Yes
+               Yes
             </Badge>
           </div>
         </div>

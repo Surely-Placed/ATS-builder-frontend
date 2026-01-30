@@ -24,18 +24,16 @@ export function useFlowActions(params: any) {
 
   useEffect(() => {
     if (optimizationStatus === 'complete' && optimizationResult && analysisId) {
-      setViewState && setViewState('comparison');
+      setViewState && setViewState('preview');
       try {
-        const url = new URL(window.location.href);
-        url.pathname = '/resume-comparison';
-        url.searchParams.set('analysisId', analysisId);
-        window.history.replaceState(window.history.state, '', url.toString());
+        navigate && navigate(`/resume-preview/${analysisId}`, { replace: true });
       } catch (e) {
-        navigate && navigate(`/resume-comparison?analysisId=${analysisId}`, { replace: true });
+        // fallback ignored
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [optimizationStatus, optimizationResult, analysisId]);
+
 
   const handleStartNew = () => {
     // Mark fresh start so state restoration hooks ignore existing analysisId

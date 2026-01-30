@@ -58,25 +58,13 @@ export function useAnalysisHandlers({
                 setAnalysisId(fetchedAnalysisId);
                 setIsAnalyzing(false);
                 setShowAnalysisProgress(false);
-                // Only switch to the analysis view if we're not currently on the optimization/comparison page
-                if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
-                  setViewState("analysis");
+                // Automatically transition to optimizing view (unified flow)
+                if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-preview')) {
+                  setViewState("optimizing");
                 }
-                // Removed saveToStorage
 
-                // Update URL with analysisId for proper routing (preserve originating route)
-                // If we're already on the optimization or comparison page, avoid navigating (preserve user's current view)
-                if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
-                  // Ensure query param is present without forcing a navigation
-                  const url = new URL(window.location.href);
-                  url.searchParams.set('analysisId', fetchedAnalysisId);
-                  window.history.replaceState(window.history.state, '', url.toString());
-                  // preserved optimization route, set analysisId query
-                } else {
-                  const targetPath = '/resume-analysis';
-                  // navigating to analysis route
-                  navigate(`${targetPath}?analysisId=${fetchedAnalysisId}`, { replace: true });
-                }
+                // Update URL with analysisId for proper routing
+                navigate(`?analysisId=${fetchedAnalysisId}`, { replace: true });
 
                 if (onComplete) onComplete();
                 return;
@@ -93,22 +81,13 @@ export function useAnalysisHandlers({
           setAnalysisId(fallbackAnalysisId);
           setIsAnalyzing(false);
           setShowAnalysisProgress(false);
-          // Preserve optimization/comparison flow if user is on the optimization page
-          if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
-            setViewState("analysis");
+          // Automatically transition to optimizing view (unified flow)
+          if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-preview')) {
+            setViewState("optimizing");
           }
-          // Removed saveToStorage
 
-          // Update URL with analysisId for proper routing (preserve originating route)
-          if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('analysisId', fallbackAnalysisId);
-            window.history.replaceState(window.history.state, '', url.toString());
-            // preserved optimization route (fallback), set analysisId
-          } else {
-            // navigating to analysis route (fallback)
-            navigate(`/resume-analysis?analysisId=${fallbackAnalysisId}`, { replace: true });
-          }
+          // Update URL with analysisId for proper routing
+          navigate(`?analysisId=${fallbackAnalysisId}`, { replace: true });
 
           if (onComplete) onComplete();
           return;
@@ -119,24 +98,13 @@ export function useAnalysisHandlers({
         setAnalysisId(analysisId);
         setIsAnalyzing(false);
         setShowAnalysisProgress(false);
-        // Don't force navigation away from the optimization/comparison flow; only switch to analysis view
-        // when not currently on the optimization/comparison page.
-        if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-comparison')) {
-          setViewState("analysis");
+        // Automatically transition to optimizing view instead of analysis view (unified flow)
+        if (!window.location.pathname.includes('/resume-optimization') && !window.location.pathname.includes('/resume-preview')) {
+          setViewState("optimizing");
         }
-        
-        // Removed setAnalysisInProgress and saveToStorage
 
-        // Update URL with analysisId for proper routing (preserve originating route)
-        if (window.location.pathname.includes('/resume-optimization') || window.location.pathname.includes('/resume-comparison')) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('analysisId', analysisId);
-          window.history.replaceState(window.history.state, '', url.toString());
-          // preserved optimization route, set analysisId
-        } else {
-          // navigating to analysis route
-          navigate(`/resume-analysis?analysisId=${analysisId}`, { replace: true });
-        }
+        // Update URL with analysisId for proper routing
+        navigate(`?analysisId=${analysisId}`, { replace: true });
 
         if (onComplete) onComplete();
       } catch (error: any) {
@@ -187,7 +155,7 @@ export function useAnalysisHandlers({
     setAnalysisError(null);
     setIsAnalyzing(true);
     setShowAnalysisProgress(true);
-    
+
     // Removed saveToStorage and setAnalysisInProgress
   }, [
     resumeId,

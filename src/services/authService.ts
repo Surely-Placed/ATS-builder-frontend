@@ -13,7 +13,7 @@ import { trackLogin, trackSignup, trackLogout } from "../utils/analytics";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev/api";
+  "https://api.jobrabbit.ai/api";
 
 export const authService = {
   async signup(name: string, email: string, password: string) {

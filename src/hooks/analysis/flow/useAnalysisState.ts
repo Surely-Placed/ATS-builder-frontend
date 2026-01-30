@@ -9,15 +9,15 @@ import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 export function useAnalysisState() {
   const [searchParams] = useSearchParams();
 
-  
+
   // Check if this is a fresh start (user clicked "Analyze Another Resume")
   const isFreshStart = sessionStorage.getItem('resume_fresh_start') === 'true';
-  
+
   // Clear the fresh start flag after reading it
   if (isFreshStart) {
     sessionStorage.removeItem('resume_fresh_start');
   }
-  
+
   // No localStorage or storedData logic
   const urlAnalysisId = isFreshStart ? null : searchParams.get("analysisId");
 
@@ -30,10 +30,11 @@ export function useAnalysisState() {
   const setViewState = (newState: ViewState) => {
     try {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-      if ((pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison')) && newState === 'analysis') {
-        // Ignore attempts to force 'analysis' while on the optimization/comparison page
+      if ((pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison') || pathname.includes('/resume-preview')) && newState === 'analysis') {
+        // Ignore attempts to force 'analysis' while on the optimization/comparison/preview page
         return;
       }
+
     } catch (e) {
       // If anything goes wrong, fall back to normal behavior
     }
@@ -53,20 +54,20 @@ export function useAnalysisState() {
       if (isFreshStart) {
         return;
       }
-      
+
       // If we have analysisId but no analysisResult, try to fetch it
       // This handles page refresh during or after analysis
       const currentAnalysisId = urlAnalysisId || analysisId;
-      
+
       if (currentAnalysisId && !analysisResult) {
         try {
           const response = await AnalysisApiService.getAnalysis(currentAnalysisId);
           const normalized = normalizeAnalysisResult(response);
-          
+
           if (normalized.analysis?.id) {
             setAnalysisResult(normalized as unknown as AnalysisResult);
             setAnalysisId(normalized.analysis.id);
-            
+
             // Check if optimization is complete
             const hasOptimization =
               normalized.optimized_resume ||
@@ -75,15 +76,15 @@ export function useAnalysisState() {
               normalized.ats_analysis?.after;
 
             if (hasOptimization) {
-                setViewState("comparison");
-              } else {
-                // If the user is currently on the optimization page, prefer keeping them
-                // in an optimizing state instead of flipping back to the analysis view.
-                const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-                const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison');
-                setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
-              }
-            
+              setViewState("preview");
+            } else {
+              // If the user is currently on the optimization or preview page, prefer keeping them
+              // in an optimizing state instead of flipping back to the analysis view.
+              const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+              const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-preview');
+              setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
+            }
+
             // Reset analyzing states since analysis is complete
             setIsAnalyzing(false);
             setShowAnalysisProgress(false);
@@ -110,12 +111,12 @@ export function useAnalysisState() {
           try {
             const response = await AnalysisApiService.getAnalysis(currentAnalysisId);
             const normalized = normalizeAnalysisResult(response);
-            
+
             if (normalized.analysis?.id) {
               // Analysis exists and is complete, stop analyzing state
               setIsAnalyzing(false);
               setShowAnalysisProgress(false);
-              
+
               // Update result in case it's newer
               setAnalysisResult(normalized as unknown as AnalysisResult);
             }
@@ -141,7 +142,7 @@ export function useAnalysisState() {
   useEffect(() => {
     // Check if URL has analysisId parameter
     const hasUrlAnalysisId = urlAnalysisId !== null;
-    
+
     if (hasUrlAnalysisId && urlAnalysisId !== analysisId) {
       setAnalysisId(urlAnalysisId);
       // If we have analysisId in URL but no analysis result, try to load it
@@ -153,7 +154,7 @@ export function useAnalysisState() {
             if (normalized.analysis?.id) {
               setAnalysisResult(normalized as unknown as AnalysisResult);
 
-              // Check if optimization is complete - if so, set viewState to 'comparison'
+              // Check if optimization is complete - if so, set viewState to 'preview'
               // Check for optimization result in the response
               const hasOptimization =
                 normalized.optimized_resume ||
@@ -162,15 +163,14 @@ export function useAnalysisState() {
                 normalized.ats_analysis?.after;
 
               if (hasOptimization) {
-                setViewState("comparison");
+                setViewState("preview");
               } else {
-                // Respect the current route: if user landed on the optimization path,
-                // don't immediately switch them to the analysis view when optimization
-                // data isn't yet visible (prevents race with eventual consistency).
-                const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-                const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-comparison');
-                setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
+                // If we have analysisId but no optimization yet, we should be in optimizing state
+                // This handles the transition from analysis complete -> optimization starting
+                setViewState('optimizing');
               }
+
+
             }
           } catch (error) {
             // Failed to load analysis - user will need to start new analysis
@@ -178,13 +178,9 @@ export function useAnalysisState() {
         };
         loadAnalysisFromUrl();
       }
-    } else if (!hasUrlAnalysisId && analysisId) {
-      // If URL doesn't have analysisId but we have one in state, clear it
-      // This happens when user navigates to a clean URL
-      setAnalysisId(null);
-      setAnalysisResult(null);
     }
   }, [urlAnalysisId, analysisId, analysisResult]);
+
 
   return {
     analysisResult,

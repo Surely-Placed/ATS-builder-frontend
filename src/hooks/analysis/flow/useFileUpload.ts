@@ -22,6 +22,12 @@ export function useFileUpload() {
         description: errorMsg,
         variant: "destructive",
       });
+      // Clear file input if not PDF
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setUploadedFile(null);
+      setResumeId(null);
       return;
     }
 

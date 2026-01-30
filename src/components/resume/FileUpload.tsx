@@ -50,7 +50,7 @@ export const FileUpload = ({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx"
+          accept=".pdf,application/pdf"
           onChange={handleFileInputChange}
           className="hidden"
           disabled={isUploading || isAnalyzing}
@@ -81,7 +81,7 @@ export const FileUpload = ({
             <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-sm font-medium mb-1">Drop your resume here</p>
             <p className="text-xs text-muted-foreground">
-              or click to browse (PDF, DOC, DOCX - Max 10MB)
+              or click to browse (PDF only - Max 10MB)
             </p>
           </div>
         )}

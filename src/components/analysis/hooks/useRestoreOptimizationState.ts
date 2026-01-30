@@ -38,7 +38,7 @@ export function useRestoreOptimizationState(params: any) {
                 fetchedAnalysis?.ats_analysis?.after;
 
               if (hasOptimization) {
-                setViewState && setViewState('comparison');
+                setViewState && setViewState('preview');
               } else {
                 setViewState && setViewState('analysis');
               }
@@ -62,7 +62,7 @@ export function useRestoreOptimizationState(params: any) {
             try {
               const fetchedAnalysis = await fetchAnalysis();
               if (fetchedAnalysis?.optimized_resume || fetchedAnalysis?.analysis?.ats_score_after) {
-                setViewState && setViewState('comparison');
+                setViewState && setViewState('preview');
               }
             } catch (e) {
               // noop
@@ -78,7 +78,7 @@ export function useRestoreOptimizationState(params: any) {
                 fetchedAnalysis?.ats_analysis?.after;
 
               if (isComplete) {
-                setViewState && setViewState('comparison');
+                setViewState && setViewState('preview');
               }
             } catch (e) {
               // noop
@@ -102,7 +102,8 @@ export function useRestoreOptimizationState(params: any) {
                   (fetchedAnalysis?.analysis?.ats_score_after !== null && fetchedAnalysis?.analysis?.ats_score_after !== undefined) ||
                   fetchedAnalysis?.ats_analysis?.after;
 
-                setViewState && setViewState(hasOptimization ? 'comparison' : 'analysis');
+                setViewState && setViewState(hasOptimization ? 'preview' : 'optimizing');
+
               }
             } catch (err) {
               const isAnalysisInProgress = (analysisInProgress && analysisInProgress()) || false;

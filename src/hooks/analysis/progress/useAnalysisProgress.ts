@@ -46,10 +46,11 @@ export function useAnalysisProgress({
       try {
         // Create an AbortController for this analysis so it can be cancelled
         if (abortControllerRef.current) {
-          try { abortControllerRef.current.abort(); } catch (e) {}
+          try { abortControllerRef.current.abort(); } catch (e) { }
         }
         abortControllerRef.current = new AbortController();
 
+        // Call the analysis API (first step)
         const apiCallPromise = AnalysisApiService.analyzeResume(
           {
             resume_id: analysisParams.resumeId,
@@ -107,7 +108,7 @@ export function useAnalysisProgress({
         });
 
         if (onComplete) {
-          setTimeout(() => onComplete(result), 500);
+          onComplete(result);
         }
       } catch (error: any) {
         if (analysisIntervalRef.current) {
@@ -141,7 +142,7 @@ export function useAnalysisProgress({
         clearInterval(analysisIntervalRef.current);
       }
       if (abortControllerRef.current) {
-        try { abortControllerRef.current.abort(); } catch (e) {}
+        try { abortControllerRef.current.abort(); } catch (e) { }
         abortControllerRef.current = null;
       }
     };
@@ -153,7 +154,7 @@ export function useAnalysisProgress({
       analysisIntervalRef.current = null;
     }
     if (abortControllerRef.current) {
-      try { abortControllerRef.current.abort(); } catch (e) {}
+      try { abortControllerRef.current.abort(); } catch (e) { }
       abortControllerRef.current = null;
     }
     setProgressState({ currentStep: 0, progress: 0, status: 'idle' });

@@ -14,6 +14,8 @@ export default function ResumeComparison() {
   const [originalAnalysis, setOriginalAnalysis] = useState<any | null>(null);
   const [optimizedResult, setOptimizedResult] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isDownloadLoading, setIsDownloadLoading] = useState(false);
 
   useEffect(() => {
     if (!analysisId) {
@@ -80,14 +82,51 @@ export default function ResumeComparison() {
     );
   }
 
+  const handleDownload = async () => {
+    setIsDownloadLoading(true);
+    try {
+      // Get the optimized resume URL from the current data
+      const pdfUrl = 
+        optimizedResult?.optimized_resume?.url || 
+        optimizedResult?.optimized_resume?.file_url || 
+        optimizedResult?.optimized_resume?.pdf_url ||
+        null;
+
+      if (pdfUrl) {
+        // Download the PDF directly
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = 'optimized-resume.pdf';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('No optimized resume URL found');
+      }
+    } catch (err) {
+      console.error('Download failed:', err);
+    } finally {
+      setIsDownloadLoading(false);
+    }
+  };
+
+  const handlePreview = () => {
+    setIsPreviewLoading(true);
+    navigate(`/resume-preview/${analysisId}`);
+    // No need to reset loading as navigation happens immediately
+  };
+
   return (
     <DashboardLayout activeTab="Resume Optimization">
       <ComparisonView
         originalAnalysis={originalAnalysis}
         optimizedResult={optimizedResult}
-        onDownload={() => { /* noop - keep same UX in page */ }}
+        onDownload={handleDownload}
         onStartNew={() => navigate('/resume-analysis')}
-        onPreview={() => navigate(`/resume-preview/${analysisId}`)}
+        onPreview={handlePreview}
+        isPreviewLoading={isPreviewLoading}
+        isDownloadLoading={isDownloadLoading}
       />
     </DashboardLayout>
   );

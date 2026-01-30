@@ -121,9 +121,6 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
                   </p>
                 </div>
                 <div className="flex gap-3">
-                  <Button onClick={onCancel} variant="outline" disabled={isGenerating}>
-                    Cancel
-                  </Button>
                   <Button
                     onClick={onConfirm}
                     className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
@@ -135,7 +132,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
                         Generating & Downloading PDF...
                       </>
                     ) : (
-                      <>✅ Confirm & Generate PDF</>
+                      <>Confirm & Generate PDF</>
                     )}
                   </Button>
                 </div>

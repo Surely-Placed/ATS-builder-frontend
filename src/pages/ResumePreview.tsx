@@ -57,28 +57,37 @@ export default function ResumePreview() {
 
     setIsGeneratingPDF(true);
     try {
-      const pdfResponse = await AnalysisApiService.generatePDF(analysisId);
-      if (pdfResponse.file_url) {
-        AnalysisApiService.downloadResume(pdfResponse.file_url, "optimized-resume.pdf", undefined);
+      // Fetch the analysis data to get the optimized resume URL
+      const analysis = await AnalysisApiService.getAnalysis(analysisId);
+      const pdfUrl = analysis?.optimized_resume?.url || analysis?.optimized_resume?.file_url || null;
+
+      if (pdfUrl) {
+        // Download the PDF directly
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = 'optimized-resume.pdf';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
         toast({
-          title: "PDF Generated & Downloaded",
-          description: "Your optimized resume PDF has been generated and downloaded successfully",
+          title: "PDF Downloaded",
+          description: "Your optimized resume has been downloaded successfully",
         });
+      } else {
+        throw new Error("Optimized resume PDF not found");
       }
-      // Navigate back to comparison or optimization page
-      // returning to optimization page
-      try {
-        const url = new URL(window.location.href);
-        url.pathname = '/resume-comparison';
-        url.searchParams.set('analysisId', analysisId);
-        window.history.replaceState(window.history.state, '', url.toString());
-      } catch (e) {
+      
+      // Navigate back to comparison page
+      setTimeout(() => {
         navigate(`/resume-comparison?analysisId=${analysisId}`);
-      }
+      }, 1000);
     } catch (err: any) {
+      console.error("Download failed:", err);
       toast({
-        title: "Failed to generate PDF",
-        description: err.message || "Could not generate PDF",
+        title: "Failed to download PDF",
+        description: err.message || "Could not download PDF",
         variant: "destructive",
       });
     } finally {
@@ -89,18 +98,11 @@ export default function ResumePreview() {
   const handlePreviewCancel = () => {
     // Navigate back to optimization page
     if (analysisId) {
-      // cancel -> return to comparison page
-      try {
-        const url = new URL(window.location.href);
-        url.pathname = '/resume-comparison';
-        url.searchParams.set('analysisId', analysisId);
-        window.history.replaceState(window.history.state, '', url.toString());
-      } catch (e) {
-        navigate(`/resume-comparison?analysisId=${analysisId}`);
-      }
+      navigate('/resume-analysis', { replace: true });
     } else {
-      navigate("/resume-comparison");
+      navigate("/resume-analysis");
     }
+
   };
 
   if (isLoading) {

@@ -56,7 +56,7 @@ export const QualityScoreDetails: React.FC<QualityScoreDetailsProps> = ({
         {qualityScore.strengths.length > 0 && (
           <div>
             <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <span>✅</span> Strengths
+              <span></span> Strengths
             </h3>
             <div className="flex flex-wrap gap-2">
               {qualityScore.strengths.map((strength, idx) => (

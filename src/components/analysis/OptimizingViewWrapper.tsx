@@ -34,11 +34,17 @@ export const OptimizingViewWrapper: React.FC<OptimizingViewWrapperProps> = ({
       status={optimizationStatusMapped}
       error={errorToPass}
       onReset={() => {
-        setViewState("analysis");
+        setViewState("form");
         // Clear the URL parameters to prevent restoration logic from running (analysis route)
         navigate("/resume-analysis", { replace: true });
       }}
-      onComplete={() => setViewState("comparison")}
+      onComplete={() => {
+        setViewState("preview");
+        if (analysisId) {
+          navigate(`/resume-preview/${analysisId}`, { replace: true });
+        }
+      }}
+
       onError={(error) => {
         if (optimizationStatus === "failed") {
           toast({

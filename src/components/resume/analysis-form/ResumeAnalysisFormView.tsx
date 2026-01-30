@@ -6,6 +6,8 @@ import { FileUpload } from "../FileUpload";
 import { JobTitleInput } from "../JobTitleInput";
 import { JobDescriptionInput } from "../JobDescriptionInput";
 import { AnalysisActions } from "../AnalysisActions";
+import { mapOptimizationStatus } from "@/utils/analysis/optimizationStatusMapper";
+
 
 interface ResumeAnalysisFormViewProps {
   uploadedFile: File | null;
@@ -14,6 +16,12 @@ interface ResumeAnalysisFormViewProps {
   resumeId: string | null;
   isUploading: boolean;
   isAnalyzing: boolean;
+  isOptimizing?: boolean;
+  hasAnalysisId?: boolean;
+  analysisId?: string;
+  optimizationStatus?: string;
+  optimizationProgress?: number;
+  optimizationError?: string;
   analysisError: string | null;
   showAnalysisProgress: boolean;
   fileInputRef: React.RefObject<HTMLInputElement>;
@@ -24,6 +32,7 @@ interface ResumeAnalysisFormViewProps {
   onStartAnalysis: () => void;
   onReset: () => void;
   onAnalysisComplete: (result: any) => void;
+  onOptimizationComplete?: (result: any) => void;
   onAnalysisError: (error: string) => void;
   onCancelAvailable?: (cancel: () => void) => void;
 }
@@ -35,6 +44,12 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
   resumeId,
   isUploading,
   isAnalyzing,
+  isOptimizing = false,
+  hasAnalysisId = false,
+  analysisId = "",
+  optimizationStatus = "idle",
+  optimizationProgress = 0,
+  optimizationError,
   analysisError,
   showAnalysisProgress,
   fileInputRef,
@@ -45,6 +60,7 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
   onStartAnalysis,
   onReset,
   onAnalysisComplete,
+  onOptimizationComplete,
   onAnalysisError,
   onCancelAvailable,
 }) => {
@@ -102,15 +118,36 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
           />
         )}
 
+        {isOptimizing && analysisId && (
+          <ProgressTracker
+            type="optimization"
+            optimizationParams={{
+              analysisId,
+              progress: optimizationProgress,
+              status: mapOptimizationStatus(optimizationStatus),
+              error: optimizationError,
+            }}
+            onComplete={onOptimizationComplete || onAnalysisComplete}
+            onError={onAnalysisError}
+          />
+        )}
+
+
         <AnalysisActions
           canStartAnalysis={canStartAnalysis}
           isAnalyzing={isAnalyzing}
+          isOptimizing={isOptimizing}
+          hasAnalysisId={hasAnalysisId}
+          optimizationStatus={optimizationStatus}
           isUploading={isUploading}
           analysisError={analysisError}
           hasData={hasData}
           onStartAnalysis={onStartAnalysis}
           onReset={onReset}
         />
+
+
+
       </CardContent>
     </Card>
   );

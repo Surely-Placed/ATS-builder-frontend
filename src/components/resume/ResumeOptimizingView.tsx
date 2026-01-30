@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgressTracker } from "../analysis/ProgressTracker";
 import { X } from "lucide-react";
@@ -22,6 +22,14 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
   onComplete,
   onError,
 }) => {
+  // Memoize optimizationParams to prevent unnecessary re-renders
+  const optimizationParams = useMemo(() => ({
+    analysisId,
+    progress,
+    status,
+    error,
+  }), [analysisId, progress, status, error]);
+
   return (
     <div className="resume-analysis-flow relative w-full px-2 sm:px-4 md:px-0">
       {/* Reset Button - Top Right */}
@@ -39,12 +47,7 @@ export const ResumeOptimizingView: React.FC<ResumeOptimizingViewProps> = ({
       <div className="optimizing-view pt-10 sm:pt-8">
         <ProgressTracker
           type="optimization"
-          optimizationParams={{
-            analysisId,
-            progress,
-            status,
-            error,
-          }}
+          optimizationParams={optimizationParams}
           onComplete={onComplete}
           onError={onError}
         />

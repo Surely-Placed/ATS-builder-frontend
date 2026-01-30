@@ -1,7 +1,7 @@
 import { SUPPORTED_FILE_TYPES, MAX_FILE_SIZE } from "@/constants/analysis";
 
 export const validateFileType = (file: File): boolean => {
-  return SUPPORTED_FILE_TYPES.includes(file.type);
+  return file.type === "application/pdf";
 };
 
 export const validateFileSize = (file: File): boolean => {
@@ -28,12 +28,10 @@ export const validateFileContent = async (file: File): Promise<boolean> => {
 
 export const getFileErrorMessage = (file: File): string | null => {
   if (!validateFileType(file)) {
-    return "Please upload a PDF, DOC, or DOCX file";
+    return "Please upload a PDF file only.";
   }
-
   if (!validateFileSize(file)) {
     return "File size must be less than 10MB";
   }
-
   return null;
 };

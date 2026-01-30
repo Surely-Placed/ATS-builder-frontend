@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useResumeOptimization } from "@/hooks/useResumeOptimization";
 import { ResumeAnalysisFormView } from "@/components/resume/analysis-form";
-import { ResumeAnalysisView } from "@/components/resume/analysis-view";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 import {
   useAnalysisState,
+
   useFileUpload,
   useAnalysisHandlers,
   useOptimizationHandlers,
@@ -17,8 +18,6 @@ import { useEnforceViewState } from "./hooks/useEnforceViewState";
 import { useFlowActions } from "./hooks/useFlowActions";
 // debug utilities removed
 import { mapOptimizationStatus } from '@/utils/analysis/optimizationStatusMapper';
-import { OptimizingViewWrapper } from "./OptimizingViewWrapper";
-import { ComparisonViewWrapper } from "./ComparisonViewWrapper";
 
 type ResumeAnalysisFlowProps = {
   onComplete?: () => void;
@@ -119,7 +118,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
   });
 
   // Ref to hold cancel function for analysis progress
-  const cancelAnalysisRef = useRef<(() => void) | null>(null);
+  const cancelAnalysisRef = useRef<() => void | null>(null);
 
   const handleCancelAvailable = (cancelFn: () => void) => {
     cancelAnalysisRef.current = cancelFn;
@@ -143,6 +142,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
 
   const [optimizationResult, setOptimizationResult] = useState(null);
   const [optimizedResumeUrl, setOptimizedResumeUrl] = useState<string | null>(null);
+  
 
   // Update local state when hook result changes
   useEffect(() => {
@@ -154,8 +154,38 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     }
   }, [optimizationResultHook, optimizedResumeUrlHook]);
 
+  // Automatically start optimization when viewState becomes "optimizing"
+  // This is the key to the unified flow - no manual "Optimize" button needed
+  const lastTriggeredAnalysisIdRef = useRef<string | null>(null);
+  
+  useEffect(() => {
+    if (viewState === "optimizing" && analysisId && lastTriggeredAnalysisIdRef.current !== analysisId) {
+      lastTriggeredAnalysisIdRef.current = analysisId;
+      // Automatically trigger optimization
+      startOptimization().catch((err) => {
+        console.error("Auto-optimization failed:", err);
+        setViewState("form");
+        toast({
+          title: "Optimization Failed",
+          description: err.message || "Failed to start optimization automatically",
+          variant: "destructive",
+        });
+      });
+    }
+    
+    // Reset the tracker if we leave the optimizing view for a long enough time or if id is cleared
+    if (viewState !== "optimizing" || !analysisId) {
+      lastTriggeredAnalysisIdRef.current = null;
+    }
+  }, [viewState, analysisId, startOptimization, setViewState, toast]);
 
-  const { handleAnalysisComplete, handleAnalysisError, handleStartAnalysis } = useAnalysisHandlers({
+
+
+
+
+
+
+  const { handleAnalysisComplete: handleAnalysisCompleteBase, handleAnalysisError, handleStartAnalysis } = useAnalysisHandlers({
     setAnalysisResult,
     setAnalysisId,
     setIsAnalyzing,
@@ -168,6 +198,20 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     jobDescription,
     onComplete,
   });
+
+  // Wrap handleAnalysisComplete to set waiting state immediately
+  // This prevents the "Start Analysis" button from flashing when analysis ends but optimization view hasn't loaded yet
+  const handleAnalysisComplete = (result: any) => {
+    handleAnalysisCompleteBase(result);
+  };
+
+  const handleOptimizationComplete = (result: any) => {
+    console.log("Optimization complete:", result);
+    if (analysisId) {
+      navigate(`/resume-comparison?analysisId=${analysisId}`, { replace: true });
+    }
+  };
+
 
   const { handleStartOptimization } = useOptimizationHandlers({
     analysisId,
@@ -224,49 +268,17 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
     analysisResult,
     optimizationResult,
     optimizationStatus,
+    navigate,
   });
-  if (viewState === "analysis" && analysisResult) {
-    const isOptimizingFlag = optimizationStatus === 'starting' || optimizationStatus === 'running';
-    return (
-      <ResumeAnalysisView
-        analysisResult={analysisResult}
-        isStatusUpdatesConnected={isStatusUpdatesConnected}
-        onStartOptimization={handleStartOptimization}
-        isOptimizing={isOptimizingFlag}
-        onStartNew={handleStartNew}
-      />
-    );
+
+  
+  // Comparison view has been removed - we now navigate directly to preview
+  // which is handled by a separate route and component (ResumePreview.tsx)
+  
+  if (viewState === "preview") {
+    return null; // Navigation handles this
   }
 
-  // Render Optimizing View
-  if (viewState === "optimizing" && analysisId) {
-    return (
-      <OptimizingViewWrapper
-        analysisId={analysisId}
-        optimizationStatus={optimizationStatus}
-        optimizationProgress={optimizationProgress}
-        optimizationError={optimizationError}
-        setViewState={setViewState}
-        toast={toast}
-        navigate={navigate}
-      />
-    );
-  }
-
-
-  // Render Comparison View
-  if (viewState === "comparison") {
-    return (
-      <ComparisonViewWrapper
-        analysisResult={analysisResult}
-        optimizationResult={optimizationResult}
-        handleDownload={handleDownload}
-        handleStartNew={handleStartNew}
-        handlePreview={handlePreview}
-        isDownloading={isDownloading}
-      />
-    );
-  }
 
   // Render Form View (Default)
   return (
@@ -279,7 +291,16 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
         resumeId={resumeId}
         isUploading={isUploading}
         isAnalyzing={isAnalyzing}
+        isOptimizing={viewState === "optimizing"}
+        hasAnalysisId={!!analysisId}
+        analysisId={analysisId || ""}
+        optimizationStatus={optimizationStatus}
+        optimizationProgress={optimizationProgress}
+        optimizationError={optimizationError}
         analysisError={analysisError}
+
+
+
         showAnalysisProgress={showAnalysisProgress}
         fileInputRef={fileInputRef}
         onFileSelect={handleFileSelect}
@@ -289,7 +310,9 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
         onStartAnalysis={handleStartAnalysis}
         onReset={handleStartNew}
         onAnalysisComplete={handleAnalysisComplete}
+        onOptimizationComplete={handleOptimizationComplete}
         onAnalysisError={handleAnalysisError}
+
         onCancelAvailable={handleCancelAvailable}
       />
     </div>

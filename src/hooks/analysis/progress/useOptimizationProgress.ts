@@ -23,7 +23,7 @@ interface ProgressState {
 const getStepFromProgress = (progress: number, status: string): number => {
   if (status === "optimization_completed") return OPTIMIZATION_STEPS.length - 1; // Last step
   if (status === "optimization_failed") return 0;
-  
+
   // Map progress 0-100 to step indices 0-5
   // Step 0: 0-16%, Step 1: 17-33%, Step 2: 34-50%, Step 3: 51-66%, Step 4: 67-83%, Step 5: 84-100%
   const stepPercentage = 100 / OPTIMIZATION_STEPS.length;
@@ -82,7 +82,7 @@ export function useOptimizationProgress({
 
       prevStatusRef.current = status;
     }
-  }, [optimizationParams, onError]);
+  }, [optimizationParams?.progress, optimizationParams?.status, optimizationParams?.error, onError]);
 
   return progressState;
 }

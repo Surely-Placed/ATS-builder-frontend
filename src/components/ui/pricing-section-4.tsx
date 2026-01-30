@@ -81,7 +81,7 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
   const { user } = useAuth();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { toast } = useToast();
-  const { state: usageState } = useUsage();
+  const { state: usageState, refresh } = useUsage();
     
   
   const handlePlanClick = async (planKey: 'free' | 'premium' | 'enterprise') => {
@@ -90,7 +90,7 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
       navigate('/signup');
       return;
     }
-    
+
     setLoadingPlan(planKey);
     try {
       if (planKey === 'free') {
@@ -122,6 +122,10 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
         }
 
         await checkout(planKey);
+        // Refresh usage context after successful checkout to update badge
+        if (typeof refresh === 'function') {
+          try { await refresh(); } catch (_) {}
+        }
       }
     } finally {
       setLoadingPlan(null);

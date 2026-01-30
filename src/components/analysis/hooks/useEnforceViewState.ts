@@ -8,13 +8,13 @@ export function useEnforceViewState(params: any) {
     analysisResult,
     optimizationResult,
     optimizationStatus,
+    navigate, // Added navigate to params destructuring
   } = params;
 
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
       const pathname = window.location.pathname || '';
-      if (!pathname.includes('/resume-optimization') && !pathname.includes('/resume-comparison')) return;
 
       const hasOptimization =
         !!optimizationResult ||
@@ -26,19 +26,19 @@ export function useEnforceViewState(params: any) {
         optimizationStatus === 'complete';
 
       if (hasOptimization) {
-        if (viewState !== 'comparison') setViewState && setViewState('comparison');
-        if (analysisId) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('analysisId', analysisId);
-          window.history.replaceState(window.history.state, '', url.toString());
+        // Navigate to comparison screen instead of preview
+        if (analysisId && !pathname.includes('/resume-comparison')) {
+          navigate && navigate(`/resume-comparison?analysisId=${analysisId}`, { replace: true });
         }
       } else {
-        if (viewState !== 'optimizing') setViewState && setViewState('optimizing');
+        // Only force optimizing view if we actually have an analysisId
+        if (analysisId && viewState !== 'optimizing') setViewState && setViewState('optimizing');
       }
     } catch (e) {
       // noop
     }
-  }, [analysisId, analysisResult, optimizationResult, optimizationStatus, viewState, setViewState]);
+  }, [analysisId, analysisResult, optimizationResult, optimizationStatus, viewState, setViewState, navigate]); // Added navigate to dependencies
+
 
   useEffect(() => {
     try {

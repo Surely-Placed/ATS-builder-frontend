@@ -7,6 +7,9 @@ import PricingDialog from '@/components/shared/PricingDialog';
 interface AnalysisActionsProps {
   canStartAnalysis: boolean;
   isAnalyzing: boolean;
+  isOptimizing?: boolean;
+  hasAnalysisId?: boolean;
+  optimizationStatus?: string;
   isUploading: boolean;
   analysisError: string | null;
   hasData: boolean;
@@ -17,6 +20,9 @@ interface AnalysisActionsProps {
 export const AnalysisActions = ({
   canStartAnalysis,
   isAnalyzing,
+  isOptimizing = false,
+  hasAnalysisId = false,
+  optimizationStatus = "idle",
   isUploading,
   analysisError,
   hasData,
@@ -60,9 +66,12 @@ export const AnalysisActions = ({
       <div className="flex gap-3">
         <Button
           onClick={handleStart}
-          disabled={!canStartAnalysis || isAnalyzing || isUploading}
+          disabled={!canStartAnalysis || isAnalyzing || isUploading || isOptimizing || hasAnalysisId}
+
           className="flex-1"
         >
+
+
           {isAnalyzing ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -71,7 +80,7 @@ export const AnalysisActions = ({
           ) : (
             <>
               <Target className="w-4 h-4 mr-2" />
-              Start Analysis
+              Start Analysis & Optimization
               {(clicked) && (
                 <span className="ml-2 inline-flex items-center" aria-hidden>
                   <span className="w-4 h-4 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" />
@@ -80,6 +89,7 @@ export const AnalysisActions = ({
             </>
           )}
         </Button>
+
         {hasData && (
           <Button onClick={onReset} variant="outline" disabled={isAnalyzing || isUploading}>
             Reset

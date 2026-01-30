@@ -43,19 +43,31 @@ export function useResumeOptimization({
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<any>(null);
   const [optimizedResumeUrl, setOptimizedResumeUrl] = useState<string | null>(null);
-  
+
   // Use refs to prevent stale closures and avoid re-triggering effects
   const hasCheckedInitialState = useRef(false);
   const hasCompletedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   const onErrorRef = useRef(onError);
-  
+
   // Keep refs updated
   useEffect(() => {
     onCompleteRef.current = onComplete;
     onErrorRef.current = onError;
   }, [onComplete, onError]);
-  
+
+  // Reset state when analysisId changes to ensure a fresh optimization process for each new analysis
+  useEffect(() => {
+    if (analysisId) {
+      setStatus('idle');
+      setProgress(0);
+      setError(null);
+      setResult(null);
+      setOptimizedResumeUrl(null);
+      hasCompletedRef.current = false;
+    }
+  }, [analysisId]);
+
   const {
     analysisStatus,
     error: pollError,
@@ -66,51 +78,51 @@ export function useResumeOptimization({
   } = useAnalysisPolling();
 
   const usageCtx = useUsage();
-  
+
   // Do not fetch existing optimization state automatically. Callers can use `fetchAnalysis()` when desired.
-  
+
   // Handle polling updates - only process when analysisStatus changes
   useEffect(() => {
     // Skip if no status or already completed
     if (!analysisStatus || hasCompletedRef.current) {
       return;
     }
-    
+
     // Check if optimization is complete by looking for optimized content
     const isOptimizationComplete = !!(
       analysisStatus?.optimized_resume?.file_url ||
       analysisStatus?.optimized_resume?.pdf_url ||
       analysisStatus?.optimized_resume?.url ||
-      (analysisStatus?.analysis?.ats_score_after !== null && 
-       analysisStatus?.analysis?.ats_score_after !== undefined) ||
+      (analysisStatus?.analysis?.ats_score_after !== null &&
+        analysisStatus?.analysis?.ats_score_after !== undefined) ||
       analysisStatus?.ats_analysis?.after
     );
 
     if (isOptimizationComplete) {
       // Mark as completed to prevent further processing
       hasCompletedRef.current = true;
-      
+
       setStatus('complete');
       setResult(analysisStatus);
       setProgress(100);
-      
+
       // Stop polling
       stopPolling();
-      
+
       // Extract optimized resume URL if available
-      const optimizedUrl = 
+      const optimizedUrl =
         analysisStatus?.optimized_resume?.file_url ||
         analysisStatus?.optimized_resume?.pdf_url ||
         analysisStatus?.optimized_resume?.url;
-        
+
       if (optimizedUrl) {
         setOptimizedResumeUrl(optimizedUrl);
       }
-      
+
       if (onCompleteRef.current) {
         onCompleteRef.current(analysisStatus);
       }
-      
+
       // Resume header updates now that optimization is complete so usage reflects server state
       try {
         usageCtx.resumeHeaderUpdates();
@@ -121,7 +133,7 @@ export function useResumeOptimization({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analysisStatus, analysisId]); // Don't include stopPolling in deps
-  
+
   // Update progress from polling hook
   useEffect(() => {
     if (!hasCompletedRef.current && pollingProgress > 0) {
@@ -143,11 +155,12 @@ export function useResumeOptimization({
     (startOptimization as any)._inFlight = true;
     // Reset completed flag when starting new optimization
     hasCompletedRef.current = false;
-    
+
     try {
       setError(null);
       setStatus('starting');
-      setProgress(0);
+      // FIXED: Do not reset progress to 0 here as it overwrites backend progress
+      // setProgress(0);
 
       // Suspend header-based usage updates while the optimization is in-flight so the UI doesn't
       // immediately decrement the free-trial count. We'll resume updates when optimization completes.
@@ -158,13 +171,14 @@ export function useResumeOptimization({
       }
 
       const response = await OptimizationService.startOptimization(analysisId);
-      
+
       // No localStorage logic
-      
+
       // Start polling for status updates
       startPolling(analysisId);
       setStatus('running');
-      setProgress(10); // Initial progress
+      // FIXED: Do not force progress to 10 here
+      // setProgress(10); // Initial progress
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message || err.message || "Failed to start optimization";
