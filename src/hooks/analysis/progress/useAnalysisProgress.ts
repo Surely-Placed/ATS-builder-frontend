@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import AnalysisApiService from "@/services/analysisApi";
+import { AnalysisService } from '@/features/analysis/services/analysisService';
 import { ANALYSIS_STEPS, Step } from "@/constants/analysis/steps";
 
 interface UseAnalysisProgressProps {
@@ -36,8 +36,17 @@ export function useAnalysisProgress({
   const steps = ANALYSIS_STEPS;
   const totalEstimatedTime = steps.reduce((sum, step) => sum + step.estimatedTime, 0);
 
-  const simulateAnalysisProgress = useCallback(async () => {
-    if (!analysisParams) return;
+  // Use refs for callbacks to stabilize simulateAnalysisProgress dependencies
+  const onCompleteRef = useRef(onComplete);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onErrorRef.current = onError;
+  }, [onComplete, onError]);
+
+  const simulateAnalysisProgress = useCallback(async (params: typeof analysisParams) => {
+    if (!params) return;
 
     setProgressState({ currentStep: 0, progress: 0, status: "analyzing" });
     startTimeRef.current = Date.now();
@@ -51,11 +60,11 @@ export function useAnalysisProgress({
         abortControllerRef.current = new AbortController();
 
         // Call the analysis API (first step)
-        const apiCallPromise = AnalysisApiService.analyzeResume(
+        const apiCallPromise = AnalysisService.analyzeResume(
           {
-            resume_id: analysisParams.resumeId,
-            job_description: analysisParams.jobDescription,
-            job_title: analysisParams.jobTitle,
+            resume_id: params.resumeId,
+            job_description: params.jobDescription,
+            job_title: params.jobTitle,
           },
           { signal: abortControllerRef.current.signal }
         );
@@ -107,8 +116,8 @@ export function useAnalysisProgress({
           status: "completed",
         });
 
-        if (onComplete) {
-          onComplete(result);
+        if (onCompleteRef.current) {
+          onCompleteRef.current(result);
         }
       } catch (error: any) {
         if (analysisIntervalRef.current) {
@@ -121,20 +130,25 @@ export function useAnalysisProgress({
           status: "failed",
           error: error.message || "Analysis failed",
         });
-        if (onError) {
-          onError(error.message || "Analysis failed");
+        if (onErrorRef.current) {
+          onErrorRef.current(error.message || "Analysis failed");
         }
       }
     };
 
     startAnalysis();
-  }, [analysisParams, steps, totalEstimatedTime, onComplete, onError]);
+  }, [steps, totalEstimatedTime]);
+
+  // Use JSON.stringify to ensure effect only runs when params strictly change content-wise
+  // This prevents infinite loops from new object references on re-renders
+  const paramsString = analysisParams ? JSON.stringify(analysisParams) : "";
 
   useEffect(() => {
-    if (analysisParams) {
-      simulateAnalysisProgress();
+    if (paramsString) {
+      const params = JSON.parse(paramsString);
+      simulateAnalysisProgress(params);
     }
-  }, [analysisParams, simulateAnalysisProgress]);
+  }, [paramsString, simulateAnalysisProgress]);
 
   useEffect(() => {
     return () => {

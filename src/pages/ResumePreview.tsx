@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ResumePreviewWithChanges from "@/components/resume/ResumePreviewWithChanges";
-import AnalysisApiService from "@/services/analysisApi";
+import ResumePreviewWithChanges from "@/features/resume/components/ResumePreviewWithChanges";
+import AnalysisApiService from '@/features/analysis/services';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 

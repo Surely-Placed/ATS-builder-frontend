@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { getFileErrorMessage } from "@/utils/fileValidation";
-import { resumeApi } from "@/services/resumeApi";
+import { resumeApi } from "@/features/resume/services/resumeService";
 
 
 export function useFileUpload() {

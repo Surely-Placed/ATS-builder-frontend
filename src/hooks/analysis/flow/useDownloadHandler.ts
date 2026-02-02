@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
-import AnalysisApiService from "@/services/analysisApi";
+import { DownloadService } from '@/features/analysis/services/downloadService';
 
 interface UseDownloadHandlerProps {
   optimizedResumeUrl: string | null;
@@ -56,7 +56,7 @@ export function useDownloadHandler({
         throw new Error("No optimized resume URL available. The resume may not be optimized yet.");
       }
 
-      AnalysisApiService.downloadResume(
+      DownloadService.downloadResume(
         downloadUrl,
         "optimized-resume.pdf",
         analysisId || undefined

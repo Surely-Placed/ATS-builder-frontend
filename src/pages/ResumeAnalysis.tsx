@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ResumeAnalysisFlow from "@/components/analysis/ResumeAnalysisFlow";
+import ResumeAnalysisFlow from "@/features/analysis/components/ResumeAnalysisFlow";
 
 export default function ResumeAnalysis() {
   const handleAnalysisComplete = () => {

@@ -143,9 +143,7 @@ The application will be available at `http://localhost:8080`
 ai-resume-genius/
 ├── public/                 # Static assets
 ├── src/
-│   ├── components/         # React components
-│   │   ├── dashboard/      # Dashboard-specific components
-│   │   ├── resume/         # Resume management components
+│   ├── components/         # Shared React components
 │   │   ├── ui/             # Reusable UI components (shadcn/ui)
 │   │   └── layouts/        # Layout components
 │   ├── config/             # Configuration files
@@ -153,29 +151,25 @@ ai-resume-genius/
 │   │   └── firebase.ts     # Firebase configuration
 │   ├── context/            # React context providers
 │   │   └── AuthContext.tsx # Authentication context
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useDashboard.ts
-│   │   ├── useResumeOptimization.ts
-│   │   └── ...
-│   ├── pages/              # Page components
-│   │   ├── Index.tsx       # Landing page
-│   │   ├── Dashboard.tsx   # User dashboard
-│   │   ├── Documents.tsx   # Document management
-│   │   └── ResumeAnalyzer.tsx # Resume optimization flow
-│   ├── services/           # API service layers
-│   │   ├── analysisApi.ts  # Resume analysis API
-│   │   ├── authService.ts  # Authentication service
-│   │   ├── resumeApi.ts    # Resume management API
-│   │   └── socketService.ts # WebSocket service
-│   ├── types/              # TypeScript type definitions
-│   ├── utils/              # Utility functions
-│   │   ├── authUtils.ts    # Authentication utilities
-│   │   ├── scoreUtils.ts   # Score calculation utilities
-│   │   └── ...
+│   ├── features/           # Feature-based modules
+│   │   ├── analysis/       # Analysis & Optimization logic
+│   │   │   ├── components/ # Feature-specific components
+│   │   │   ├── hooks/      # Feature-specific hooks
+│   │   │   └── services/   # Feature-specific API services
+│   │   ├── dashboard/      # Dashboard feature
+│   │   ├── profile/        # User profile management
+│   │   ├── resume/         # Resume management (upload, list)
+│   │   └── subscription/   # Subscription management
+│   ├── hooks/              # Shared custom React hooks
+│   ├── pages/              # Top-level page components
+│   ├── services/           # Shared services
+│   │   └── authService.ts  # Authentication service
+│   ├── types/              # Shared TypeScript definitions
+│   ├── utils/              # Shared utility functions
 │   ├── App.tsx             # Root component
 │   ├── main.tsx            # Application entry point
 │   └── index.css           # Global styles
-├── .env                    # Environment variables (create this)
+├── .env                    # Environment variables
 ├── package.json            # Dependencies and scripts
 ├── tsconfig.json           # TypeScript configuration
 ├── vite.config.ts          # Vite configuration

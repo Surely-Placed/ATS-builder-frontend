@@ -7,7 +7,7 @@ import NumberFlow from "@number-flow/react";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { SpotlightHeading } from "@/components/ui/spotlight-heading";
-import { checkout } from "@/services/subscription";
+import { checkout } from "@/features/subscription/services/subscriptionService";
 import { useNavigate } from "react-router-dom";
 import { useToast } from '@/hooks/use-toast';
 import { useUsage } from '@/context/UsageContext';

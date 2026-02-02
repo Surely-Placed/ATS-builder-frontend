@@ -1,25 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { apiClient } from "@/services/resumeApi";
+import { apiClient } from "@/features/resume/services/resumeService";
 import { useToast } from "@/hooks/use-toast";
-import { getStatus } from '@/services/subscription';
+import { getStatus } from '@/features/subscription/services/subscriptionService';
 import { useUsage } from '@/context/UsageContext';
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 import ProfileLayout from "@/components/layouts/ProfileLayout";
-import ProfileSubscription from "@/components/profile/ProfileSubscription";
+import ProfileSubscription from "@/features/profile/components/ProfileSubscription";
 
 // Components
-import { OverviewTab } from "@/components/profile/tabs/overview";
-import { ProfileTab } from "@/components/profile/tabs/ProfileTab";
-import { ResumeTab } from "@/components/profile/tabs/ResumeTab";
-import { SubscriptionTab } from "@/components/profile/tabs/SubscriptionTab";
-import { PurchasesTab } from "@/components/profile/tabs/PurchasesTab";
-import { ActivityTab } from "@/components/profile/tabs/ActivityTab";
-import { SettingsTab } from "@/components/profile/tabs/SettingsTab";
-import { ApiKeysTab } from "@/components/profile/tabs/api-keys";
+import { OverviewTab } from "@/features/profile/components/OverviewTab";
+import { ProfileTab } from "@/features/profile/components/ProfileTab";
+import { ResumeTab } from "@/features/profile/components/ResumeTab";
+import { SubscriptionTab } from "@/features/profile/components/SubscriptionTab";
+import { PurchasesTab } from "@/features/profile/components/PurchasesTab";
+import { ActivityTab } from "@/features/profile/components/ActivityTab";
+import { SettingsTab } from "@/features/profile/components/SettingsTab";
+import { ApiKeysTab } from "@/features/profile/components/ApiKeysTab";
 
 // Types
 interface Profile {

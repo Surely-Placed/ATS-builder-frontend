@@ -10,5 +10,6 @@
  */
 
 // Re-export everything from the modular analysis service
-export * from "./analysis";
-export { AnalysisApiService as default } from "./analysis";
+// Re-export everything from the modular analysis service
+export * from "@/features/analysis/services";
+export { AnalysisApiService as default } from "@/features/analysis/services";

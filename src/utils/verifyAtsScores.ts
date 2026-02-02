@@ -3,7 +3,7 @@
  * Use this to debug and verify ATS score data from API responses
  */
 
-import { AnalysisResult } from "@/services/analysis/types";
+import { AnalysisResult } from "@/features/analysis/services/types";
 
 export interface AtsScoreVerification {
   before: {
@@ -48,7 +48,7 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
   verification.before.display = result.ats_analysis?.before?.score || null;
   verification.before.real = result.ats_analysis?.before?.real_score || null;
   verification.before.fromAnalysis = result.analysis?.ats_score_before || null;
-  verification.before.displayFromAnalysis = result.analysis?.display_score_before || null;
+  verification.before.displayFromAnalysis = (result.analysis as any)?.display_score_before || null;
   verification.before.fromAtsAnalysis = result.ats_analysis?.before?.score || null;
 
   // After Score (if available)
@@ -57,7 +57,7 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
       display: result.ats_analysis?.after?.score || null,
       real: result.ats_analysis?.after?.real_score || null,
       fromAnalysis: result.analysis?.ats_score_after || null,
-      displayFromAnalysis: result.analysis?.display_score_after || null,
+      displayFromAnalysis: (result.analysis as any)?.display_score_after || null,
       fromAtsAnalysis: result.ats_analysis?.after?.score || null,
       improvement: result.ats_analysis?.after?.improvement || null,
     };
@@ -74,7 +74,7 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
         points,
         percent,
         displayImprovement:
-          result.analysis?.display_improvement || result.ats_analysis?.after?.improvement || null,
+          (result.analysis as any)?.display_improvement || result.ats_analysis?.after?.improvement || null,
       };
     }
   }
@@ -103,7 +103,7 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
 export const getAtsScores = (result: AnalysisResult) => {
   const beforeScore =
     result.ats_analysis?.before?.score ||
-    result.analysis?.display_score_before ||
+    (result.analysis as any)?.display_score_before ||
     result.analysis?.ats_score_before ||
     0;
 
@@ -112,7 +112,7 @@ export const getAtsScores = (result: AnalysisResult) => {
 
   const afterScore =
     result.ats_analysis?.after?.score ||
-    result.analysis?.display_score_after ||
+    (result.analysis as any)?.display_score_after ||
     result.analysis?.ats_score_after ||
     null;
 
@@ -121,7 +121,7 @@ export const getAtsScores = (result: AnalysisResult) => {
 
   const improvement =
     result.ats_analysis?.after?.improvement ||
-    result.analysis?.display_improvement ||
+    (result.analysis as any)?.display_improvement ||
     (afterReal && beforeReal ? afterReal - beforeReal : null);
 
   return {
@@ -132,9 +132,9 @@ export const getAtsScores = (result: AnalysisResult) => {
     after:
       afterScore !== null
         ? {
-            display: afterScore,
-            real: afterReal,
-          }
+          display: afterScore,
+          real: afterReal,
+        }
         : null,
     improvement,
   };

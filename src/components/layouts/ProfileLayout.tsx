@@ -1,5 +1,5 @@
 import ProfileHeader from "./ProfileLayoutHeader";
-import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
+import { ProfileSidebar } from "@/features/profile/components/ProfileSidebar";
 
 interface ProfileLayoutProps {
   children: React.ReactNode;

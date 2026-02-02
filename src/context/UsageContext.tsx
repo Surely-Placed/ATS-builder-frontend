@@ -1,5 +1,5 @@
 import React from "react";
-import { analysisApiClient } from "@/services/analysis/apiClient";
+import { analysisApiClient } from "@/features/analysis/services/apiClient";
 import { updateUsageFromHeader, readUsageFromStorage } from "@/utils/usage";
 
 // Simple React context store for usage

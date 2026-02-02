@@ -1,8 +1,8 @@
 import React from 'react';
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ResumeAnalysisFlow from "@/components/analysis/ResumeAnalysisFlow";
+import ResumeAnalysisFlow from "@/features/analysis/components/ResumeAnalysisFlow";
 import { useUsage } from '@/context/UsageContext';
-import PricingDialog from '@/components/shared/PricingDialog';
+
 
 export default function ResumeOptimization() {
   const handleAnalysisComplete = () => {

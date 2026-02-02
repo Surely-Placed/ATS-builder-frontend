@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import ResumeManager from "@/components/resume/ResumeManager";
-import { ResumeFilters } from "@/components/resume/ResumeFilters";
-import { useResumeFilters } from "@/hooks/useResumeFilters";
+import ResumeManager from "@/features/resume/components/ResumeManager";
+import { ResumeFilters } from "@/features/resume/components/ResumeFilters";
+import { useResumeFilters } from "@/features/resume/hooks/useResumeFilters";
 
 type FilterType = "all" | "drafts" | "published";
 

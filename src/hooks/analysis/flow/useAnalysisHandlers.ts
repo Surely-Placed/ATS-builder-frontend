@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import AnalysisApiService from "@/services/analysisApi";
-import { AnalysisResult } from "@/services/analysisApi";
+import { AnalysisService } from '@/features/analysis/services/analysisService';
+import { AnalysisResult } from '@/features/analysis/services/types';
 import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 import { constructFallbackResult } from "@/utils/analysis/analysisResultHelpers";
 
@@ -49,7 +49,7 @@ export function useAnalysisHandlers({
           // If still no ID after normalization, try to fetch from API
           if (result?.id) {
             try {
-              const fullAnalysisResponse = await AnalysisApiService.getAnalysis(result.id);
+              const fullAnalysisResponse = await AnalysisService.getAnalysis(result.id);
               const fetchedNormalized = normalizeAnalysisResult(fullAnalysisResponse);
 
               if (fetchedNormalized.analysis?.id) {

@@ -3,8 +3,6 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { authService } from "../services/authService";
 import { identifyUser, resetMixpanel, setUserProperties } from "../config/mixpanel";
-import { apiClient } from "../services/resumeApi";
-import { analysisApiClient } from "../services/analysis/apiClient";
 
 interface AuthContextType {
   user: User | null;

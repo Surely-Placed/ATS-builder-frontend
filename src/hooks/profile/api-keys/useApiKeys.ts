@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { apiKeysService, type ApiKey } from "@/services/apiKeysService";
+import { apiKeysService, type ApiKey } from "@/features/profile/apiKeysService";
 import { useToast } from "@/hooks/use-toast";
 
 export const useApiKeys = () => {

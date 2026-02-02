@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { GetStartedCard } from "@/components/dashboard/GetStartedCard";
-import { EmptyActivityCard } from "@/components/dashboard/EmptyActivityCard";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
-import { useDashboard } from "@/hooks/useDashboard";
+import { StatCard } from "@/features/dashboard/components/StatCard";
+import { GetStartedCard } from "@/features/dashboard/components/GetStartedCard";
+import { EmptyActivityCard } from "@/features/dashboard/components/EmptyActivityCard";
+import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
+import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { FileText, TrendingUp, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { useUsage } from '@/context/UsageContext';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import SubscriptionBadges from '@/components/dashboard/SubscriptionBadges';
+import SubscriptionBadges from '@/features/dashboard/components/SubscriptionBadges';
 
 const Dashboard = () => {
   const { stats, loading, error, refetch } = useDashboard();

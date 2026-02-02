@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import ComparisonView from '@/components/analysis/ComparisonView';
+import ComparisonView from '@/features/analysis/components/ComparisonView';
 import AnalysisApiService from '@/services/analysisApi';
 import { normalizeAnalysisResult } from '@/utils/analysisResultNormalizer';
-import { AnalysisResult } from '@/services/analysis';
+
 
 export default function ResumeComparison() {
   const [searchParams] = useSearchParams();

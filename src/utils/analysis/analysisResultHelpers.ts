@@ -1,4 +1,4 @@
-import { AnalysisResult } from "@/services/analysisApi";
+import { AnalysisResult } from '@/features/analysis/services/types';
 
 export function constructFallbackResult(result: any, jobTitle: string = ""): AnalysisResult {
   return {

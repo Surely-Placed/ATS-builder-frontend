@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HeaderActions } from "@/components/shared/HeaderActions";
 import { DashboardSidebar } from "@/components/shared/DashboardSidebar";
 import { Logo } from "@/components/shared/Logo";
-import DashboardSubscription from "@/components/subscription/DashboardSubscription";
+import DashboardSubscription from "@/features/subscription/components/DashboardSubscription";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

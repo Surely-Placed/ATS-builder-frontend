@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { AnalysisResult } from "@/services/analysisApi";
+import { AnalysisResult } from '@/features/analysis/services/types';
 
 type ViewState = "form" | "analysis" | "optimizing" | "comparison" | "preview";
-import AnalysisApiService from "@/services/analysisApi";
+import { AnalysisService } from '@/features/analysis/services/analysisService';
 import { normalizeAnalysisResult } from "@/utils/analysisResultNormalizer";
 
 export function useAnalysisState() {
@@ -61,7 +61,7 @@ export function useAnalysisState() {
 
       if (currentAnalysisId && !analysisResult) {
         try {
-          const response = await AnalysisApiService.getAnalysis(currentAnalysisId);
+          const response = await AnalysisService.getAnalysis(currentAnalysisId);
           const normalized = normalizeAnalysisResult(response);
 
           if (normalized.analysis?.id) {
@@ -109,7 +109,7 @@ export function useAnalysisState() {
         // This handles cases where state says analyzing but analysis is done
         if (isAnalyzing || showAnalysisProgress) {
           try {
-            const response = await AnalysisApiService.getAnalysis(currentAnalysisId);
+            const response = await AnalysisService.getAnalysis(currentAnalysisId);
             const normalized = normalizeAnalysisResult(response);
 
             if (normalized.analysis?.id) {
@@ -149,7 +149,7 @@ export function useAnalysisState() {
       if (!analysisResult && urlAnalysisId) {
         const loadAnalysisFromUrl = async () => {
           try {
-            const response = await AnalysisApiService.getAnalysis(urlAnalysisId);
+            const response = await AnalysisService.getAnalysis(urlAnalysisId);
             const normalized = normalizeAnalysisResult(response);
             if (normalized.analysis?.id) {
               setAnalysisResult(normalized as unknown as AnalysisResult);
