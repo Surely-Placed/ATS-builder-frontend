@@ -437,7 +437,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await apiClient.post<{ success: boolean; data: Resume }>(
+      const response = await apiClient.post<{ success: boolean; data: Resume | { resume: Resume } }>(
         "/profile/resume/upload",
         formData,
         {
@@ -448,13 +448,23 @@ const Profile = () => {
       );
 
       if (response.data.success) {
-        const resume = response.data.data;
-
-        if (!resume || !resume.id) {
-          throw new Error("Upload succeeded but resume data was not returned");
+        // Handle different response formats from backend
+        let resume: Resume | null = null;
+        
+        // Check if data is directly a Resume object
+        if (response.data.data && 'id' in response.data.data && 'original_file_url' in response.data.data) {
+          resume = response.data.data as Resume;
+        }
+        // Check if data is wrapped in a resume property
+        else if (response.data.data && 'resume' in response.data.data) {
+          resume = (response.data.data as { resume: Resume }).resume;
         }
 
-        setSuccess("Profile resume uploaded successfully!");
+        if (!resume || !resume.id) {
+          console.error("Upload response data:", response.data);
+          throw new Error("Upload succeeded but resume data was not returned in expected format");
+        }
+
         setProfileResume(resume);
         toast({
           title: "Success",
@@ -483,9 +493,6 @@ const Profile = () => {
   };
 
   const handleRemoveProfileResume = async () => {
-    if (!window.confirm("Remove resume from profile?")) {
-      return;
-    }
     try {
       setError(null);
       setSuccess(null);
@@ -495,7 +502,6 @@ const Profile = () => {
       );
 
       if (response.data.success) {
-        setSuccess("Resume removed from profile");
         toast({
           title: "Success",
           description: "Resume removed from profile",

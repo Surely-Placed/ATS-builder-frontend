@@ -1,10 +1,19 @@
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Calendar, Eye, Download, Trash2, Upload, Loader2, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { FileText, Calendar, Trash2, Upload, Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Resume {
   id: string;
@@ -30,6 +39,12 @@ export const ResumeTab = ({
 }: ResumeTabProps) => {
   const internalFileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = fileInputRef || internalFileInputRef;
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    setShowDeleteDialog(false);
+    await onRemove();
+  };
 
   return (
     <div className="space-y-6 pl-0 pr-0">
@@ -41,13 +56,7 @@ export const ResumeTab = ({
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <FileText className="w-5 h-5 text-primary" />
-                    <p className="font-semibold">Resume Uploaded</p>
-                    {profileResume.optimized_file_url && (
-                      <Badge variant="default" className="gap-1">
-                        <Sparkles className="w-3 h-3" />
-                        Optimized
-                      </Badge>
-                    )}
+                    <p className="font-semibold">Profile Resume</p>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
@@ -60,31 +69,14 @@ export const ResumeTab = ({
                 </div>
               </div>
               <div className="flex gap-3 flex-wrap">
-                <Button variant="outline" size="sm" asChild className="gap-2">
-                  <a
-                    href={profileResume.original_file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View Original
-                  </a>
-                </Button>
-                {profileResume.optimized_file_url && (
-                  <Button variant="outline" size="sm" asChild className="gap-2">
-                    <a
-                      href={profileResume.optimized_file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Download className="w-4 h-4" />
-                      View Optimized
-                    </a>
-                  </Button>
-                )}
-                <Button variant="destructive" size="sm" onClick={onRemove} className="gap-2">
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={() => setShowDeleteDialog(true)} 
+                  className="gap-2"
+                >
                   <Trash2 className="w-4 h-4" />
-                  Remove
+                  Remove Resume
                 </Button>
               </div>
             </CardContent>
@@ -154,6 +146,27 @@ export const ResumeTab = ({
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Profile Resume?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this resume from your profile? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove Resume
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
