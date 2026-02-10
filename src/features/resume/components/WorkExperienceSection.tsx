@@ -4,10 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import type { ResumeStructure, ChangeHighlight, ViewMode } from "@/types/resume/preview";
 import { SectionWrapper } from "./SectionWrapper";
 import { SectionHeader } from "./SectionHeader";
-import { getBadgeStyles, highlightText } from "@/utils/resume/preview";
+import { getBadgeStyles } from "@/utils/resume/preview";
 
 interface WorkExperienceSectionProps {
   resume: ResumeStructure;
+  originalResume?: ResumeStructure;
   changes: ChangeHighlight[];
   expandedSections: Set<string>;
   viewMode: ViewMode;
@@ -16,6 +17,7 @@ interface WorkExperienceSectionProps {
 
 export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
   resume,
+  originalResume,
   changes,
   expandedSections,
   viewMode,
@@ -24,7 +26,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
   return (
     <SectionWrapper sectionKey="work_experience" changes={changes}>
       <SectionHeader title="Work Experience" sectionKey="work_experience" changes={changes} />
-      {resume.work_experience.map((exp, expIndex) => {
+      {resume.work_experience?.map((exp, expIndex) => {
         const expChanges = changes.filter((c) => c.location?.index === expIndex);
         const isExpanded = expandedSections.has(`work_${expIndex}`) || viewMode !== "split";
         
@@ -46,31 +48,18 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
               {isExpanded ? (
                 <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground mt-3">
                   {exp.responsibilities.map((bullet, bulletIndex) => {
-                    // Find the responsibilities change for this work experience
-                    const responsibilitiesChange = expChanges.find(
-                      (c) => c.field === "responsibilities"
-                    );
+                    // Check if this work experience has any changes
+                    const hasChange = expChanges.length > 0;
                     
-                    // Check if this specific bullet was modified by comparing with original
-                    let isModified = false;
-                    let isAdded = false;
-                    
-                    if (responsibilitiesChange) {
-                      const originalBullets = responsibilitiesChange.original as string[] || [];
-                      const optimizedBullets = responsibilitiesChange.optimized as string[] || [];
-                      
-                      // Check if this bullet exists in original and is different
-                      if (bulletIndex < originalBullets.length) {
-                        isModified = originalBullets[bulletIndex] !== optimizedBullets[bulletIndex];
-                      } else {
-                        // Bullet is new (added)
-                        isAdded = true;
-                      }
-                    }
-
                     return (
                       <li key={bulletIndex} className="px-3 py-2 rounded">
-                        {(isModified || isAdded) ? highlightText(bullet, expChanges, "responsibilities") : bullet}
+                        {hasChange ? (
+                          <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                            {bullet}
+                          </span>
+                        ) : (
+                          bullet
+                        )}
                       </li>
                     );
                   })}

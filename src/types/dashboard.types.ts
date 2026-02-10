@@ -15,4 +15,5 @@ export interface RecentActivity {
   scoreImprovement: number | null;
   status: string;
   createdAt: string;
+  optimizedFileUrl?: string | null; // URL to the optimized resume PDF
 }

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Filter, ChevronDown } from "lucide-react";
 
-type FilterType = "all" | "drafts" | "published";
+export type FilterType = "all" | "uploaded" | "optimized";
 
 interface ResumeFiltersProps {
   activeFilter: FilterType;
@@ -23,12 +23,12 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
   counts,
 }) => {
   const filters = [
-    { key: "all" as FilterType, label: "All Documents" },
-    { key: "drafts" as FilterType, label: "Drafts" },
-    { key: "published" as FilterType, label: "Published" },
+    { key: "all" as FilterType, label: "All Resumes" },
+    { key: "uploaded" as FilterType, label: "Uploaded" },
+    { key: "optimized" as FilterType, label: "Optimized" },
   ];
 
-  const activeFilterLabel = filters.find((f) => f.key === activeFilter)?.label || "All Documents";
+  const activeFilterLabel = filters.find((f) => f.key === activeFilter)?.label || "All Resumes";
 
   return (
     <DropdownMenu>
@@ -37,7 +37,7 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
           <Filter className="h-4 w-4" />
           <span>{activeFilterLabel}</span>
           <span className="ml-1 text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">
-            {counts[activeFilter]}
+            {counts[activeFilter === 'uploaded' ? 'drafts' : activeFilter === 'optimized' ? 'published' : 'all'] || 0}
           </span>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
@@ -51,7 +51,7 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
           >
             <span>{filter.label}</span>
             <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">
-              {counts[filter.key]}
+              {counts[filter.key === 'uploaded' ? 'drafts' : filter.key === 'optimized' ? 'published' : 'all'] || 0}
             </span>
           </DropdownMenuItem>
         ))}

@@ -5,6 +5,7 @@ import ResumePreviewWithChanges from "@/features/resume/components/ResumePreview
 import AnalysisApiService from '@/features/analysis/services';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { reconstructOptimizedResume } from "@/utils/resume/reconstructOptimized";
 
 export default function ResumePreview() {
   const { analysisId } = useParams<{ analysisId: string }>();
@@ -31,9 +32,31 @@ export default function ResumePreview() {
       setError(null);
       try {
         const previewResponse = await AnalysisApiService.getPreview(analysisId);
+        
+        // Validate that we have the required data
+        if (!previewResponse.original_resume?.structured_data) {
+          throw new Error('Original resume structured data is missing');
+        }
+        
+        let optimizedResumeData = previewResponse.optimized_resume?.structured_data;
+        
+        // Check if optimized_resume.structured_data is actually structured data or just file URLs
+        // Backend bug: sometimes it returns {url, pdf_url, file_url} instead of the actual resume structure
+        if (optimizedResumeData && !optimizedResumeData.personal_info) {
+          // Reconstruct the optimized resume by applying changes to the original
+          optimizedResumeData = reconstructOptimizedResume(
+            previewResponse.original_resume.structured_data,
+            previewResponse.changes
+          );
+        }
+        
+        if (!optimizedResumeData) {
+          throw new Error('Optimized resume structured data is missing. The optimization may not have completed successfully.');
+        }
+        
         setPreviewData({
           originalResume: previewResponse.original_resume.structured_data,
-          optimizedResume: previewResponse.optimized_resume.structured_data,
+          optimizedResume: optimizedResumeData,
           changes: previewResponse.changes,
         });
       } catch (err: any) {
@@ -59,24 +82,36 @@ export default function ResumePreview() {
     try {
       // Fetch the analysis data to get the optimized resume URL
       const analysis = await AnalysisApiService.getAnalysis(analysisId);
-      const pdfUrl = analysis?.optimized_resume?.url || analysis?.optimized_resume?.file_url || null;
+      // logic from RecentActivityCard.tsx
+      let pdfUrl = 
+        analysis?.optimized_resume?.file_url || 
+        analysis?.optimized_resume?.url || 
+        analysis?.optimized_resume?.pdf_url || 
+        analysis?.analysis?.optimized_file_url ||
+        null;
+
+      // If still no URL, try generation (fallback)
+      if (!pdfUrl) {
+         try {
+            const genResponse = await AnalysisApiService.generatePDF(analysisId);
+            if (genResponse.success && genResponse.file_url) {
+                pdfUrl = genResponse.file_url;
+            }
+         } catch (genErr) {
+             console.error("Failed to generate PDF on demand:", genErr);
+         }
+      }
 
       if (pdfUrl) {
-        // Download the PDF directly
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = 'optimized-resume.pdf';
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Use the service to download
+        AnalysisApiService.downloadResume(pdfUrl, 'optimized-resume.pdf', analysisId);
         
         toast({
-          title: "PDF Downloaded",
+          title: "Download Started",
           description: "Your optimized resume has been downloaded successfully",
         });
       } else {
-        throw new Error("Optimized resume PDF not found");
+        throw new Error("Download URL not available");
       }
       
       // Navigate back to comparison page

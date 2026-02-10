@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardStats } from "@/types/dashboard.types";
 import { apiClient } from "@/features/resume/services/resumeService";
-import { AnalysisService } from '@/features/analysis/services/analysisService';
-import { getDisplayScores } from "@/utils/scoreUtils";
 import { AxiosError } from "axios";
 
 export const useDashboard = () => {
@@ -15,7 +13,6 @@ export const useDashboard = () => {
     const retryDelay = 500; // Start with 500ms delay
 
     try {
-      console.debug('useDashboard: fetchDashboardStats start, retryCount=', retryCount);
       setLoading(true);
       setError(null);
 
@@ -27,8 +24,6 @@ export const useDashboard = () => {
 
       if (response.data.success) {
         const rawData = response.data.data as any;
-        console.debug('useDashboard: /dashboard/stats response ->', rawData);
-
         let statsData: DashboardStats;
 
         // Handle snake_case to camelCase conversion if needed
@@ -48,6 +43,7 @@ export const useDashboard = () => {
               scoreImprovement: activity.score_improvement ?? activity.scoreImprovement ?? null,
               status: activity.status,
               createdAt: activity.created_at || activity.createdAt,
+              optimizedFileUrl: activity.optimized_file_url || activity.optimizedFileUrl || null,
             })),
             averageAtsScore: rawData.average_ats_score ?? rawData.averageAtsScore ?? null,
             resumesAnalyzed: rawData.resumes_analyzed ?? rawData.resumesAnalyzed ?? 0,
@@ -59,43 +55,10 @@ export const useDashboard = () => {
           statsData.optimizations = directOptimizations;
         }
 
-        // Always enrich activity data and compute optimizations count from actual data
-        let optimizationsCount = 0;
-        const enrichedActivity = await Promise.all(
-          statsData.recentActivity.map(async (activity) => {
-            let enrichedAct = activity;
-
-            // Always try to fetch fresh data for accuracy
-            try {
-              const analysisResult = await AnalysisService.getAnalysis(activity.id);
-
-              // Use getDisplayScores to properly extract scores (handles all formats)
-              const displayScores = getDisplayScores({
-                analysis: analysisResult.analysis,
-                ats_analysis: analysisResult.ats_analysis,
-              });
-
-              enrichedAct = {
-                ...activity,
-                atsScoreBefore: displayScores.scoreBefore,
-                atsScoreAfter: displayScores.scoreAfter,
-                scoreImprovement: displayScores.improvement,
-              };
-
-              // Count this as an optimization if it has an after score
-              if (displayScores.scoreAfter !== null && displayScores.scoreAfter !== undefined) {
-                optimizationsCount++;
-              }
-            } catch (err) {
-              // If fetch fails, check existing data
-              if (activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined) {
-                optimizationsCount++;
-              }
-            }
-
-            return enrichedAct;
-          })
-        );
+        // Count optimizations from the activity data
+        const optimizationsCount = statsData.recentActivity.filter(
+          (activity) => activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined
+        ).length;
 
         // Override the optimizations count with our computed value
         statsData.optimizations = optimizationsCount;
@@ -106,21 +69,14 @@ export const useDashboard = () => {
             "/profile/stats"
           );
           if (profileResp.data?.success && profileResp.data.data?.totalOptimizations !== undefined) {
-            const profileOptimizations = profileResp.data.data.totalOptimizations;
-            console.debug('useDashboard: profile.totalOptimizations ->', profileOptimizations, 'computedOptimizations=', optimizationsCount);
             // Prefer profile's totalOptimizations as the authoritative value
-            statsData.optimizations = profileOptimizations;
+            statsData.optimizations = profileResp.data.data.totalOptimizations;
           }
         } catch (e) {
           // ignore - fall back to computed value
         }
 
-        console.debug('useDashboard: enrichedActivity ->', enrichedActivity, 'optimizationsCount=', optimizationsCount);
-
-        setStats({
-          ...statsData,
-          recentActivity: enrichedActivity,
-        });
+        setStats(statsData);
       } else {
         throw new Error(response.data.message || "Failed to fetch dashboard stats");
       }

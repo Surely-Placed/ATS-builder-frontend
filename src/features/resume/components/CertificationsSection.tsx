@@ -1,13 +1,14 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from "react";
 import type { ResumeStructure, ChangeHighlight, ViewMode } from "@/types/resume/preview";
 import { SectionWrapper } from "./SectionWrapper";
 import { SectionHeader } from "./SectionHeader";
-import { getBadgeStyles, highlightText } from "@/utils/resume/preview";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getBadgeStyles } from "@/utils/resume/preview";
 
 interface CertificationsSectionProps {
   resume: ResumeStructure;
+  originalResume?: ResumeStructure;
   changes: ChangeHighlight[];
   isExpanded: boolean;
   viewMode: ViewMode;
@@ -16,15 +17,17 @@ interface CertificationsSectionProps {
 
 export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
   resume,
+  originalResume,
   changes,
   isExpanded,
   viewMode,
   onToggle,
 }) => {
-  if (resume.certifications.length === 0) return null;
+  const certifications = resume.certifications || [];
+  if (certifications.length === 0) return null;
 
-  const certificationsToShow = isExpanded ? resume.certifications : resume.certifications.slice(0, 3);
-  const hasMoreCertifications = resume.certifications.length > 3;
+  const certificationsToShow = isExpanded ? certifications : certifications.slice(0, 3);
+  const hasMoreCertifications = certifications.length > 3;
   const hasChanges = changes.length > 0;
 
   return (
@@ -43,12 +46,30 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">
-                    {nameChange ? highlightText(cert.name, certChanges, "name") : cert.name}
+                    {nameChange ? (
+                      <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                        {cert.name}
+                      </span>
+                    ) : (
+                      cert.name
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {issuerChange ? highlightText(cert.issuer, certChanges, "issuer") : cert.issuer}
+                    {issuerChange ? (
+                      <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                        {cert.issuer}
+                      </span>
+                    ) : (
+                      cert.issuer
+                    )}
                     {" • "}
-                    {dateChange ? highlightText(cert.date, certChanges, "date") : cert.date}
+                    {dateChange ? (
+                      <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                        {cert.date}
+                      </span>
+                    ) : (
+                      cert.date
+                    )}
                   </p>
                 </div>
                 {hasAnyChange && (
@@ -66,7 +87,7 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({
           onClick={onToggle}
           className="text-primary text-xs mt-2 hover:underline font-medium"
         >
-          {isExpanded ? "▼ Show less" : `▶ Show more (${resume.certifications.length - 3} more)`}
+          {isExpanded ? "▼ Show less" : `▶ Show more (${certifications.length - 3} more)`}
         </button>
       )}
     </SectionWrapper>

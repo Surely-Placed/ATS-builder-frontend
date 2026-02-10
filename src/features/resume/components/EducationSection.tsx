@@ -1,13 +1,14 @@
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from "react";
 import type { ResumeStructure, ChangeHighlight, ViewMode } from "@/types/resume/preview";
 import { SectionWrapper } from "./SectionWrapper";
 import { SectionHeader } from "./SectionHeader";
-import { getBadgeStyles, highlightText } from "@/utils/resume/preview";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getBadgeStyles } from "@/utils/resume/preview";
 
 interface EducationSectionProps {
   resume: ResumeStructure;
+  originalResume?: ResumeStructure;
   changes: ChangeHighlight[];
   isExpanded: boolean;
   viewMode: ViewMode;
@@ -16,13 +17,15 @@ interface EducationSectionProps {
 
 export const EducationSection: React.FC<EducationSectionProps> = ({
   resume,
+  originalResume,
   changes,
   isExpanded,
   viewMode,
   onToggle,
 }) => {
-  const educationToShow = isExpanded ? resume.education : resume.education.slice(0, 2);
-  const hasMoreEducation = resume.education.length > 2;
+  const education = resume.education || [];
+  const educationToShow = isExpanded ? education : education.slice(0, 2);
+  const hasMoreEducation = education.length > 2;
   const hasChanges = changes.length > 0;
 
   return (
@@ -41,7 +44,13 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
             <CardContent className="p-3">
               <div className="flex justify-between items-start mb-1">
                 <h4 className="font-semibold text-foreground">
-                  {degreeChange ? highlightText(edu.degree, eduChanges, "degree") : edu.degree}
+                  {degreeChange ? (
+                    <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                      {edu.degree}
+                    </span>
+                  ) : (
+                    edu.degree
+                  )}
                 </h4>
                 {hasAnyChange && (
                   <Badge variant="outline" className={getBadgeStyles("purple")}>
@@ -50,14 +59,32 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                {institutionChange ? highlightText(edu.institution, eduChanges, "institution") : edu.institution}
+                {institutionChange ? (
+                  <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                    {edu.institution}
+                  </span>
+                ) : (
+                  edu.institution
+                )}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {datesChange ? highlightText(edu.dates, eduChanges, "dates") : edu.dates}
+                {datesChange ? (
+                  <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                    {edu.dates}
+                  </span>
+                ) : (
+                  edu.dates
+                )}
               </p>
               {edu.gpa && (
                 <p className="text-xs text-muted-foreground">
-                  GPA: {gpaChange ? highlightText(edu.gpa, eduChanges, "gpa") : edu.gpa}
+                  GPA: {gpaChange ? (
+                    <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                      {edu.gpa}
+                    </span>
+                  ) : (
+                    edu.gpa
+                  )}
                 </p>
               )}
             </CardContent>
@@ -69,7 +96,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
           onClick={onToggle}
           className="text-primary text-xs mt-2 hover:underline font-medium"
         >
-          {isExpanded ? "▼ Show less" : `▶ Show more (${resume.education.length - 2} more)`}
+          {isExpanded ? "▼ Show less" : `▶ Show more (${education.length - 2} more)`}
         </button>
       )}
     </SectionWrapper>

@@ -11,7 +11,7 @@ export const getResumeUrl = (
     id?: string;
   },
   options?: {
-    useProxy?: boolean; // Use authenticated proxy endpoint instead of direct URL
+    useProxy?: boolean; // (legacy) Prefer authenticated proxy endpoint when no direct URL is available
     preferOptimized?: boolean; // Use optimized_file_url if available
     baseUrl?: string; // Backend base URL (defaults to current origin or localhost:5000)
   }
@@ -29,11 +29,6 @@ export const getResumeUrl = (
         "https://ai-resume-genius-backend-hidden-glitter-6547.fly.dev",
   } = options || {};
 
-  // If using proxy, return authenticated proxy URL
-  if (useProxy && resume.id) {
-    return `${baseUrl}/api/resume/${resume.id}/pdf`;
-  }
-
   // Get the appropriate URL (optimized or original)
   const fileUrl =
     preferOptimized && resume.optimized_file_url
@@ -43,7 +38,11 @@ export const getResumeUrl = (
   // If no file URL and we have an ID, use proxy endpoint as fallback
   if (!fileUrl) {
     if (resume.id) {
-      return `${baseUrl}/api/resume/${resume.id}/pdf`;
+      // When no direct file URL is available, optionally fall back to the
+      // authenticated proxy endpoint. This is used mainly for local/dev.
+      if (useProxy) {
+        return `${baseUrl}/api/resume/${resume.id}/pdf`;
+      }
     }
     // If no ID either, return empty string instead of throwing
     return "";

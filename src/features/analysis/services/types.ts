@@ -58,6 +58,7 @@ export interface AnalysisResult {
   // (Previously this was `[x: string]: AnalysisResult`, which was incorrect and caused type errors.)
   [key: string]: unknown;
   analysis: {
+    optimized_file_url: string;
     id: string;
     resume_id: string;
     ats_score_before: number;

@@ -205,7 +205,7 @@ const ResumeAnalysisFlow: React.FC<ResumeAnalysisFlowProps> = ({ onComplete }) =
   };
 
   const handleOptimizationComplete = (result: any) => {
-    console.log("Optimization complete:", result);
+ 
     if (analysisId) {
       navigate(`/resume-comparison?analysisId=${analysisId}`, { replace: true });
     }

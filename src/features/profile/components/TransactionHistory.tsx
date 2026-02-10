@@ -28,21 +28,15 @@ export const TransactionHistory: React.FC<{ limit?: number }> = ({ limit = 50 })
       setError(null);
       try {
         const url = `/api/profile/transactions?limit=${limit}`;
-        console.log('[TransactionHistory] fetching', url);
         const res = await fetch(url, { credentials: 'include' });
-        console.log('[TransactionHistory] response status', res.status, res.statusText);
         if (!res.ok) {
           const text = await res.text().catch(() => '');
-          console.error('[TransactionHistory] non-OK response body:', text);
           throw new Error(`Status ${res.status}`);
         }
-        const json = await res.json();
-        console.log('[TransactionHistory] response json', json);
+        const json = await res.json();;
         const txs = (json.transactions ?? json.data?.transactions) as Transaction[] | undefined;
-        console.log('[TransactionHistory] normalized transactions', txs);
         if (mounted) setTransactions(txs || []);
       } catch (e: any) {
-        console.error('[TransactionHistory] failed to fetch transactions', e);
         if (mounted) setError(e?.message || 'Failed to load transactions');
       } finally {
         if (mounted) setLoading(false);

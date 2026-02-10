@@ -33,7 +33,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
     });
   };
 
-  const renderResumeContent = (resume: ResumeStructure, isOptimized: boolean = true) => {
+  const renderResumeContent = (resume: ResumeStructure, isOptimized: boolean = true, originalResume?: ResumeStructure) => {
     // Only show changes on optimized resume, not original
     const summaryChanges = isOptimized ? getSectionChanges("summary", changes) : [];
     const skillsChanges = isOptimized ? getSectionChanges("skills", changes) : [];
@@ -41,6 +41,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
     const projectsChanges = isOptimized ? getSectionChanges("projects", changes) : [];
     const educationChanges = isOptimized ? getSectionChanges("education", changes) : [];
     const certificationsChanges = isOptimized ? getSectionChanges("certifications", changes) : [];
+
 
     const isSummaryExpanded = expandedSections.has("summary") || viewMode !== "split";
     const isSkillsExpanded = expandedSections.has("skills") || viewMode !== "split";
@@ -53,6 +54,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         <PersonalInfo resume={resume} />
         <SummarySection
           resume={resume}
+          originalResume={originalResume}
           changes={summaryChanges}
           isExpanded={isSummaryExpanded}
           viewMode={viewMode}
@@ -60,6 +62,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         />
         <SkillsSection
           resume={resume}
+          originalResume={originalResume}
           changes={skillsChanges}
           isExpanded={isSkillsExpanded}
           viewMode={viewMode}
@@ -67,6 +70,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         />
         <WorkExperienceSection
           resume={resume}
+          originalResume={originalResume}
           changes={workChanges}
           expandedSections={expandedSections}
           viewMode={viewMode}
@@ -74,6 +78,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         />
         <ProjectsSection
           resume={resume}
+          originalResume={originalResume}
           changes={projectsChanges}
           isExpanded={isProjectsExpanded}
           viewMode={viewMode}
@@ -81,6 +86,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         />
         <EducationSection
           resume={resume}
+          originalResume={originalResume}
           changes={educationChanges}
           isExpanded={isEducationExpanded}
           viewMode={viewMode}
@@ -88,6 +94,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
         />
         <CertificationsSection
           resume={resume}
+          originalResume={originalResume}
           changes={certificationsChanges}
           isExpanded={isCertificationsExpanded}
           viewMode={viewMode}
@@ -183,7 +190,7 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent>{renderResumeContent(optimizedResume, true)}</CardContent>
+              <CardContent>{renderResumeContent(optimizedResume, true, originalResume)}</CardContent>
             </Card>
           </div>
         ) : (
@@ -196,7 +203,8 @@ const ResumePreviewWithChanges: React.FC<ResumePreviewProps> = ({
             <CardContent>
               {renderResumeContent(
                 viewMode === "original" ? originalResume : optimizedResume,
-                viewMode === "optimized"
+                viewMode === "optimized",
+                viewMode === "optimized" ? originalResume : undefined
               )}
             </CardContent>
           </Card>

@@ -80,20 +80,14 @@ export const verifyAtsScores = (result: AnalysisResult): AtsScoreVerification =>
   }
 
   // Log verification
-  console.log("=== ATS Score Verification ===");
-  console.log("Before Score:", verification.before);
+
 
   if (verification.after) {
-    console.log("After Score:", verification.after);
-    if (verification.improvement) {
-      console.log("Improvement:", verification.improvement);
+      if (verification.improvement) {
     }
   } else {
-    console.log("After Score: Not available (resume not optimized)");
+
   }
-
-  console.log("=== Verification Complete ===");
-
   return verification;
 };
 

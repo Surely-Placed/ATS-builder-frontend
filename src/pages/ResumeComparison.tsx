@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import ComparisonView from '@/features/analysis/components/ComparisonView';
 import AnalysisApiService from '@/services/analysisApi';
@@ -66,7 +67,10 @@ export default function ResumeComparison() {
     return (
       <DashboardLayout activeTab="Resume Optimization">
         <div className="min-h-[400px] flex items-center justify-center">
-          <div>Loading comparison...</div>
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading comparison...</p>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -85,24 +89,32 @@ export default function ResumeComparison() {
   const handleDownload = async () => {
     setIsDownloadLoading(true);
     try {
-      // Get the optimized resume URL from the current data
-      const pdfUrl = 
-        optimizedResult?.optimized_resume?.url || 
-        optimizedResult?.optimized_resume?.file_url || 
-        optimizedResult?.optimized_resume?.pdf_url ||
+      // Fetch fresh analysis data to get the URL (matching Dashboard logic)
+      const result = await AnalysisApiService.getAnalysis(analysisId);
+
+      let pdfUrl = 
+        result?.optimized_resume?.file_url || 
+        result?.optimized_resume?.url || 
+        result?.optimized_resume?.pdf_url ||
+        result?.analysis?.optimized_file_url ||
         null;
 
+      if (!pdfUrl) {
+         try {
+            const genResponse = await AnalysisApiService.generatePDF(analysisId);
+            if (genResponse.success && genResponse.file_url) {
+                pdfUrl = genResponse.file_url;
+            }
+         } catch (genErr) {
+             console.error("Failed to generate PDF on demand:", genErr);
+         }
+      }
+
       if (pdfUrl) {
-        // Download the PDF directly
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = 'optimized-resume.pdf';
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        AnalysisApiService.downloadResume(pdfUrl, 'optimized-resume.pdf', analysisId);
       } else {
-        console.error('No optimized resume URL found');
+        console.error('No optimized resume URL found', { result });
+        throw new Error("Optimized resume PDF not found");
       }
     } catch (err) {
       console.error('Download failed:', err);

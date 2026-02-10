@@ -35,7 +35,7 @@ export class DownloadService {
    */
   static downloadResume(
     url: string,
-    filename: string = "optimized-resume.pdf",
+    filename: string = "optimized-resume.pdf", // kept for backward compatibility (no longer used)
     resumeId?: string
   ): void {
     if (!url) {
@@ -48,12 +48,8 @@ export class DownloadService {
       trackConversion("download");
     }
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Open the Tigris URL in a new tab so the user
+    // can view the PDF there and choose to download it.
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 }

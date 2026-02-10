@@ -1,13 +1,14 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { ResumeStructure, ChangeHighlight, ViewMode } from "@/types/resume/preview";
 import { SectionWrapper } from "./SectionWrapper";
 import { SectionHeader } from "./SectionHeader";
-import { getBadgeStyles, highlightText } from "@/utils/resume/preview";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getBadgeStyles } from "@/utils/resume/preview";
 
 interface ProjectsSectionProps {
   resume: ResumeStructure;
+  originalResume?: ResumeStructure;
   changes: ChangeHighlight[];
   isExpanded: boolean;
   viewMode: ViewMode;
@@ -16,13 +17,15 @@ interface ProjectsSectionProps {
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   resume,
+  originalResume,
   changes,
   isExpanded,
   viewMode,
   onToggle,
 }) => {
-  const projectsToShow = isExpanded ? resume.projects : resume.projects.slice(0, 2);
-  const hasMoreProjects = resume.projects.length > 2;
+  const projects = resume.projects || [];
+  const projectsToShow = isExpanded ? projects : projects.slice(0, 2);
+  const hasMoreProjects = projects.length > 2;
   const hasChanges = changes.length > 0;
 
   return (
@@ -46,7 +49,13 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 )}
               </div>
               <div className="text-sm text-muted-foreground mb-3">
-                {descChange ? highlightText(project.description, projChanges, "description") : project.description}
+                {descChange ? (
+                  <span className="px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-700">
+                    {project.description}
+                  </span>
+                ) : (
+                  project.description
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {project.technologies.map((tech, techIndex) => (
@@ -68,7 +77,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           onClick={onToggle}
           className="text-primary text-xs mt-2 hover:underline font-medium"
         >
-          {isExpanded ? "▼ Show less" : `▶ Show more (${resume.projects.length - 2} more)`}
+          {isExpanded ? "▼ Show less" : `▶ Show more (${projects.length - 2} more)`}
         </button>
       )}
     </SectionWrapper>

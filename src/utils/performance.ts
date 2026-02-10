@@ -26,7 +26,6 @@ export const measureWebVitals = (): void => {
 
         const lcp = lastEntry.renderTime || lastEntry.loadTime || 0;
         if (lcp > 0) {
-          console.log("LCP:", lcp);
           // Send to analytics
           if (import.meta.env.PROD) {
             // Example: analytics.track('web_vital', { metric: 'LCP', value: lcp });
@@ -47,7 +46,6 @@ export const measureWebVitals = (): void => {
         const entries = list.getEntries();
         entries.forEach((entry: any) => {
           const fid = entry.processingStart - entry.startTime;
-          console.log("FID:", fid);
           if (import.meta.env.PROD) {
             // Example: analytics.track('web_vital', { metric: 'FID', value: fid });
           }
@@ -71,7 +69,6 @@ export const measureWebVitals = (): void => {
             clsValue += entry.value;
           }
         });
-        console.log("CLS:", clsValue);
         if (import.meta.env.PROD) {
           // Example: analytics.track('web_vital', { metric: 'CLS', value: clsValue });
         }

@@ -26,7 +26,7 @@ export interface ResumeWithStatus {
   } | null;
 }
 
-export const useResumeFilters = (filter: "all" | "drafts" | "published" = "all") => {
+export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all") => {
   const [counts, setCounts] = useState<FilterCounts>({ all: 0, drafts: 0, published: 0 });
   const [resumes, setResumes] = useState<ResumeWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +78,7 @@ export const useResumeFilters = (filter: "all" | "drafts" | "published" = "all")
       }
       // Don't set error state for cancelled requests
       if (!axios.isCancel(err)) {
-        setError(err.message || "Failed to fetch filter counts");
+        // Silent fail for counts
       }
     } finally {
       countsFetchingRef.current = false;
@@ -106,31 +106,123 @@ export const useResumeFilters = (filter: "all" | "drafts" | "published" = "all")
       const source = axios.CancelToken.source();
       resumesCancelTokenRef.current = source;
 
+      // Always fetch ALL valid resumes (limit increased to 1000 to ensure we get everything for accurate counts)
       const response = await apiClient.get<{
         success: boolean;
         data: { resumes?: ResumeWithStatus[] } | ResumeWithStatus[];
         message?: string;
-      }>(`/resume?filter=${filter}`, {
+      }>(`/resume?limit=1000`, {
         cancelToken: source.token,
       });
 
       if (response.data.success) {
-        // Handle both response structures: { data: { resumes: [] } } or { data: [] }
+        // Handle both response structures
         const resumesData = response.data.data;
-        let resumesArray: ResumeWithStatus[] = [];
+        let basicResumes: any[] = [];
+
+        // Helper to normalize resume data
+        const normalizeResume = (raw: any): ResumeWithStatus => {
+          return {
+            id: raw.id,
+            user_id: raw.user_id || raw.userId,
+            original_file_url: raw.original_file_url || raw.originalFileUrl,
+            optimized_file_url: raw.optimized_file_url || raw.optimizedFileUrl || null,
+            storage_path: raw.storage_path || raw.storagePath || null,
+            created_at: raw.created_at || raw.createdAt,
+            status: raw.status,
+            hasAnalysis: raw.has_analysis || raw.hasAnalysis || false,
+            latestAnalysis: raw.latest_analysis || raw.latestAnalysis
+              ? {
+                id: raw.latest_analysis?.id || raw.latestAnalysis?.id,
+                jobTitle: raw.latest_analysis?.job_title || raw.latestAnalysis?.jobTitle || '',
+                atsScoreBefore: raw.latest_analysis?.ats_score_before ?? raw.latestAnalysis?.atsScoreBefore ?? 0,
+                atsScoreAfter: raw.latest_analysis?.ats_score_after ?? raw.latestAnalysis?.atsScoreAfter ?? null,
+                createdAt: raw.latest_analysis?.created_at || raw.latestAnalysis?.createdAt,
+              }
+              : null
+          };
+        };
 
         if (Array.isArray(resumesData)) {
-          resumesArray = resumesData;
+          basicResumes = resumesData;
         } else if (
           resumesData &&
           typeof resumesData === "object" &&
           "resumes" in resumesData &&
           Array.isArray(resumesData.resumes)
         ) {
-          resumesArray = resumesData.resumes;
+          basicResumes = resumesData.resumes;
         }
 
-        setResumes(resumesArray);
+        let resumesArray = basicResumes.map(normalizeResume);
+
+        // Fetch analyses to map to resumes (client-side join to avoid N+1 requests)
+        try {
+          // Fetch recent analyses (limit 1000 to match resume limit)
+          const analysesResp = await apiClient.get<any>('/profile/analyses?limit=1000');
+
+          if (analysesResp.data.success) {
+            const analyses = analysesResp.data.data.analyses || [];
+
+            // Create a map for quick lookup: resume_id -> analysis
+            const analysisMap = new Map();
+            analyses.forEach((analysis: any) => {
+              // If multiple analyses exist for one resume, the latest one (first in list usually) wins
+              if (!analysisMap.has(analysis.resume_id)) {
+                analysisMap.set(analysis.resume_id, analysis);
+              }
+            });
+
+            // Merge analysis data into resumes
+            resumesArray = resumesArray.map(resume => {
+              const matchedAnalysis = analysisMap.get(resume.id);
+              if (matchedAnalysis) {
+                // Enrich resume with missing analysis data
+                return {
+                  ...resume,
+                  optimized_file_url: resume.optimized_file_url || matchedAnalysis.optimized_resume_url || null,
+                  hasAnalysis: true,
+                  latestAnalysis: resume.latestAnalysis || {
+                    id: matchedAnalysis.id,
+                    jobTitle: matchedAnalysis.job_title || '',
+                    atsScoreBefore: matchedAnalysis.ats_score_before || 0,
+                    atsScoreAfter: matchedAnalysis.ats_score_after || null,
+                    createdAt: matchedAnalysis.created_at
+                  }
+                };
+              }
+              return resume;
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to fetch/merge analyses with documents", err);
+          // Continue with basic data - don't block UI
+        }
+
+        // Calculate counts client-side to ensure consistency with filter logic
+        const optimizedCount = resumesArray.filter(r =>
+          !!r.optimized_file_url || (r.latestAnalysis?.atsScoreAfter !== null && r.latestAnalysis?.atsScoreAfter !== undefined)
+        ).length;
+
+        const allCount = resumesArray.length;
+
+        // Update counts state with calculated values
+        setCounts({
+          all: allCount,
+          published: optimizedCount, // Mapping 'Optimized' to 'published' key for UI
+          drafts: allCount - optimizedCount // Remaining are 'Uploaded' (mapped to 'drafts')
+        });
+
+        // Client-side filtering
+        const filteredResumes = resumesArray.filter(resume => {
+          const isOptimized = !!resume.optimized_file_url || (resume.latestAnalysis?.atsScoreAfter !== null && resume.latestAnalysis?.atsScoreAfter !== undefined);
+
+          if (filter === 'optimized') return isOptimized;
+          if (filter === 'uploaded') return !isOptimized;
+          return true; // 'all'
+        });
+
+        setResumes(filteredResumes);
       } else {
         throw new Error(response.data.message || "Failed to fetch resumes");
       }
@@ -156,17 +248,11 @@ export const useResumeFilters = (filter: "all" | "drafts" | "published" = "all")
     }
   }, [filter]); // Only depends on filter
 
-  // Fetch counts only once on mount
+  // Fetch counts only once on mount - kept for initial fast load if needed, but fetchResumes will overwrite with accurate counts
   useEffect(() => {
-    fetchCounts();
-
-    // Cleanup: cancel request on unmount
-    return () => {
-      if (countsCancelTokenRef.current) {
-        countsCancelTokenRef.current.cancel("Component unmounted");
-      }
-    };
-  }, [fetchCounts]); // fetchCounts is memoized with useCallback
+    // We can rely on fetchResumes to set accurate counts now.
+    // fetchCounts(); 
+  }, []);
 
   // Fetch resumes when filter changes
   useEffect(() => {
@@ -186,6 +272,6 @@ export const useResumeFilters = (filter: "all" | "drafts" | "published" = "all")
     loading,
     error,
     refetch: fetchResumes,
-    refetchCounts: fetchCounts,
+    refetchCounts: fetchResumes, // Make refetchCounts just trigger full fetch to recalculate
   };
 };

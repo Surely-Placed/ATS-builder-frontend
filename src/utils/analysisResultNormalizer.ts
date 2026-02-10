@@ -17,15 +17,15 @@ export function normalizeAnalysisResult(apiResponse: any) {
   }
 
   // Get ATS score from various possible locations
-  const atsScoreBefore = 
-    result?.ats_analysis?.before?.score ?? 
-    result?.analysis?.ats_score_before ?? 
-    result?.ats_score_before ?? 
+  const atsScoreBefore =
+    result?.ats_analysis?.before?.score ??
+    result?.analysis?.ats_score_before ??
+    result?.ats_score_before ??
     0;
-  
-  const qualityScore = 
-    result?.analysis?.quality_score ?? 
-    result?.quality_score ?? 
+
+  const qualityScore =
+    result?.analysis?.quality_score ??
+    result?.quality_score ??
     null;
 
   // Get AI insights
@@ -58,7 +58,7 @@ export function normalizeAnalysisResult(apiResponse: any) {
       improvements: aiInsights.recommendations || [],
     };
   }
-  
+
   // Ensure resume_quality has all required fields if it exists
   if (resumeQuality) {
     resumeQuality = {
@@ -74,7 +74,7 @@ export function normalizeAnalysisResult(apiResponse: any) {
   let comprehensiveFeedback = result?.comprehensive_feedback;
   if (!comprehensiveFeedback && atsScoreBefore > 0) {
     // Calculate overall score (average of ATS and quality, or just ATS if no quality)
-    const overallScore = qualityScore !== null 
+    const overallScore = qualityScore !== null
       ? Math.round((atsScoreBefore + qualityScore) / 2)
       : atsScoreBefore;
 
@@ -85,7 +85,7 @@ export function normalizeAnalysisResult(apiResponse: any) {
       quality_score: qualityScore,
       level: getLevel(overallScore),
       feedback: {
-        ats_feedback: aiInsights.weaknesses?.length > 0 
+        ats_feedback: aiInsights.weaknesses?.length > 0
           ? `Areas to improve: ${aiInsights.weaknesses.slice(0, 2).join(', ')}.`
           : "Your resume's ATS compatibility could be improved with more relevant keywords.",
         quality_feedback: aiInsights.strengths?.length > 0
@@ -179,15 +179,15 @@ export function normalizeAnalysisResult(apiResponse: any) {
       },
       after: normalized.analysis?.ats_score_after
         ? {
-            score:
-              normalized.analysis?.ats_score_after || null,
-            real_score: normalized.analysis?.ats_score_after || null,
-            label: "Optimized ATS Score",
-            breakdown: null,
-            matched_skills: [],
-            missing_skills: [],
-            improvement: null,
-          }
+          score:
+            normalized.analysis?.ats_score_after || null,
+          real_score: normalized.analysis?.ats_score_after || null,
+          label: "Optimized ATS Score",
+          breakdown: null,
+          matched_skills: [],
+          missing_skills: [],
+          improvement: null,
+        }
         : null,
       ai_insights: normalized.ai_insights || {
         strengths: [],
@@ -209,6 +209,7 @@ export function normalizeAnalysisResult(apiResponse: any) {
         result.analysis?.quality_score ??
         result.comprehensive_feedback?.quality_score ??
         null,
+      optimized_file_url: result.optimized_file_url || result.analysis?.optimized_file_url || "",
       created_at: result.created_at || result.analysis?.created_at || new Date().toISOString(),
     };
   }
@@ -220,7 +221,7 @@ export function normalizeAnalysisResult(apiResponse: any) {
     (normalized.ai_insights || normalized.ats_analysis?.ai_insights);
 
   if (!isValid) {
-    console.warn("⚠️ Invalid analysis result structure:", {
+    console.warn(" Invalid analysis result structure:", {
       hasAnalysis: !!normalized.analysis,
       hasAtsAnalysis: !!normalized.ats_analysis,
       hasAiInsights: !!normalized.ai_insights,

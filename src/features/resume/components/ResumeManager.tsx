@@ -11,6 +11,10 @@ interface ResumeManagerProps {
   error: string | null;
   refetch: () => void;
   refetchCounts: () => void;
+  // Pagination props
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export const ResumeManager: React.FC<ResumeManagerProps> = ({
@@ -19,9 +23,12 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
   error,
   refetch,
   refetchCounts,
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange,
 }) => {
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       {/* Main Content - Resume List */}
       <div className="min-h-[400px]">
         {error && (
@@ -48,6 +55,31 @@ export const ResumeManager: React.FC<ResumeManagerProps> = ({
         )}
         <ResumeList resumes={resumes || []} loading={loading} />
       </div>
+
+      {/* Pagination Controls */}
+      {!loading && !error && totalPages > 1 && onPageChange && (
+          <div className="flex items-center justify-center gap-2 py-4">
+            <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+            >
+                Previous
+            </Button>
+            <div className="text-sm font-medium mx-2">
+                Page {currentPage} of {totalPages}
+            </div>
+            <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+            >
+                Next
+            </Button>
+          </div>
+      )}
     </div>
   );
 };
