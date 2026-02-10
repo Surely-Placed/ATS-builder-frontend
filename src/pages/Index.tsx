@@ -12,50 +12,21 @@ import { HowItWorks } from "@/components/ui/how-it-works";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import PricingSection from "@/components/sections/PricingSection";
 import { LoginModal } from "@/components/ui/login-modal";
-import { SignupModal } from "@/components/ui/signup-modal";
-import { ForgotPasswordModal } from "@/components/ui/forgot-password-modal";
 
 const Index = () => {
   const [loginOpen, setLoginOpen] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(false);
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (location.pathname === "/login") {
       setLoginOpen(true);
-    } else if (location.pathname === "/signup") {
-      setSignupOpen(true);
     }
   }, [location]);
 
   const handleLoginClose = (open: boolean) => {
     setLoginOpen(open);
     if (!open) navigate("/");
-  };
-
-  const handleSignupClose = (open: boolean) => {
-    setSignupOpen(open);
-    if (!open) navigate("/");
-  };
-
-  const switchToSignup = () => {
-    setLoginOpen(false);
-    setSignupOpen(true);
-    navigate("/signup");
-  };
-
-  const switchToLogin = () => {
-    setSignupOpen(false);
-    setForgotPasswordOpen(false);
-    setLoginOpen(true);
-    navigate("/login");
-  };
-
-  const switchToForgotPassword = () => {
-    setLoginOpen(false);
-    setForgotPasswordOpen(true);
   };
 
   return (
@@ -106,18 +77,6 @@ const Index = () => {
       <LoginModal
         open={loginOpen}
         onOpenChange={handleLoginClose}
-        onSwitchToSignup={switchToSignup}
-        onSwitchToForgotPassword={switchToForgotPassword}
-      />
-      <SignupModal
-        open={signupOpen}
-        onOpenChange={handleSignupClose}
-        onSwitchToLogin={switchToLogin}
-      />
-      <ForgotPasswordModal
-        open={forgotPasswordOpen}
-        onOpenChange={setForgotPasswordOpen}
-        onBackToLogin={switchToLogin}
       />
     </>
   );

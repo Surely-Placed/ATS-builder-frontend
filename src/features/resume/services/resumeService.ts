@@ -1,22 +1,19 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError } from "axios";
 import { trackResumeUpload, trackResumeDelete, trackConversion } from "@/utils/analytics";
 import { navigate } from "@/utils/navigation";
+import { API_BASE_URL } from "@/config/api";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://api.jobrabbit.ai/api";
-
-// Create axios instance with cookie and token authentication (Safari compatible)
+// Create axios instance with cookie-based authentication
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // Essential - allows cookies to be sent with requests
-  timeout: 180000, // 3 minutes for long-running analysis
+  withCredentials: true,
+  timeout: 180000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Response interceptor: handle errors (no token handling here - cookie-based auth only)
+// Response interceptor: handle errors
 apiClient.interceptors.response.use(
   (response) => {
     try {
