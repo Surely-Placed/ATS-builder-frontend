@@ -8,6 +8,15 @@ export interface FilterCounts {
   published: number;
 }
 
+export interface ResumeAnalysis {
+  id: string;
+  jobTitle: string;
+  atsScoreBefore: number;
+  atsScoreAfter: number | null;
+  createdAt: string;
+  status?: string;
+}
+
 export interface ResumeWithStatus {
   id: string;
   user_id: string;
@@ -17,16 +26,12 @@ export interface ResumeWithStatus {
   created_at: string;
   status: "draft" | "published";
   hasAnalysis: boolean;
-  latestAnalysis: {
-    id: string;
-    jobTitle: string;
-    atsScoreBefore: number;
-    atsScoreAfter: number | null;
-    createdAt: string;
-  } | null;
+  latestAnalysis: ResumeAnalysis | null;
 }
 
-export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all") => {
+export type ResumeFilterType = "all" | "not_completed" | "optimized";
+
+export const useResumeFilters = (filter: ResumeFilterType = "all") => {
   const [counts, setCounts] = useState<FilterCounts>({ all: 0, drafts: 0, published: 0 });
   const [resumes, setResumes] = useState<ResumeWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,13 +138,20 @@ export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all
             hasAnalysis: raw.has_analysis || raw.hasAnalysis || false,
             latestAnalysis: raw.latest_analysis || raw.latestAnalysis
               ? {
-                id: raw.latest_analysis?.id || raw.latestAnalysis?.id,
-                jobTitle: raw.latest_analysis?.job_title || raw.latestAnalysis?.jobTitle || '',
-                atsScoreBefore: raw.latest_analysis?.ats_score_before ?? raw.latestAnalysis?.atsScoreBefore ?? 0,
-                atsScoreAfter: raw.latest_analysis?.ats_score_after ?? raw.latestAnalysis?.atsScoreAfter ?? null,
-                createdAt: raw.latest_analysis?.created_at || raw.latestAnalysis?.createdAt,
-              }
-              : null
+                  id: raw.latest_analysis?.id || raw.latestAnalysis?.id,
+                  jobTitle: raw.latest_analysis?.job_title || raw.latestAnalysis?.jobTitle || "",
+                  atsScoreBefore:
+                    raw.latest_analysis?.ats_score_before ??
+                    raw.latestAnalysis?.atsScoreBefore ??
+                    0,
+                  atsScoreAfter:
+                    raw.latest_analysis?.ats_score_after ??
+                    raw.latestAnalysis?.atsScoreAfter ??
+                    null,
+                  createdAt: raw.latest_analysis?.created_at || raw.latestAnalysis?.createdAt,
+                  status: raw.latest_analysis?.status || raw.latestAnalysis?.status,
+                }
+              : null,
           };
         };
 
@@ -157,12 +169,15 @@ export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all
         let resumesArray = basicResumes.map(normalizeResume);
 
         // Fetch analyses to map to resumes (client-side join to avoid N+1 requests)
+        // New backend: GET /profile/analyses returns { success, data: { analyses, count } }
         try {
-          // Fetch recent analyses (limit 1000 to match resume limit)
-          const analysesResp = await apiClient.get<any>('/profile/analyses?limit=1000');
+          const analysesResp = await apiClient.get<{
+            success: boolean;
+            data: { analyses: Array<{ id: string; resume_id: string; job_title: string | null; ats_score_before: number | null; ats_score_after: number | null; created_at: string; status?: string; optimized_resume_url?: string | null }>; count?: number };
+          }>('/profile/analyses', { params: { limit: 1000 } });
 
           if (analysesResp.data.success) {
-            const analyses = analysesResp.data.data.analyses || [];
+            const analyses = analysesResp.data.data?.analyses ?? [];
 
             // Create a map for quick lookup: resume_id -> analysis
             const analysisMap = new Map();
@@ -177,18 +192,20 @@ export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all
             resumesArray = resumesArray.map(resume => {
               const matchedAnalysis = analysisMap.get(resume.id);
               if (matchedAnalysis) {
-                // Enrich resume with missing analysis data
+                const baseAnalysis: ResumeAnalysis =
+                  resume.latestAnalysis || {
+                    id: matchedAnalysis.id,
+                    jobTitle: matchedAnalysis.job_title || "",
+                    atsScoreBefore: matchedAnalysis.ats_score_before || 0,
+                    atsScoreAfter: matchedAnalysis.ats_score_after || null,
+                    createdAt: matchedAnalysis.created_at,
+                    status: matchedAnalysis.status,
+                  };
                 return {
                   ...resume,
                   optimized_file_url: resume.optimized_file_url || matchedAnalysis.optimized_resume_url || null,
                   hasAnalysis: true,
-                  latestAnalysis: resume.latestAnalysis || {
-                    id: matchedAnalysis.id,
-                    jobTitle: matchedAnalysis.job_title || '',
-                    atsScoreBefore: matchedAnalysis.ats_score_before || 0,
-                    atsScoreAfter: matchedAnalysis.ats_score_after || null,
-                    createdAt: matchedAnalysis.created_at
-                  }
+                  latestAnalysis: { ...baseAnalysis, status: baseAnalysis.status ?? matchedAnalysis.status },
                 };
               }
               return resume;
@@ -199,27 +216,38 @@ export const useResumeFilters = (filter: "all" | "uploaded" | "optimized" = "all
           // Continue with basic data - don't block UI
         }
 
-        // Calculate counts client-side to ensure consistency with filter logic
-        const optimizedCount = resumesArray.filter(r =>
-          !!r.optimized_file_url || (r.latestAnalysis?.atsScoreAfter !== null && r.latestAnalysis?.atsScoreAfter !== undefined)
-        ).length;
+        // Derive optimization/analyzer flags
+        const withAnalysis = resumesArray.filter((r) => !!r.latestAnalysis);
+        const optimized = withAnalysis.filter(
+          (r) =>
+            !!r.optimized_file_url ||
+            (r.latestAnalysis?.atsScoreAfter !== null &&
+              r.latestAnalysis?.atsScoreAfter !== undefined)
+        );
+        const notOptimizedButAnalyzed = withAnalysis.filter(
+          (r) =>
+            !optimized.includes(r) &&
+            r.latestAnalysis?.status !== "initial_failed"
+        );
 
-        const allCount = resumesArray.length;
-
-        // Update counts state with calculated values
         setCounts({
-          all: allCount,
-          published: optimizedCount, // Mapping 'Optimized' to 'published' key for UI
-          drafts: allCount - optimizedCount // Remaining are 'Uploaded' (mapped to 'drafts')
+          all: withAnalysis.length,
+          published: optimized.length,          // Optimized
+          drafts: notOptimizedButAnalyzed.length, // Not completed (analyzed but not optimized)
         });
 
         // Client-side filtering
-        const filteredResumes = resumesArray.filter(resume => {
-          const isOptimized = !!resume.optimized_file_url || (resume.latestAnalysis?.atsScoreAfter !== null && resume.latestAnalysis?.atsScoreAfter !== undefined);
+        const filteredResumes = withAnalysis.filter((resume) => {
+          const isOptimized =
+            !!resume.optimized_file_url ||
+            (resume.latestAnalysis?.atsScoreAfter !== null &&
+              resume.latestAnalysis?.atsScoreAfter !== undefined);
+          const isInitialFailed = resume.latestAnalysis?.status === "initial_failed";
 
-          if (filter === 'optimized') return isOptimized;
-          if (filter === 'uploaded') return !isOptimized;
-          return true; // 'all'
+          if (filter === "optimized") return isOptimized;
+          if (filter === "not_completed")
+            return !isOptimized && !isInitialFailed; // only analyzed-but-not-optimized
+          return true; // 'all' -> any analyzed resume
         });
 
         setResumes(filteredResumes);

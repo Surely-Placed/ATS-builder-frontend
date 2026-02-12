@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, FileText, Download, TrendingUp, Sparkles, Clock } from "lucide-react";
 import { DownloadService } from "@/features/analysis/services/downloadService";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ResumeListProps {
   resumes: ResumeWithStatus[];
@@ -16,6 +17,28 @@ interface ResumeListProps {
 export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
   const { toast } = useToast();
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const s = status.toLowerCase();
+    if (s === "optimization_completed" || s === "completed" || s === "complete") return "default";
+    if (s === "optimization_pending" || s === "initial_processed" || s === "pending") return "secondary";
+    if (s === "optimization_processing" || s === "processing" || s === "running") return "outline";
+    if (s === "optimization_failed" || s === "initial_failed" || s === "failed") return "destructive";
+    return "secondary";
+  };
+
+  const getStatusLabel = (status: string): string => {
+    const labels: Record<string, string> = {
+      optimization_completed: "Optimization completed",
+      optimization_pending: "Optimization pending",
+      optimization_processing: "Optimization in progress",
+      optimization_failed: "Optimization failed",
+      initial_processed: "Analysis done",
+      initial_failed: "Not analyzed",
+    };
+    return labels[status] ?? status;
+  };
 
   const handleDownloadOptimized = async (url: string, resumeId: string, filename: string) => {
     try {
@@ -64,8 +87,11 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
       {resumes.map((resume) => {
         // Determine if optimized based on file URL OR having an after score
         const hasOptimized = !!resume.optimized_file_url || (resume.latestAnalysis?.atsScoreAfter !== null && resume.latestAnalysis?.atsScoreAfter !== undefined);
-        const mainTitle = resume.latestAnalysis?.jobTitle || `Resume #${resume.id.substring(0, 8)}`;
-        
+        const displayStatus =
+          resume.latestAnalysis?.status ||
+          (hasOptimized ? "optimization_completed" : resume.latestAnalysis ? "initial_processed" : "initial_failed");
+        const mainTitle = resume.latestAnalysis?.jobTitle?.trim() || `Resume #${resume.id.substring(0, 8)}`;
+
         const optimizedUrl = resume.optimized_file_url
           ? getResumeUrl(
               {
@@ -75,7 +101,7 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
               { useProxy: true }
             )
           : null;
-        
+
         return (
           <Card key={resume.id} className="transition-all hover:shadow-md">
             <CardHeader className="pb-3">
@@ -89,35 +115,9 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
                   </CardDescription>
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                   {/* Status Badge */}
-                   {/* Detailed Status Badge */}
-                   {(() => {
-                     // 1. Optimized
-                     if (hasOptimized) {
-                       return (
-                         <Badge variant="default" className="bg-green-600 hover:bg-green-700 gap-1 text-white border-transparent">
-                           <Sparkles className="w-3 h-3" />
-                           Optimized
-                         </Badge>
-                       );
-                     }
-                     // 2. Analyzed (Has analysis but no optimization score yet)
-                     if (resume.latestAnalysis) {
-                       return (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 gap-1">
-                             <TrendingUp className="w-3 h-3" />
-                             Analyzed
-                          </Badge>
-                       );
-                     }
-                     // 3. Just Uploaded
-                     return (
-                         <Badge variant="outline" className="text-muted-foreground gap-1">
-                             <FileText className="w-3 h-3" />
-                             Uploaded
-                         </Badge>
-                     );
-                   })()}
+                  <Badge variant={getStatusVariant(displayStatus)} className="shrink-0">
+                    {getStatusLabel(displayStatus)}
+                  </Badge>
                 </div>
               </div>
             </CardHeader>
@@ -141,42 +141,66 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
               )}
 
               <div className="flex flex-wrap gap-2 pt-2">
-                 {/* Primary Action: Download Optimized */}
+                {/* Primary Action: Download Optimized / Resume Optimization / Start analysis */}
                 {hasOptimized ? (
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+                  <Button
+                    variant="default"
+                    size="sm"
                     className="flex-1 sm:flex-none"
                     onClick={async () => {
-                        if (optimizedUrl) {
-                             await handleDownloadOptimized(optimizedUrl, resume.id, `optimized-resume-${resume.id.substring(0,8)}.pdf`);
-                        } else if (resume.latestAnalysis?.id) {
-                            // Lazy fetch URL if missing
-                            try {
-                                setDownloadingId(resume.id);
-                                const { AnalysisService } = await import('@/features/analysis/services/analysisService');
-                                const analysis = await AnalysisService.getAnalysis(resume.latestAnalysis.id);
-                                const fetchedUrl = analysis.optimized_resume?.file_url || analysis.analysis?.optimized_file_url || analysis.optimized_resume?.url;
-                                
-                                if (fetchedUrl) {
-                                    // Construct full URL if needed
-                                    const fullUrl = getResumeUrl({ id: resume.id, optimized_file_url: fetchedUrl }, { useProxy: true });
-                                    if (fullUrl) {
-                                        await DownloadService.downloadResume(fullUrl, `optimized-resume-${resume.id.substring(0,8)}.pdf`, resume.id);
-                                        toast({ title: "Download Started", description: "Your optimized resume is downloading." });
-                                    } else {
-                                        throw new Error("Could not construct download URL");
-                                    }
-                                } else {
-                                    throw new Error("No download URL found in analysis");
-                                }
-                            } catch (e) {
-                                console.error("Lazy download failed", e);
-                                toast({ variant: "destructive", title: "Download Failed", description: "Could not retrieve the optimized file." });
-                            } finally {
-                                setDownloadingId(null);
+                      if (optimizedUrl) {
+                        await handleDownloadOptimized(
+                          optimizedUrl,
+                          resume.id,
+                          `optimized-resume-${resume.id.substring(0, 8)}.pdf`
+                        );
+                      } else if (resume.latestAnalysis?.id) {
+                        // Lazy fetch URL if missing
+                        try {
+                          setDownloadingId(resume.id);
+                          const { AnalysisService } = await import(
+                            "@/features/analysis/services/analysisService"
+                          );
+                          const analysis = await AnalysisService.getAnalysis(
+                            resume.latestAnalysis.id
+                          );
+                          const fetchedUrl =
+                            analysis.optimized_resume?.file_url ||
+                            analysis.analysis?.optimized_file_url ||
+                            analysis.optimized_resume?.url;
+
+                          if (fetchedUrl) {
+                            const fullUrl = getResumeUrl(
+                              { id: resume.id, optimized_file_url: fetchedUrl },
+                              { useProxy: true }
+                            );
+                            if (fullUrl) {
+                              await DownloadService.downloadResume(
+                                fullUrl,
+                                `optimized-resume-${resume.id.substring(0, 8)}.pdf`,
+                                resume.id
+                              );
+                              toast({
+                                title: "Download Started",
+                                description: "Your optimized resume is downloading.",
+                              });
+                            } else {
+                              throw new Error("Could not construct download URL");
                             }
+                          } else {
+                            throw new Error("No download URL found in analysis");
+                          }
+                        } catch (e) {
+                          console.error("Lazy download failed", e);
+                          toast({
+                            variant: "destructive",
+                            title: "Download Failed",
+                            description: "Could not retrieve the optimized file.",
+                          });
+                        } finally {
+                          setDownloadingId(null);
                         }
+                      }
                     }}
                     disabled={downloadingId === resume.id}
                   >
@@ -187,15 +211,29 @@ export const ResumeList: React.FC<ResumeListProps> = ({ resumes, loading }) => {
                     )}
                     Download Optimized
                   </Button>
+                ) : resume.latestAnalysis ? (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 sm:flex-none"
+                    onClick={() =>
+                      navigate(`/resume-analysis?analysisId=${resume.latestAnalysis?.id}`)
+                    }
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Resume Optimization
+                  </Button>
                 ) : (
-                   /* Fallback/Pending State if no optimized file yet */
-                   <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" disabled>
-                     <Clock className="w-4 h-4 mr-2" />
-                     {resume.hasAnalysis ? "Optimization Pending" : "Not Optimized"}
-                   </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1 sm:flex-none"
+                    onClick={() => navigate("/resume-analysis")}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Start analysis
+                  </Button>
                 )}
-
-                {/* Secondary: Download Original - REMOVED per user request */}
               </div>
 
               <div className="text-xs text-muted-foreground pt-3 border-t flex items-center gap-1">

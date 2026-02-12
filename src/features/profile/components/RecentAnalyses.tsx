@@ -42,14 +42,14 @@ export const RecentAnalyses = ({ analyses, activeFilter, onFilterChange }: Recen
                 className="flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-foreground mb-1">{analysis.job_title}</p>
+                  <p className="font-medium text-foreground mb-1">{analysis.job_title ?? "Untitled"}</p>
                   <p className="text-sm text-muted-foreground">
                     {formatDateOverview(analysis.created_at)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold text-muted-foreground">
-                    {analysis.ats_score_before}
+                    {analysis.ats_score_before ?? "-"}
                   </span>
                   {analysis.ats_score_after && (
                     <>

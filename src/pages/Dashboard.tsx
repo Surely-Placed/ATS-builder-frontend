@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { StatCard } from "@/features/dashboard/components/StatCard";
 import { GetStartedCard } from "@/features/dashboard/components/GetStartedCard";
@@ -13,15 +13,13 @@ import { useNavigate } from "react-router-dom";
 import SubscriptionBadges from '@/features/dashboard/components/SubscriptionBadges';
 
 const Dashboard = () => {
-  const { stats, loading, error, refetch } = useDashboard();
+  const [page, setPage] = React.useState(1);
+  const { stats, loading, error, refetch, totalPages } = useDashboard(page);
   const navigate = useNavigate();
-
 
   const { state } = useUsage();
   const remainingRaw = state.remaining;
   const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
-
-
 
   // Auto-load dashboard on mount (useDashboard already triggers the fetch with a short delay)
   // Keep a retry handler available for error state
@@ -103,15 +101,50 @@ const Dashboard = () => {
         {/* Recent Activity Section */}
         <div>
           <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recent Activity</h2>
+          <div className="flex justify-end mb-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/documents")}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              View all resumes
+            </Button>
+          </div>
 
           {!stats || stats.recentActivity.length === 0 ? (
             <EmptyActivityCard />
           ) : (
-            <div className="space-y-3 sm:space-y-4">
-              {stats.recentActivity.map((activity) => (
-                <RecentActivityCard key={activity.id} activity={activity} />
-              ))}
-            </div>
+            <>
+              <div className="space-y-3 sm:space-y-4">
+                {stats.recentActivity.map((activity) => (
+                  <RecentActivityCard key={activity.id} activity={activity} />
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page <= 1 || loading}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {page} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= totalPages || loading}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

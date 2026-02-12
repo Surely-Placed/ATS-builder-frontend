@@ -1,5 +1,5 @@
 import React from "react";
-import { FilterCounts } from "@/features/resume/hooks/useResumeFilters";
+import { FilterCounts, ResumeFilterType } from "@/features/resume/hooks/useResumeFilters";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Filter, ChevronDown } from "lucide-react";
 
-export type FilterType = "all" | "uploaded" | "optimized";
+export type FilterType = ResumeFilterType;
 
 interface ResumeFiltersProps {
   activeFilter: FilterType;
@@ -17,15 +17,18 @@ interface ResumeFiltersProps {
   counts: FilterCounts;
 }
 
+const countKey = (key: FilterType): keyof FilterCounts =>
+  key === "not_completed" ? "drafts" : key === "optimized" ? "published" : "all";
+
 export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
   activeFilter,
   onFilterChange,
   counts,
 }) => {
-  const filters = [
-    { key: "all" as FilterType, label: "All Resumes" },
-    { key: "uploaded" as FilterType, label: "Uploaded" },
-    { key: "optimized" as FilterType, label: "Optimized" },
+  const filters: { key: FilterType; label: string }[] = [
+    { key: "all", label: "All Resumes" },
+    { key: "not_completed", label: "Not completed" },
+    { key: "optimized", label: "Optimized" },
   ];
 
   const activeFilterLabel = filters.find((f) => f.key === activeFilter)?.label || "All Resumes";
@@ -37,7 +40,7 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
           <Filter className="h-4 w-4" />
           <span>{activeFilterLabel}</span>
           <span className="ml-1 text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">
-            {counts[activeFilter === 'uploaded' ? 'drafts' : activeFilter === 'optimized' ? 'published' : 'all'] || 0}
+            {counts[countKey(activeFilter)] ?? 0}
           </span>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
@@ -51,7 +54,7 @@ export const ResumeFilters: React.FC<ResumeFiltersProps> = ({
           >
             <span>{filter.label}</span>
             <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">
-              {counts[filter.key === 'uploaded' ? 'drafts' : filter.key === 'optimized' ? 'published' : 'all'] || 0}
+              {counts[countKey(filter.key)] ?? 0}
             </span>
           </DropdownMenuItem>
         ))}

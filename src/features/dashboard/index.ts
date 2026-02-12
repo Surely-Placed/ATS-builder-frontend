@@ -6,3 +6,4 @@ export * from './components/FreeTrialUsage';
 
 // Hooks
 export * from './hooks/useDashboard';
+export * from './hooks/useDashboardActions';

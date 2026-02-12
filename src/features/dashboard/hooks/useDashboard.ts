@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardStats } from "@/types/dashboard.types";
 import { apiClient } from "@/features/resume/services/resumeService";
 import { AxiosError } from "axios";
 
-export const useDashboard = () => {
+const PER_PAGE = 20;
+
+export const useDashboard = (page: number = 1) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchDashboardStats = async (retryCount = 0): Promise<void> => {
+  const fetchDashboardStats = useCallback(async (pageNum: number, retryCount = 0): Promise<void> => {
     const maxRetries = 3;
-    const retryDelay = 500; // Start with 500ms delay
+    const retryDelay = 500;
 
     try {
       setLoading(true);
@@ -18,18 +21,71 @@ export const useDashboard = () => {
 
       const response = await apiClient.get<{
         success: boolean;
-        data: DashboardStats;
+        data: Record<string, unknown>;
         message?: string;
-      }>("/dashboard/stats");
+      }>("/dashboard/stats", {
+        params: { page: pageNum, limit: PER_PAGE },
+      });
 
       if (response.data.success) {
         const rawData = response.data.data as any;
         let statsData: DashboardStats;
 
-        // Handle snake_case to camelCase conversion if needed
-        if (rawData.recent_activity && !rawData.recentActivity) {
-          const mappedOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
+        // New backend API: { totalResumes, resumes[], page, limit, totalPages } + jobTitle per item
+        if (rawData.totalResumes !== undefined && Array.isArray(rawData.resumes)) {
+          const resumes = rawData.resumes as Array<{
+            // Prefer analysisId for view/resume actions when provided by backend
+            analysisId?: string | null;
+            resumeId: string;
+            jobTitle?: string | null;
+            atsScoreBefore: number | null;
+            atsScoreAfter: number | null;
+            optimizedFileUrl: string | null;
+          }>;
+          const totalResumes = rawData.totalResumes ?? resumes.length;
+          setTotalPages(Math.max(1, Number(rawData.totalPages) ?? 1));
+          const optimizationsCount = resumes.filter(
+            (r) => r.atsScoreAfter !== null && r.atsScoreAfter !== undefined
+          ).length;
+          const scores = resumes.flatMap((r) =>
+            [r.atsScoreBefore, r.atsScoreAfter].filter(
+              (s): s is number => s !== null && s !== undefined
+            )
+          );
+          const averageAtsScore =
+            scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
 
+          statsData = {
+            resumesAnalyzed: totalResumes,
+            averageAtsScore,
+            optimizations: optimizationsCount,
+            recentActivity: resumes.map((r) => {
+              const before = r.atsScoreBefore ?? 0;
+              const after = r.atsScoreAfter;
+              const improvement =
+                after !== null && after !== undefined ? after - before : null;
+              return {
+                // Use analysisId when available so dashboard “View”/“Resume Optimization”
+                // actions navigate by analysis instead of just resume.
+                id: r.analysisId || r.resumeId,
+                resumeId: r.resumeId,
+                jobId: r.resumeId,
+                jobTitle: (r.jobTitle && r.jobTitle.trim()) || `Resume #${r.resumeId.substring(0, 8)}`,
+                atsScoreBefore: before,
+                atsScoreAfter: after ?? null,
+                scoreImprovement: improvement,
+                status:
+                  after !== null && after !== undefined
+                    ? "optimization_completed"
+                    : "optimization_pending",
+                createdAt: new Date().toISOString(),
+                optimizedFileUrl: r.optimizedFileUrl ?? null,
+              };
+            }),
+          };
+        } else if (rawData.recent_activity && !rawData.recentActivity) {
+          // Legacy: snake_case recent_activity
+          const mappedOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
           statsData = {
             recentActivity: rawData.recent_activity.map((activity: any) => ({
               id: activity.id,
@@ -49,31 +105,24 @@ export const useDashboard = () => {
             resumesAnalyzed: rawData.resumes_analyzed ?? rawData.resumesAnalyzed ?? 0,
             optimizations: mappedOptimizations,
           };
+          const recentByResume = statsData.recentActivity.reduce((acc: Record<string, any>, activity: any) => {
+            const key = activity.resumeId || activity.id;
+            if (!acc[key]) acc[key] = activity;
+            else {
+              const existingTime = new Date(acc[key].createdAt).getTime();
+              const currentTime = new Date(activity.createdAt).getTime();
+              if (currentTime > existingTime) acc[key] = activity;
+            }
+            return acc;
+          }, {});
+          statsData.recentActivity = Object.values(recentByResume);
+          statsData.optimizations = statsData.recentActivity.filter(
+            (a) => a.atsScoreAfter != null
+          ).length;
         } else {
           const directOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
           statsData = rawData as DashboardStats;
           statsData.optimizations = directOptimizations;
-        }
-
-        // Count optimizations from the activity data
-        const optimizationsCount = statsData.recentActivity.filter(
-          (activity) => activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined
-        ).length;
-
-        // Override the optimizations count with our computed value
-        statsData.optimizations = optimizationsCount;
-
-        // Attempt to read the authoritative total optimizations from the profile stats
-        try {
-          const profileResp = await apiClient.get<{ success: boolean; data: any }>(
-            "/profile/stats"
-          );
-          if (profileResp.data?.success && profileResp.data.data?.totalOptimizations !== undefined) {
-            // Prefer profile's totalOptimizations as the authoritative value
-            statsData.optimizations = profileResp.data.data.totalOptimizations;
-          }
-        } catch (e) {
-          // ignore - fall back to computed value
         }
 
         setStats(statsData);
@@ -120,7 +169,7 @@ export const useDashboard = () => {
         // Wait before retrying (exponential backoff)
         const delay = retryDelay * Math.pow(2, retryCount);
         await new Promise((resolve) => setTimeout(resolve, delay));
-        return fetchDashboardStats(retryCount + 1);
+        return fetchDashboardStats(pageNum, retryCount + 1);
       }
 
       // Extract error message
@@ -141,21 +190,20 @@ export const useDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    // Add a small delay to ensure cookie is set after login
     const timer = setTimeout(() => {
-      fetchDashboardStats();
+      fetchDashboardStats(page);
     }, 100);
-
     return () => clearTimeout(timer);
-  }, []);
+  }, [page, fetchDashboardStats]);
 
   return {
     stats,
     loading,
     error,
-    refetch: () => fetchDashboardStats(0),
+    refetch: () => fetchDashboardStats(page, 0),
+    totalPages,
   };
 };
