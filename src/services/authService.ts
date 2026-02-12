@@ -29,6 +29,7 @@ export const authService = {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const firebaseToken = await result.user.getIdToken();
+      console.log("Firebase ID token:", firebaseToken);
 
       const response = await fetch(`${API_URL}/auth/firebase`, {
         method: "POST",

@@ -72,23 +72,7 @@ interface Activity {
   created_at: string;
 }
 
-interface AccountStats {
-  totalResumes: number;
-  totalAnalyses: number;
-  totalOptimizations: number;
-  averageScore: number;
-  accountAge: number;
-  lastLogin: string | null;
-  loginCount: number;
-}
-
-interface RecentAnalysis {
-  id: string;
-  ats_score_before: number;
-  ats_score_after: number | null;
-  job_title: string;
-  created_at: string;
-}
+import type { AccountStats, RecentAnalysis } from "@/types/profile/overview";
 
 interface Preferences {
   notifications: {
@@ -311,10 +295,10 @@ const Profile = () => {
     try {
       const response = await apiClient.get<{
         success: boolean;
-        data: { analyses: RecentAnalysis[] };
-      }>("/profile/analyses?limit=5");
+        data: { analyses: RecentAnalysis[]; count?: number };
+      }>("/profile/analyses", { params: { limit: 5 } });
       if (response.data.success) {
-        setRecentAnalyses(response.data.data.analyses || []);
+        setRecentAnalyses(response.data.data?.analyses ?? []);
       }
     } catch (err: any) {
       console.error("Failed to load recent analyses:", err);

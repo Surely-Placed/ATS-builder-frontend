@@ -1,4 +1,4 @@
-import { FileText, TrendingUp, Sparkles, Award } from "lucide-react";
+import { FileText, TrendingUp, Sparkles } from "lucide-react";
 import { StatCard } from "./StatCard";
 import type { AccountStats } from "@/types/profile/overview";
 
@@ -10,7 +10,7 @@ export const StatsGrid = ({ stats }: StatsGridProps) => {
   if (!stats) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <StatCard
         icon={FileText}
         label="Total Resumes"
@@ -31,13 +31,6 @@ export const StatsGrid = ({ stats }: StatsGridProps) => {
         value={stats.totalOptimizations}
         iconBgColor="bg-[#FEF3C7]"
         iconColor="text-[#F59E0B]"
-      />
-      <StatCard
-        icon={Award}
-        label="Avg Score"
-        value={Math.round(stats.averageScore)}
-        iconBgColor="bg-[#F3E8FF]"
-        iconColor="text-[#8B5CF6]"
       />
     </div>
   );

@@ -23,7 +23,10 @@ export function useAnalysisState() {
 
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
-  const [viewState, setViewStateInternal] = useState<ViewState>("form");
+  // When URL has analysisId, start on optimization view so page doesn’t load from top (form)
+  const [viewState, setViewStateInternal] = useState<ViewState>(() =>
+    urlAnalysisId ? "optimizing" : "form"
+  );
   // Guarded setter: prevent switching back to the analysis view when the user
   // is currently on the optimization route. This avoids race-condition flips
   // where other logic navigates or restores state and hides the comparison UI.
@@ -42,7 +45,7 @@ export function useAnalysisState() {
     // setViewState called
     setViewStateInternal(newState);
   };
-  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(() => urlAnalysisId);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysisProgress, setShowAnalysisProgress] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
@@ -78,11 +81,9 @@ export function useAnalysisState() {
             if (hasOptimization) {
               setViewState("preview");
             } else {
-              // If the user is currently on the optimization or preview page, prefer keeping them
-              // in an optimizing state instead of flipping back to the analysis view.
-              const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-              const onOptimizationRoute = pathname.includes('/resume-optimization') || pathname.includes('/resume-preview');
-              setViewState(onOptimizationRoute ? 'optimizing' : 'analysis');
+              // No optimization yet → always show optimizing so startOptimization() is called
+              // (fixes /resume-analysis?analysisId=... not hitting optimize API)
+              setViewState("optimizing");
             }
 
             // Reset analyzing states since analysis is complete

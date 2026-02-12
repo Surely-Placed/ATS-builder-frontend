@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { AnalysisService } from "@/features/analysis/services/analysisService";
 import { DownloadService } from "@/features/analysis/services/downloadService";
 import { useToast } from "@/hooks/use-toast";
+import { useDashboardActions } from "@/features/dashboard/hooks/useDashboardActions";
 
 interface RecentActivityCardProps {
   activity: RecentActivity;
@@ -16,6 +17,7 @@ interface RecentActivityCardProps {
 export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { handleContinueOrOptimize } = useDashboardActions();
   const [isDownloading, setIsDownloading] = useState(false);
 
   const getStatusVariant = (
@@ -52,32 +54,36 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
     navigate(`/resume-comparison?analysisId=${activity.id}`);
   };
 
+  const handleContinue = () => {
+    handleContinueOrOptimize({ analysisId: activity.id, status: activity.status });
+  };
+
   const handleDownload = async () => {
     if (isDownloading) return;
-    
+
     setIsDownloading(true);
     try {
-      // Fetch fresh analysis data to get the URL (same as ResumeComparison)
-      const result = await AnalysisService.getAnalysis(activity.id);
+      // New backend API may send optimizedFileUrl on activity; use it when present
+      let pdfUrl = activity.optimizedFileUrl ?? null;
 
-      let pdfUrl = 
-        result?.optimized_resume?.file_url || 
-        result?.optimized_resume?.url || 
-        result?.optimized_resume?.pdf_url ||
-        result?.analysis?.optimized_file_url ||
-        null;
-
-      // Fallback: generate PDF if URL is missing
       if (!pdfUrl) {
-         try {
-            const { default: AnalysisApiService } = await import('@/services/analysisApi');
-            const genResponse = await AnalysisApiService.generatePDF(activity.id);
-            if (genResponse.success && genResponse.file_url) {
-                pdfUrl = genResponse.file_url;
-            }
-         } catch (genErr) {
-             console.error("Failed to generate PDF on demand:", genErr);
-         }
+        const result = await AnalysisService.getAnalysis(activity.id);
+        pdfUrl =
+          result?.optimized_resume?.file_url ||
+          result?.optimized_resume?.url ||
+          result?.optimized_resume?.pdf_url ||
+          result?.analysis?.optimized_file_url ||
+          null;
+      }
+
+      if (!pdfUrl) {
+        try {
+          const { default: AnalysisApiService } = await import('@/services/analysisApi');
+          const genResponse = await AnalysisApiService.generatePDF(activity.id);
+          if (genResponse.success && genResponse.file_url) pdfUrl = genResponse.file_url;
+        } catch (genErr) {
+          console.error("Failed to generate PDF on demand:", genErr);
+        }
       }
 
       if (!pdfUrl) {
@@ -85,7 +91,7 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
       }
 
       DownloadService.downloadResume(pdfUrl, "optimized-resume.pdf", activity.id);
-      
+
       toast({
         title: "Download Started",
         description: "Your optimized resume is downloading.",
@@ -103,9 +109,12 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
   };
 
   // Check if optimization is successful/completed to show actions
-  const isCompleted = 
-    activity.status.toLowerCase().includes('complete') || 
+  const isCompleted =
+    activity.status.toLowerCase().includes('complete') ||
     (activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined);
+
+  // Show "Continue" for any row with analysis id that is not yet completed
+  const showContinue = !isCompleted && activity.id;
 
   return (
     <Card className="transition-all duration-200 hover:shadow-md">
@@ -157,21 +166,21 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
               <span>{formatDate(activity.createdAt)}</span>
             </div>
 
-            {isCompleted && (
+            {isCompleted ? (
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   onClick={handleView}
                   title="View Comparison"
                 >
                   <Eye className="w-4 h-4" />
                 </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   onClick={handleDownload}
                   disabled={isDownloading}
@@ -184,7 +193,15 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
                   )}
                 </Button>
               </div>
-            )}
+            ) : showContinue ? (
+              <Button
+                size="sm"
+                disabled={!activity.id}
+                onClick={handleContinue}
+              >
+                Continue
+              </Button>
+            ) : null}
           </div>
         </div>
       </CardContent>

@@ -71,6 +71,50 @@ export const ResumeAnalysisFormView: React.FC<ResumeAnalysisFormViewProps> = ({
     jobDescription.trim().length >= 50;
   const hasData = !!uploadedFile || !!jobTitle || !!jobDescription;
 
+  // When optimizing (from URL or normal flow): show only optimization card, form hidden
+  const showOnlyOptimization = isOptimizing && !!analysisId;
+
+  if (showOnlyOptimization) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            Resume Optimization
+          </CardTitle>
+          <CardDescription>
+            Optimizing your resume for better ATS match
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <ProgressTracker
+            type="optimization"
+            optimizationParams={{
+              analysisId,
+              progress: optimizationProgress,
+              status: mapOptimizationStatus(optimizationStatus),
+              error: optimizationError,
+            }}
+            onComplete={onOptimizationComplete || onAnalysisComplete}
+            onError={onAnalysisError}
+          />
+          <AnalysisActions
+            canStartAnalysis={false}
+            isAnalyzing={false}
+            isOptimizing={isOptimizing}
+            hasAnalysisId={true}
+            optimizationStatus={optimizationStatus}
+            isUploading={false}
+            analysisError={analysisError}
+            hasData={true}
+            onStartAnalysis={onStartAnalysis}
+            onReset={onReset}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

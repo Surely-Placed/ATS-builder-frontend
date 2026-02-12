@@ -7,32 +7,56 @@ import { useResumeFilters } from "@/features/resume/hooks/useResumeFilters";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
+const VALID_FILTERS: FilterType[] = ["all", "not_completed", "optimized"];
+const parseFilter = (v: string | null): FilterType =>
+  v && VALID_FILTERS.includes(v as FilterType) ? (v as FilterType) : "all";
+
 const Documents = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeFilter, setActiveFilter] = useState<FilterType>(
+    () => parseFilter(searchParams.get("filter"))
+  );
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
   const { counts, resumes, loading, error, refetch, refetchCounts } =
     useResumeFilters(activeFilter);
-    
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    const p = searchParams.get("page");
+    const n = p ? parseInt(p, 10) : 1;
+    return Number.isFinite(n) && n >= 1 ? n : 1;
+  });
   const itemsPerPage = 10;
-  
-  // Reset page when filter or search changes
+
+  // Sync filter and page to URL so refresh keeps state
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    next.set("filter", activeFilter);
+    if (currentPage > 1) next.set("page", String(currentPage));
+    else next.delete("page");
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [activeFilter, currentPage, searchParams]);
+
+  // Restore filter/page from URL on back/forward
+  useEffect(() => {
+    const filter = parseFilter(searchParams.get("filter"));
+    const p = searchParams.get("page");
+    const pageNum = p && Number.isFinite(parseInt(p, 10)) ? Math.max(1, parseInt(p, 10)) : 1;
+    setActiveFilter((prev) => (prev !== filter ? filter : prev));
+    setCurrentPage((prev) => (prev !== pageNum ? pageNum : prev));
+  }, [searchParams]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [activeFilter, searchQuery]);
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-
     const nextParams = new URLSearchParams(searchParams);
-    if (value) {
-      nextParams.set("q", value);
-    } else {
-      nextParams.delete("q");
-    }
+    if (value) nextParams.set("q", value);
+    else nextParams.delete("q");
     setSearchParams(nextParams, { replace: true });
   };
 
@@ -91,7 +115,10 @@ const Documents = () => {
             </div>
             <ResumeFilters
               activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
+              onFilterChange={(filter) => {
+                setActiveFilter(filter);
+                setCurrentPage(1);
+              }}
               counts={counts}
             />
           </div>
