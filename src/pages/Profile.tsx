@@ -12,15 +12,12 @@ import ProfileLayout from "@/components/layouts/ProfileLayout";
 import ProfileSubscription from "@/features/profile/components/ProfileSubscription";
 
 // Components
-import { OverviewTab } from "@/features/profile/components/OverviewTab";
 import { ProfileTab } from "@/features/profile/components/ProfileTab";
-import { ResumeTab } from "@/features/profile/components/ResumeTab";
+import { ProfileResumeDetailsForm } from "@/features/profile/components/ProfileResumeDetailsForm";
 import { SubscriptionTab } from "@/features/profile/components/SubscriptionTab";
 import { PurchasesTab } from "@/features/profile/components/PurchasesTab";
-import { ActivityTab } from "@/features/profile/components/ActivityTab";
 import { SettingsTab } from "@/features/profile/components/SettingsTab";
 import { ApiKeysTab } from "@/features/profile/components/ApiKeysTab";
-
 // Types
 interface Profile {
   id: string;
@@ -46,12 +43,7 @@ interface Subscription {
   daysRemaining: number | null;
 }
 
-interface Resume {
-  id: string;
-  original_file_url: string;
-  optimized_file_url: string | null;
-  created_at: string;
-}
+// Legacy file-based profile resume upload has been removed. ATS  uses structured resume details.
 
 interface Transaction {
   id: string;
@@ -61,32 +53,6 @@ interface Transaction {
   currency: string;
   status: string;
   description: string | null;
-  created_at: string;
-}
-
-interface Activity {
-  id: string;
-  activity_type: string;
-  entity_type: string | null;
-  description: string | null;
-  created_at: string;
-}
-
-interface AccountStats {
-  totalResumes: number;
-  totalAnalyses: number;
-  totalOptimizations: number;
-  averageScore: number;
-  accountAge: number;
-  lastLogin: string | null;
-  loginCount: number;
-}
-
-interface RecentAnalysis {
-  id: string;
-  ats_score_before: number;
-  ats_score_after: number | null;
-  job_title: string;
   created_at: string;
 }
 
@@ -119,10 +85,10 @@ const Profile = () => {
   const getActiveTabFromPath = () => {
     const path = location.pathname;
     if (path === "/profile" || path === "/profile/") {
-      return "overview";
+      return "profile";
     }
     const section = path.split("/profile/")[1];
-    return section || "overview";
+    return section || "profile";
   };
 
   const activeTab = getActiveTabFromPath();
@@ -130,17 +96,13 @@ const Profile = () => {
   // Get section heading based on active tab
   const getSectionHeading = () => {
     const headings: Record<string, { title: string; subtitle: string }> = {
-      overview: {
-        title: "Overview",
-        subtitle: "View your account statistics and recent activity",
-      },
       profile: {
         title: "Profile Information",
         subtitle: "Manage your personal information and account details",
       },
       resume: {
         title: "Profile Resume",
-        subtitle: "Upload and manage your profile resume",
+        subtitle: "Manage your ATS  resume details",
       },
       subscription: {
         title: "Subscription",
@@ -171,10 +133,10 @@ const Profile = () => {
     );
   };
 
-  // Redirect to /profile/overview if just /profile
+  // Redirect to /profile/profile if just /profile
   useEffect(() => {
     if (location.pathname === "/profile" || location.pathname === "/profile/") {
-      navigate("/profile/overview", { replace: true });
+      navigate("/profile/profile", { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
@@ -184,11 +146,7 @@ const Profile = () => {
   };
   const [profile, setProfile] = useState<Profile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [profileResume, setProfileResume] = useState<Resume | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [stats, setStats] = useState<AccountStats | null>(null);
-  const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]);
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -251,22 +209,6 @@ const Profile = () => {
     }
   };
 
-  const fetchProfileResume = async () => {
-    try {
-      const response = await apiClient.get<{ success: boolean; data: { resume: Resume } }>(
-        "/profile/resume"
-      );
-      if (response.data.success && response.data.data?.resume) {
-        setProfileResume(response.data.data.resume);
-      } else {
-        setProfileResume(null);
-      }
-    } catch (err: any) {
-      setProfileResume(null);
-      console.error("Failed to load profile resume:", err);
-    }
-  };
-
   const fetchPurchaseHistory = async () => {
     try {
       const response = await apiClient.get<{
@@ -278,46 +220,6 @@ const Profile = () => {
       }
     } catch (err: any) {
       console.error("Failed to load purchase history:", err);
-    }
-  };
-
-  const fetchActivityHistory = async () => {
-    try {
-      const response = await apiClient.get<{ success: boolean; data: { activities: Activity[] } }>(
-        "/profile/activity"
-      );
-      if (response.data.success) {
-        setActivities(response.data.data.activities || []);
-      }
-    } catch (err: any) {
-      console.error("Failed to load activity history:", err);
-    }
-  };
-
-  const fetchAccountStats = async () => {
-    try {
-      const response = await apiClient.get<{ success: boolean; data: AccountStats }>(
-        "/profile/stats"
-      );
-      if (response.data.success) {
-        setStats(response.data.data);
-      }
-    } catch (err: any) {
-      console.error("Failed to load account stats:", err);
-    }
-  };
-
-  const fetchRecentAnalyses = async () => {
-    try {
-      const response = await apiClient.get<{
-        success: boolean;
-        data: { analyses: RecentAnalysis[] };
-      }>("/profile/analyses?limit=5");
-      if (response.data.success) {
-        setRecentAnalyses(response.data.data.analyses || []);
-      }
-    } catch (err: any) {
-      console.error("Failed to load recent analyses:", err);
     }
   };
 
@@ -338,14 +240,8 @@ const Profile = () => {
   useEffect(() => {
     fetchProfile();
     fetchSubscription();
-    fetchProfileResume();
 
     if (activeTab === "purchases") fetchPurchaseHistory();
-    if (activeTab === "activity") fetchActivityHistory();
-    if (activeTab === "overview") {
-      fetchAccountStats();
-      fetchRecentAnalyses();
-    }
     if (activeTab === "settings") fetchPreferences();
   }, [activeTab]);
 
@@ -393,134 +289,7 @@ const Profile = () => {
     }
   };
 
-  // File upload handler
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/msword",
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      const errorMessage = "Only PDF and DOCX files are allowed";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      const errorMessage = "File size must be less than 5MB";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    await handleUploadProfileResume(file);
-  };
-
-  const handleUploadProfileResume = async (file: File) => {
-    try {
-      setUploading(true);
-      setError(null);
-      setSuccess(null);
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await apiClient.post<{ success: boolean; data: Resume | { resume: Resume } }>(
-        "/profile/resume/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.data.success) {
-        // Handle different response formats from backend
-        let resume: Resume | null = null;
-        
-        // Check if data is directly a Resume object
-        if (response.data.data && 'id' in response.data.data && 'original_file_url' in response.data.data) {
-          resume = response.data.data as Resume;
-        }
-        // Check if data is wrapped in a resume property
-        else if (response.data.data && 'resume' in response.data.data) {
-          resume = (response.data.data as { resume: Resume }).resume;
-        }
-
-        if (!resume || !resume.id) {
-          console.error("Upload response data:", response.data);
-          throw new Error("Upload succeeded but resume data was not returned in expected format");
-        }
-
-        setProfileResume(resume);
-        toast({
-          title: "Success",
-          description: "Profile resume uploaded successfully!",
-        });
-        fetchProfile();
-
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      } else {
-        throw new Error("Failed to upload profile resume");
-      }
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || err.message || "Failed to upload profile resume";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleRemoveProfileResume = async () => {
-    try {
-      setError(null);
-      setSuccess(null);
-
-      const response = await apiClient.delete<{ success: boolean; message?: string }>(
-        "/profile/resume"
-      );
-
-      if (response.data.success) {
-        toast({
-          title: "Success",
-          description: "Resume removed from profile",
-        });
-        setProfileResume(null);
-        fetchProfile();
-      } else {
-        throw new Error(response.data.message || "Failed to remove resume");
-      }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to remove resume";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
-  };
+  // Legacy profile resume upload handlers removed – ATS  relies on resume details instead.
 
   const handleCancelSubscription = async () => {
     if (!window.confirm("Are you sure you want to cancel your subscription?")) {
@@ -656,35 +425,17 @@ const Profile = () => {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none", paddingRight: "0" }}
         >
           <div className="py-4 pl-4 sm:pl-6 lg:pl-8 pr-4">
-            {activeTab === "overview" && (
-              <OverviewTab
-                stats={stats}
-                recentAnalyses={recentAnalyses}
-                subscription={subscription}
-              />
-            )}
-
             {activeTab === "profile" && (
               <ProfileTab profile={profile} onUpdate={handleUpdateProfile} />
             )}
 
-            {activeTab === "resume" && (
-              <ResumeTab
-                profileResume={profileResume}
-                uploading={uploading}
-                onFileSelect={handleFileSelect}
-                onRemove={handleRemoveProfileResume}
-                fileInputRef={fileInputRef}
-              />
-            )}
+            {activeTab === "resume" && <ProfileResumeDetailsForm />}
 
             {activeTab === "subscription" && (
               <ProfileSubscription />
             )}
 
             {activeTab === "purchases" && <PurchasesTab transactions={transactions} />}
-
-            {activeTab === "activity" && <ActivityTab activities={activities} />}
 
             {activeTab === "settings" && (
               <SettingsTab preferences={preferences} onUpdate={handleUpdatePreferences} />

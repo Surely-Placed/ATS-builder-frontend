@@ -28,8 +28,10 @@ export const Logo = ({ className = "", showText = true, size = "md" }: LogoProps
     lg: "text-lg sm:text-xl lg:text-2xl",
   };
 
-  // Use dark logo in dark mode, regular logo in light mode
-  const logoSrc = mounted && resolvedTheme === "dark" ? "/rabbit-dark.svg" : "/rabbit.svg";
+  // Use a single logo asset in all themes for now to avoid
+  // mismatches between light/dark SVG exports.
+  const baseUrl = import.meta.env.BASE_URL ?? "/";
+  const logoSrc = baseUrl + "rabbit-dark.svg";
 
   return (
     <Link to="/" className={`flex items-center group min-w-0 ${className}`}>

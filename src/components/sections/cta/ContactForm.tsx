@@ -75,7 +75,7 @@ export function ContactForm({ form }: ContactFormProps) {
       >
         <div className="space-y-2">
           <label htmlFor="phone" className="block text-sm font-semibold text-foreground">
-            Phone (optional)
+            Phone
           </label>
           <div className="relative group">
             <Input
@@ -94,7 +94,7 @@ export function ContactForm({ form }: ContactFormProps) {
 
         <div className="space-y-2">
           <label htmlFor="company" className="block text-sm font-semibold text-foreground">
-            Company (optional)
+            Company
           </label>
           <div className="relative group">
             <Input

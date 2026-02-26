@@ -37,16 +37,25 @@ const VerifyEmail = lazyWithRetry(() => import("./pages/VerifyEmail"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const SubscriptionSuccess = lazyWithRetry(() => import("./pages/SubscriptionSuccess"));
 const SubscriptionCancel = lazyWithRetry(() => import("./pages/SubscriptionCancel"));
-const Documents = lazyWithRetry(() => import("./pages/Documents"));
+const Resume = lazyWithRetry(() => import("./pages/Resume"));
 const ResumeAnalysis = lazyWithRetry(() => import("./pages/ResumeAnalysis"));
-const ResumeOptimization = lazyWithRetry(() => import("./pages/ResumeOptimization"));
-const ResumePreview = lazyWithRetry(() => import("./pages/ResumePreview"));
-const ResumeComparison = lazyWithRetry(() => import("./pages/ResumeComparison"));
+const ResumeResult = lazyWithRetry(() => import("./pages/ResumeResult"));
+const ViewAnalysis = lazyWithRetry(() => import("./pages/ViewAnalysis"));
 const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
 const CookiePolicy = lazyWithRetry(() => import("./pages/CookiePolicy"));
 const Disclaimer = lazyWithRetry(() => import("./pages/Disclaimer"));
+const Meeting = lazyWithRetry(() => import("./pages/Meeting"));
+const MeetingCancel = lazyWithRetry(() => import("./pages/MeetingCancel"));
+const InterviewPacketsDashboard = lazyWithRetry(() => import("./pages/InterviewPacketsDashboard"));
+const InterviewPacketBuyPage = lazyWithRetry(() => import("./pages/InterviewPacketBuyPage"));
+const InterviewPacketDetailPage = lazyWithRetry(
+  () => import("./pages/InterviewPacketDetailPage")
+);
+const InterviewFollowUpPage = lazyWithRetry(
+  () => import("./pages/InterviewFollowUpPage")
+);
 
 // Loading component
 const PageLoader = () => (
@@ -117,21 +126,37 @@ const App = () => (
                       <Route path="/signup" element={<Index />} />
                       <Route path="/verify-email" element={<VerifyEmail />} />
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/documents" element={<Documents />} />
+                      <Route path="/resume" element={<Resume />} />
                       <Route path="/resume-analysis" element={<ResumeAnalysis />} />
-                      <Route path="/resume-optimization" element={<ResumeOptimization />} />
+                      <Route path="/resume-result" element={<ResumeResult />} />
+                      <Route path="/analysis/:id" element={<ViewAnalysis />} />
                       <Route path="/subscription/success" element={<SubscriptionSuccess />} />
                       <Route path="/subscription/cancel" element={<SubscriptionCancel />} />
                       {/* Legacy/alternate billing callback URLs (payment provider redirects) */}
                       <Route path="/billing/success" element={<SubscriptionSuccess />} />
                       <Route path="/billing/cancel" element={<SubscriptionCancel />} />
-                      <Route path="/resume-preview/:analysisId" element={<ResumePreview />} />
-                      <Route path="/resume-comparison" element={<ResumeComparison />} />
+                      {/* Interview Packet one-time purchase callbacks */}
+                      <Route path="/interview-packet/success" element={<SubscriptionSuccess />} />
+                      <Route path="/interview-packet/cancel" element={<SubscriptionCancel />} />
+                      {/* Legacy/alternate interview packet callback URLs (payment provider redirects) */}
+                      <Route path="/interview-packets/success" element={<SubscriptionSuccess />} />
+                      <Route path="/interview-packets/cancel" element={<SubscriptionCancel />} />
                       <Route path="/profile/*" element={<Profile />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/terms-of-service" element={<TermsOfService />} />
                       <Route path="/cookie-policy" element={<CookiePolicy />} />
                       <Route path="/disclaimer" element={<Disclaimer />} />
+                      <Route path="/interview-packet" element={<InterviewPacketsDashboard />} />
+                      <Route path="/interview-packet/:id" element={<InterviewPacketDetailPage />} />
+                      <Route path="/interview-packet/buy" element={<InterviewPacketBuyPage />} />
+                      <Route path="/interview-packet/follow-up" element={<InterviewFollowUpPage />} />
+                      <Route path="/meeting" element={<Meeting />} />
+                      <Route path="/meeting/success" element={<SubscriptionSuccess />} />
+                      <Route path="/meeting/cancel" element={<MeetingCancel />} />
+                      {/* /meetings (no trailing path): Stripe success URL may redirect here with ?session_id=... */}
+                      <Route path="/meetings" element={<Meeting />} />
+                      <Route path="/meetings/success" element={<SubscriptionSuccess />} />
+                      <Route path="/meetings/cancel" element={<MeetingCancel />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

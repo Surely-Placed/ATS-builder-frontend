@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import { trackResumeUpload, trackResumeDelete, trackConversion } from "@/utils/analytics";
 import { navigate } from "@/utils/navigation";
 import { API_BASE_URL } from "@/config/api";
+import { authService } from "@/services/authService";
 
 // Create axios instance with cookie-based authentication
 const apiClient = axios.create({
@@ -22,11 +23,23 @@ apiClient.interceptors.response.use(
     } catch (e) { }
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     if (!error.response) return Promise.reject(error);
     if (error.response?.status === 401) {
-      // For cookie-based auth, just redirect to login on 401
-      navigate("/", { replace: true });
+      // Allow guests on the meeting page to complete booking (verify-session, book) without redirecting to login
+      const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+      if (pathname === "/meeting" || pathname.startsWith("/meeting/") || pathname === "/meetings" || pathname.startsWith("/meetings/")) {
+        return Promise.reject(error);
+      }
+      // Session expired or unauthorized:
+      // 1) Sign the user out (Firebase + backend cookie)
+      // 2) Redirect to /login so the landing page opens the login modal
+      try {
+        await authService.logout();
+      } catch {
+        // Ignore logout errors; we'll still force re-auth
+      }
+      navigate("/login", { replace: true });
     }
     if (error.response?.status === 403) {
       const data = error.response.data as any;

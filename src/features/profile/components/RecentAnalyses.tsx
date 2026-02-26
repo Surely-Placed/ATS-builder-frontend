@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
 import { formatDateOverview } from "@/utils/profile/dateUtils";
 import type { RecentAnalysis } from "@/types/profile/overview";
 
@@ -39,26 +38,13 @@ export const RecentAnalyses = ({ analyses, activeFilter, onFilterChange }: Recen
             {analyses.map((analysis) => (
               <div
                 key={analysis.id}
-                className="flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer"
+                className="flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-lg transition-colors"
               >
                 <div className="flex-1">
                   <p className="font-medium text-foreground mb-1">{analysis.job_title}</p>
                   <p className="text-sm text-muted-foreground">
                     {formatDateOverview(analysis.created_at)}
                   </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold text-muted-foreground">
-                    {analysis.ats_score_before}
-                  </span>
-                  {analysis.ats_score_after && (
-                    <>
-                      <ArrowRight className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                        {analysis.ats_score_after}
-                      </span>
-                    </>
-                  )}
                 </div>
               </div>
             ))}

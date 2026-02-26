@@ -1,11 +1,9 @@
 import { useState } from "react";
 import {
-  BarChart3,
   User,
   FileText,
   CreditCard,
   ShoppingCart,
-  Activity,
   Settings,
   Menu,
   KeyRound,
@@ -28,7 +26,6 @@ interface ProfileSidebarProps {
 }
 
 const tabs: Tab[] = [
-  { id: "overview", label: "Overview", icon: <BarChart3 className="w-5 h-5" />, section: "MENU" },
   { id: "profile", label: "Profile", icon: <User className="w-5 h-5" />, section: "MENU" },
   { id: "resume", label: "Resume", icon: <FileText className="w-5 h-5" />, section: "MENU" },
   {
@@ -43,7 +40,6 @@ const tabs: Tab[] = [
     icon: <ShoppingCart className="w-5 h-5" />,
     section: "MENU",
   },
-  { id: "activity", label: "Activity", icon: <Activity className="w-5 h-5" />, section: "MENU" },
   { id: "settings", label: "Settings", icon: <Settings className="w-5 h-5" />, section: "GENERAL" },
   { id: "api-keys", label: "API Keys", icon: <KeyRound className="w-5 h-5" />, section: "GENERAL" },
 ];
@@ -59,10 +55,10 @@ export const ProfileSidebar = ({ activeTab, onTabChange }: ProfileSidebarProps) 
   const getActiveTabFromPath = () => {
     const path = location.pathname;
     if (path === "/profile" || path === "/profile/") {
-      return "overview";
+      return "profile";
     }
     const section = path.split("/profile/")[1];
-    return section || "overview";
+    return section || "profile";
   };
 
   const currentActiveTab = getActiveTabFromPath();

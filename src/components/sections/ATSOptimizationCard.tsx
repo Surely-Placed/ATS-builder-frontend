@@ -18,31 +18,30 @@ export const ATSOptimizationCard = ({ variants }: ATSOptimizationCardProps) => {
             <h3 className="font-semibold text-lg">ATS Optimization</h3>
           </div>
           <p className="text-sm text-muted-foreground mb-6">
-            Paste your job description, title, upload your resume, and let our AI do the rest. We
-            automatically tailor your resume to match the job requirements with ATS-friendly
-            formatting.
+            Set your resume details in your profile once, then paste any job. Our AI tailors your
+            summary, experience, and skills to the role and gives you an optimized PDF.
           </p>
           <div className="space-y-4 flex-1">
             {[
               {
                 step: "1",
-                title: "Paste Job Description",
-                desc: "Paste the job description and we extract all key requirements, skills, and keywords from the job posting.",
+                title: "Profile Resume Details",
+                desc: "Add experience, skills, projects, and education in your profile. No file upload—structured data only.",
               },
               {
                 step: "2",
-                title: "Analyze Your Resume",
-                desc: "Our AI scans your uploaded resume for compatibility issues, missing keywords, and formatting errors.",
+                title: "Paste Job Title & Description",
+                desc: "Paste the full job posting. We use it to tailor your content and check ATS fit.",
               },
               {
                 step: "3",
-                title: "Auto-Update PDF",
-                desc: "Automatically applies ATS-friendly fixes, optimizes formatting, and enhances content to match the job description.",
+                title: "AI Improves Your Content",
+                desc: "Get an improved summary, experience bullets, and skills aligned to the job. ATS-friendly structure.",
               },
               {
                 step: "4",
-                title: "Download & Apply",
-                desc: "Get your perfectly optimized, ATS-friendly resume ready to submit. No manual editing required.",
+                title: "PDF Optimization",
+                desc: "Generate your optimized resume PDF before you apply. Download and go.",
               },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-3">

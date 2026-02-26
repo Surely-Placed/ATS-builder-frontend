@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Zap, Target, TrendingUp, Users, Sparkles } from "lucide-react";
+import { Zap, Target, TrendingUp, Users, Sparkles, Video, Briefcase } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpotlightHeading } from "@/components/ui/spotlight-heading";
@@ -82,7 +83,7 @@ const FeaturesSection = () => {
             </h2>
           </SpotlightHeading>
           <p className="text-muted-foreground text-lg">
-            Everything you need to create an ATS-optimized resume that gets you interviews.
+            Profile-based resume builder. Paste any job, get a tailored resume without any file uploads.
           </p>
         </motion.div>
 
@@ -97,44 +98,28 @@ const FeaturesSection = () => {
 
           <FeatureCard
             icon={Zap}
-            title="Instant Results"
-            description="Get your optimized resume in seconds, not hours."
+            title="No File Upload"
+            description="Use structured resume details in your profile—experience, skills, projects. One setup, every job."
             variants={itemVariants}
           >
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold">10-20s</span>
-              <span className="text-sm text-muted-foreground">average time</span>
+              <span className="text-2xl font-bold">Profile-based</span>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">Edit once, apply everywhere</p>
           </FeatureCard>
 
           <FeatureCard
             icon={Target}
-            title="Success Rate"
-            description="Of resumes pass ATS screening"
-            variants={itemVariants}
-          >
-            <Badge className="mb-3" variant="outline">
-              Success Rate
-            </Badge>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-bold">95%</span>
-              <span className="text-sm text-muted-foreground">Pass Rate</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Of resumes pass ATS screening</p>
-          </FeatureCard>
-
-          <FeatureCard
-            icon={Target}
-            title="Smart Analysis"
-            description="AI analyzes every section for maximum impact and relevance."
+            title="Job-Tailored Content"
+            description="AI improves your summary, experience, and skills for each role you target."
             variants={itemVariants}
           >
             <div className="flex gap-2 flex-wrap">
               <Badge variant="outline" className="text-xs">
-                Keywords
+                Summary
               </Badge>
               <Badge variant="outline" className="text-xs">
-                Formatting
+                Experience
               </Badge>
               <Badge variant="outline" className="text-xs">
                 Skills
@@ -143,41 +128,49 @@ const FeaturesSection = () => {
           </FeatureCard>
 
           <FeatureCard
-            icon={TrendingUp}
-            title="Interview Boost"
-            description="Increase your interview chances by 3x with our optimization."
+            icon={Users}
+            title="Built for Every Application"
+            description="Paste any job from any board. Get a tailored resume and score for each role."
             variants={itemVariants}
           >
-            {/* <Button size="sm" className="w-full">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Get Started
-            </Button> */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold">One profile</span>
+              <span className="text-xs text-muted-foreground">· many jobs · many PDFs</span>
+            </div>
           </FeatureCard>
 
-          <motion.div variants={itemVariants} className="md:col-span-2">
-            <FeatureCard
-              icon={Users}
-              title="Trusted by Professionals"
-              description="Join thousands of job seekers who've landed their dream jobs."
-              variants={undefined}
-              className="h-full"
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {/* {[1, 2, 3, 4].map((i) => (
-                    <img
-                      key={i}
-                      src={`https://images.unsplash.com/photo-${1472099645785 + i}?w=40&h=40&fit=crop`}
-                      alt="User"
-                      className="w-8 h-8 rounded-full border-2 border-background"
-                    />
-                  ))} */}
-                </div>
-                <span className="text-sm font-semibold">10,000+</span>
-                <span className="text-xs text-muted-foreground">users</span>
-              </div>
-            </FeatureCard>
-          </motion.div>
+          <FeatureCard
+            icon={Sparkles}
+            title="Optimized PDF"
+            description="Generate a clean, ATS-friendly resume PDF in seconds. Download and submit."
+            variants={itemVariants}
+          />
+
+          <FeatureCard
+            icon={Video}
+            title="1:1 Resume Call"
+            description="Book a 30-minute video call with an engineer. Get resume feedback, ATS tips, and a Google Meet link after payment. Open to everyone—guest or logged in."
+            variants={itemVariants}
+          >
+            <Link to="/meeting">
+              <Button variant="outline" size="sm" className="mt-2">
+                Book a call
+              </Button>
+            </Link>
+          </FeatureCard>
+
+          <FeatureCard
+            icon={Briefcase}
+            title="Interview Packet"
+            description="Paste a job description and get a full interview packet: rounds, behavioral and coding questions, Get answers based on amazon leadership principles, and AI follow-ups. One-time purchase, practice at your pace."
+            variants={itemVariants}
+          >
+            <Link to="/interview-packet/buy">
+              <Button variant="outline" size="sm" className="mt-2">
+                Get your packet
+              </Button>
+            </Link>
+          </FeatureCard>
         </motion.div>
       </div>
     </section>
