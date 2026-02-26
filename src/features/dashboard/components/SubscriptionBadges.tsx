@@ -81,8 +81,8 @@ export default function SubscriptionBadges() {
   };
 
   return (
-    <div className="mt-3">
-      <div className="inline-flex items-center gap-3 rounded-md px-2 py-1 bg-muted/30 border border-border">
+    <div>
+      <div className="inline-flex items-center gap-3 rounded-md px-2 py-1.5 bg-muted/30 border border-border h-9 box-border items-center">
         <div className="flex items-center">{renderIcon()}</div>
         <div className="flex flex-col">
           <span className="text-xs text-muted-foreground">{status?.plan === 'free' ? 'Free-trial' : status?.plan?.charAt(0).toUpperCase() + status?.plan?.slice(1)}</span>

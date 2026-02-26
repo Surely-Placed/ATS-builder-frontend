@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Menu, Sparkles, FolderOpen, LayoutDashboard } from "lucide-react";
+import { Menu, Sparkles, LayoutDashboard, FileText, Briefcase } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { HeaderActions } from "@/components/shared/HeaderActions";
@@ -33,13 +33,14 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
 
   const tabs = [
     { id: "Dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { id: "Documents", label: "Documents", path: "/documents", icon: FolderOpen },
+    { id: "Resume", label: "Resume", path: "/resume", icon: FileText },
     {
       id: "Resume Optimization",
       label: "Resume Optimization",
       path: "/resume-analysis",
       icon: Sparkles,
     },
+    { id: "Interview Packets", label: "Interview Packets", path: "/interview-packet", icon: Briefcase },
   ];
 
   const handleTabClick = (path: string) => {

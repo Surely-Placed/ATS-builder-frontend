@@ -35,7 +35,7 @@ const Index = () => {
         <title>Jobrabbit - AI-Powered ATS Resume Builder & Optimizer</title>
         <meta
           name="description"
-          content="Upload your resume, let AI fix ATS compatibility issues, and download a perfectly optimized PDF. No manual editing required. Get more interviews with Jobrabbit."
+          content="Set your resume details once, paste any job, and let AI generate an ATS-optimized resume PDF . No manual editing required."
         />
         <meta
           name="keywords"
@@ -52,7 +52,7 @@ const Index = () => {
               regular: "Transform your resume with ",
               gradient: "AI-powered ATS optimization",
             }}
-            description="Upload your resume and let our AI fix compatibility issues, optimize for ATS systems, and boost your interview chances. Get a perfectly formatted PDF in seconds."
+            description="Set your resume details in your profile, paste a job description, and let our AI optimize your summary, experience, and skills. Generate a polished ATS-friendly PDF and see your ATS score in seconds."
             ctaText="Start Optimizing"
             ctaHref="#"
             bottomImage={{

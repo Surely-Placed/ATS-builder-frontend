@@ -27,8 +27,8 @@ export const StatsGrid = ({ stats }: StatsGridProps) => {
       />
       <StatCard
         icon={Sparkles}
-        label="Optimizations"
-        value={stats.totalOptimizations}
+        label="ATS  Analyses"
+        value={stats.totalAnalyses ?? 0}
         iconBgColor="bg-[#FEF3C7]"
         iconColor="text-[#F59E0B]"
       />

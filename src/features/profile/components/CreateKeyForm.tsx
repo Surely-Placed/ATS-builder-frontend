@@ -29,7 +29,7 @@ export const CreateKeyForm = ({
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="keyName">Key Name (optional)</Label>
+            <Label htmlFor="keyName">Key Name</Label>
             <Input
               id="keyName"
               type="text"

@@ -74,6 +74,18 @@ export default {
           DEFAULT: "hsl(var(--glass-bg))",
           border: "hsl(var(--glass-border))",
         },
+        // Claude-style chat input palette (uses CSS variables from index.css)
+        "bg-0": "var(--bg-0)",
+        "bg-000": "var(--bg-000)",
+        "bg-100": "var(--bg-100)",
+        "bg-200": "var(--bg-200)",
+        "bg-300": "var(--bg-300)",
+        "text-100": "var(--text-100)",
+        "text-200": "var(--text-200)",
+        "text-300": "var(--text-300)",
+        "text-400": "var(--text-400)",
+        "text-500": "var(--text-500)",
+        "accent-hover": "var(--accent-hover)",
       },
       borderRadius: {
         lg: "var(--radius)",

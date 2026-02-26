@@ -1,10 +1,8 @@
 import {
-  BarChart3,
   User,
   FileText,
   CreditCard,
   ShoppingCart,
-  Activity,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,12 +19,10 @@ interface ProfileTabsProps {
 }
 
 const tabs: Tab[] = [
-  { id: "overview", label: "Overview", icon: <BarChart3 className="w-4 h-4" /> },
   { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
   { id: "resume", label: "Resume", icon: <FileText className="w-4 h-4" /> },
   { id: "subscription", label: "Subscription", icon: <CreditCard className="w-4 h-4" /> },
   { id: "purchases", label: "Purchase History", icon: <ShoppingCart className="w-4 h-4" /> },
-  { id: "activity", label: "Activity", icon: <Activity className="w-4 h-4" /> },
   { id: "settings", label: "Settings", icon: <Settings className="w-4 h-4" /> },
 ];
 

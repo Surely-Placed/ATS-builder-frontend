@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Layers, Search, Zap, Globe, Upload } from "lucide-react";
+import { User, FileText, Sparkles, Download } from "lucide-react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import type React from "react";
 import { SpotlightHeading } from "@/components/ui/spotlight-heading";
@@ -114,35 +114,48 @@ const StepCard: React.FC<StepCardProps> = ({ icon, title, description, benefits,
 export const HowItWorks: React.FC<HowItWorksProps> = ({ className, ...props }) => {
   const stepsData = [
     {
-      icon: <Globe className="h-6 w-6" />,
-      title: "Paste Job Details",
+      icon: <User className="h-6 w-6" />,
+      title: "Set Up Your Profile",
       description:
-        "Simply paste the job title and job description from any job portal or company career page.",
+        "Add your resume details once in your profile: experience, skills, projects, and education. No file upload needed.",
       benefits: [
-        "Paste job title & full description directly",
-        "Works with LinkedIn, Indeed, Glassdoor & more",
-        "No need to save or track job links",
+        "Structured experience, skills & projects",
+        "One-time setup, use for every application",
+        "Edit anytime from your profile",
       ],
     },
-    
     {
-      icon: <Upload className="h-6 w-6" />,
-      title: "Upload Resume",
-      description: "Drop your PDF or DOCX file. We support all standard resume formats.",
-      benefits: ["Instant file analysis", "Secure data handling", "All formats supported"],
-    },
-    {
-      icon: <Layers className="h-6 w-6" />,
-      title: "AI Analyzes",
+      icon: <FileText className="h-6 w-6" />,
+      title: "Paste Job Details",
       description:
-        "Our AI scans for ATS compatibility issues, formatting errors, and missing keywords.",
-      benefits: ["Deep content analysis", "ATS compatibility check", "Keyword optimization"],
+        "Paste the job title and full job description from any job listing. Our AI uses it to tailor your resume.",
+      benefits: [
+        "Works with any job board or career page",
+        "Paste title & full description",
+        "Better targeting for each role",
+      ],
     },
     {
-      icon: <Zap className="h-6 w-6" />,
-      title: "Download Perfect PDF",
-      description: "Get your ATS-optimized resume instantly. Ready to apply.",
-      benefits: ["Professional formatting", "ATS-friendly structure", "Instant download"],
+      icon: <Sparkles className="h-6 w-6" />,
+      title: "AI Optimizes",
+      description:
+        "Our AI improves your summary, experience bullets, and skills for the role and checks ATS compatibility.",
+      benefits: [
+        "Tailored summary & experience",
+        "Keyword and formatting optimization",
+        "ATS-friendly structure",
+      ],
+    },
+    {
+      icon: <Download className="h-6 w-6" />,
+      title: "Get PDF",
+      description:
+        "Generate your optimized resume PDF and see your resume before you apply. Download and use with confidence.",
+      benefits: [
+        "Professional PDF in seconds",
+        // "See your ATS score & breakdown",
+        "Download and apply",
+      ],
     },
   ];
 
@@ -182,7 +195,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ className, ...props }) =
             </h2>
           </SpotlightHeading>
           <p className="mt-4 text-lg text-muted-foreground">
-            Four simple steps. Zero manual work. Maximum results.
+            Set your profile once, paste any job, get an optimized resume.
           </p>
         </motion.div>
 

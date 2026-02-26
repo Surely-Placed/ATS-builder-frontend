@@ -2,21 +2,36 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RecentActivity } from "@/types/dashboard.types";
+import type { DashboardActivityItem } from "@/types/dashboard.types";
 import { Clock, TrendingUp, Eye, Download, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { AnalysisService } from "@/features/analysis/services/analysisService";
 import { DownloadService } from "@/features/analysis/services/downloadService";
+import { V2AnalysisService } from "@/features/analysis/services/v2AnalysisService";
 import { useToast } from "@/hooks/use-toast";
 
+/** -only activity item; score/status are optional (legacy data not used) */
+type ActivityItem = DashboardActivityItem & {
+  status?: string;
+  atsScoreBefore?: number | null;
+  atsScoreAfter?: number | null;
+  scoreImprovement?: number | null;
+};
+
 interface RecentActivityCardProps {
-  activity: RecentActivity;
+  activity: ActivityItem;
 }
 
 export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
+
+  const hasScores =
+    activity.atsScore != null ||
+    activity.atsScoreAfter != null ||
+    activity.atsScoreBefore != null;
+  const finalScore =
+    activity.atsScoreAfter ?? activity.atsScoreBefore ?? activity.atsScore ?? null;
 
   const getStatusVariant = (
     status: string
@@ -48,43 +63,18 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
     });
   };
 
-  const handleView = () => {
-    navigate(`/resume-comparison?analysisId=${activity.id}`);
-  };
-
   const handleDownload = async () => {
     if (isDownloading) return;
     
     setIsDownloading(true);
     try {
-      // Fetch fresh analysis data to get the URL (same as ResumeComparison)
-      const result = await AnalysisService.getAnalysis(activity.id);
+      const pdf = await V2AnalysisService.generatePdf(activity.id);
 
-      let pdfUrl = 
-        result?.optimized_resume?.file_url || 
-        result?.optimized_resume?.url || 
-        result?.optimized_resume?.pdf_url ||
-        result?.analysis?.optimized_file_url ||
-        null;
-
-      // Fallback: generate PDF if URL is missing
-      if (!pdfUrl) {
-         try {
-            const { default: AnalysisApiService } = await import('@/services/analysisApi');
-            const genResponse = await AnalysisApiService.generatePDF(activity.id);
-            if (genResponse.success && genResponse.file_url) {
-                pdfUrl = genResponse.file_url;
-            }
-         } catch (genErr) {
-             console.error("Failed to generate PDF on demand:", genErr);
-         }
-      }
-
-      if (!pdfUrl) {
+      if (!pdf.url) {
         throw new Error("Download URL not available");
       }
 
-      DownloadService.downloadResume(pdfUrl, "optimized-resume.pdf", activity.id);
+      DownloadService.downloadResume(pdf.url, "optimized-resume.pdf", activity.id);
       
       toast({
         title: "Download Started",
@@ -102,11 +92,6 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
     }
   };
 
-  // Check if optimization is successful/completed to show actions
-  const isCompleted = 
-    activity.status.toLowerCase().includes('complete') || 
-    (activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined);
-
   return (
     <Card className="transition-all duration-200 hover:shadow-md">
       <CardContent className="p-4 sm:p-6">
@@ -116,39 +101,37 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
             <h3 className="text-base sm:text-lg font-semibold flex-1 line-clamp-1" title={activity.jobTitle}>
               {activity.jobTitle}
             </h3>
-            <Badge variant={getStatusVariant(activity.status)} className="shrink-0">
-              {activity.status}
-            </Badge>
-          </div>
-
-          {/* Scores - Show Before and After if available */}
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground mb-1">Before</span>
-              <span className="text-xl sm:text-2xl font-bold">{activity.atsScoreBefore}</span>
-            </div>
-
-            {/* Show After score only if it exists (optimization completed) */}
-            {activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined && (
-              <>
-                <TrendingUp className="w-5 h-5 text-muted-foreground" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground mb-1">After</span>
-                  <span className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
-                    {activity.atsScoreAfter}
-                  </span>
-                </div>
-
-                {activity.scoreImprovement !== null && activity.scoreImprovement > 0 && (
-                  <div className="ml-auto">
-                    <Badge variant="default" className="bg-green-500 hover:bg-green-600">
-                      +{activity.scoreImprovement}
-                    </Badge>
-                  </div>
-                )}
-              </>
+            {activity.status != null && activity.status !== "" && (
+              <Badge variant={getStatusVariant(activity.status)} className="shrink-0">
+                {activity.status}
+              </Badge>
             )}
           </div>
+
+          {/* ATS Score hidden for now
+          {hasScores && (
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground mb-1">ATS Score</span>
+                <span className="text-xl sm:text-2xl font-bold">
+                  {finalScore !== null && finalScore !== undefined ? finalScore : "—"}
+                </span>
+              </div>
+              {activity.atsScoreAfter != null &&
+                activity.atsScoreBefore != null && (
+                  <div className="flex items-center gap-2 ml-2">
+                    <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      Improved from {activity.atsScoreBefore}
+                      {activity.scoreImprovement != null && activity.scoreImprovement > 0
+                        ? ` (+${activity.scoreImprovement})`
+                        : ""}
+                    </span>
+                  </div>
+                )}
+            </div>
+          )}
+          */}
 
           {/* Footer with Actions */}
           <div className="flex items-center justify-between pt-2 border-t mt-2">
@@ -157,34 +140,32 @@ export const RecentActivityCard = ({ activity }: RecentActivityCardProps) => {
               <span>{formatDate(activity.createdAt)}</span>
             </div>
 
-            {isCompleted && (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={handleView}
-                  title="View Comparison"
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                  title="Download Resume"
-                >
-                  {isDownloading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-muted-foreground hover:text-foreground"
+                onClick={() => navigate(`/analysis/${activity.id}`)}
+                title="View results"
+              >
+                <Eye className="w-4 h-4 mr-1" />
+                View results
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={handleDownload}
+                disabled={isDownloading}
+                title="Download Resume"
+              >
+                {isDownloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

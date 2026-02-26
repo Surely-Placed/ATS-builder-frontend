@@ -56,16 +56,16 @@ const Header = () => {
 
   return (
     <>
-      {/* Top Header - Visible only at top */}
+      {/* Top Header - fixed at top */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{
-          y: isAtTop ? 0 : -20,
-          opacity: isAtTop ? 1 : 0,
-          pointerEvents: isAtTop ? "auto" : "none",
+          y: 0,
+          opacity: 1,
+          pointerEvents: "auto",
         }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="absolute top-0 left-0 right-0 z-50 bg-transparent"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 border-b border-border/40 backdrop-blur-md"
       >
         <div className="w-full px-3 sm:px-4 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20 gap-2 sm:gap-4">

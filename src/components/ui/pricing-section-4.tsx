@@ -31,6 +31,42 @@ const plans = [
     ],
   },
   {
+    name: "Interview Packet",
+    planKey: "interview_packet" as const,
+    description:
+      "Generate a full interview packet with rounds, questions, and practice links tailored to a specific job.",
+    price: 19,
+    priceLabel: "one-time",
+    buttonText: "Buy Interview Packet",
+    buttonVariant: "outline" as const,
+    includes: [
+      "What you get:",
+      "Multi-round interview plan",
+      "8 Follow-up Questions For Every Round Each Question.",
+      "Behavioral + coding questions",
+      "Leadership principles & STAR answers",
+      "Practice links and topics",
+    ],
+  },
+  {
+    name: "Resume Justification Call",
+    planKey: "meeting" as const,
+    description:
+      "30-min 1:1 call to understand your resume and get your doubts answered by a software engineer",
+    price: 25,
+    priceLabel: "one-time",
+    buttonText: "Book a call",
+    buttonVariant: "outline" as const,
+    includes: [
+      "What you get:",
+      "30-minute 1:1 video call",
+      "Understand your resume with a software engineer",
+      "Get doubts about experience & skills clarified",
+      "ATS and structure feedback",
+      "Actionable next steps",
+    ],
+  },
+  {
     name: "Premium",
     planKey: "premium" as const,
     description: "Unlimited access for serious job seekers who want to maximize their chances",
@@ -70,6 +106,8 @@ const plans = [
 ];
 
 import { useAuth } from "@/context/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PricingSection4Props {
   hideFreeTrial?: boolean;
@@ -80,11 +118,25 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"premium" | "enterprise" | null>(null);
+  const [acceptRefundPolicy, setAcceptRefundPolicy] = useState(false);
+  const [refundError, setRefundError] = useState<string | null>(null);
   const { toast } = useToast();
   const { state: usageState, refresh } = useUsage();
     
   
-  const handlePlanClick = async (planKey: 'free' | 'premium' | 'enterprise') => {
+  const handlePlanClick = async (
+    planKey: "free" | "premium" | "enterprise" | "meeting" | "interview_packet"
+  ) => {
+    if (planKey === "meeting") {
+      navigate("/meeting");
+      return;
+    }
+    if (planKey === "interview_packet") {
+      navigate("/interview-packet/buy");
+      return;
+    }
     if (planKey !== 'free' && !user) {
       // Redirect to signup/login for non-free plans if not authenticated
       navigate('/signup');
@@ -117,6 +169,16 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
             title: 'Already subscribed',
             description: `You are already subscribed to the ${planKey} plan.`,
           });
+          setLoadingPlan(null);
+          return;
+        }
+
+        // Open refund policy confirmation dialog for paid plans
+        if (planKey === 'premium' || planKey === 'enterprise') {
+          setSelectedPlan(planKey);
+          setAcceptRefundPolicy(false);
+          setRefundError(null);
+          setRefundDialogOpen(true);
           setLoadingPlan(null);
           return;
         }
@@ -170,7 +232,7 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
 
                 <div className="flex items-baseline gap-3 mb-6">
                   <span className="text-4xl font-semibold text-gray-900 dark:text-white">${plan.price}</span>
-                  <span className="text-sm text-gray-500">/month</span>
+                  <span className="text-sm text-gray-500">/{(plan as { priceLabel?: string }).priceLabel ?? "month"}</span>
                 </div>
 
                 <div className="mt-auto">
@@ -208,6 +270,95 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
   }
 
   return (
+    <>
+      <Dialog open={refundDialogOpen} onOpenChange={(open) => {
+        setRefundDialogOpen(open);
+        if (!open) {
+          setAcceptRefundPolicy(false);
+          setRefundError(null);
+          setSelectedPlan(null);
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Refund and Cancellation Policy</DialogTitle>
+            <DialogDescription>
+              Please confirm you have read and accept our refund and cancellation policy before continuing to payment.{" "}
+              <a
+                href="/terms-of-service"
+                target="_blank"
+                rel="noreferrer"
+                className="underline underline-offset-4 text-primary"
+              >
+                View full policy
+              </a>
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="refund-policy"
+                checked={acceptRefundPolicy}
+                onCheckedChange={(checked) => {
+                  const value = checked === true;
+                  setAcceptRefundPolicy(value);
+                  if (value) setRefundError(null);
+                }}
+              />
+              <label
+                htmlFor="refund-policy"
+                className="text-sm text-muted-foreground leading-relaxed cursor-pointer select-none"
+              >
+                I have read and accept the refund and cancellation policy, and understand that due to the
+                digital nature of Jobrabbit&apos;s services,{" "}
+                <span className="font-semibold">
+                  all purchases are final once the service has been accessed, a resume has been uploaded
+                  or processed, an optimized resume has been generated, or any downloadable file has been
+                  accessed or downloaded.
+                </span>
+              </label>
+            </div>
+            {refundError && (
+              <p className="text-sm text-red-500">
+                {refundError}
+              </p>
+            )}
+            <div className="flex justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                className="px-4 py-2 text-sm rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                onClick={() => setRefundDialogOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={async () => {
+                  if (!acceptRefundPolicy) {
+                    setRefundError("Please accept the refund and cancellation policy before continuing.");
+                    return;
+                  }
+                  if (!selectedPlan) return;
+                  try {
+                    setLoadingPlan(selectedPlan);
+                    await checkout(selectedPlan);
+                    if (typeof refresh === "function") {
+                      try { await refresh(); } catch (_) {}
+                    }
+                  } finally {
+                    setLoadingPlan(null);
+                    setRefundDialogOpen(false);
+                  }
+                }}
+              >
+                Continue to secure payment
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     <div
       className="mx-auto relative bg-white dark:bg-black overflow-x-hidden pb-20 pt-8"
       ref={pricingRef}
@@ -301,7 +452,7 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
         }}
       />
 
-      <div className="grid md:grid-cols-3 max-w-5xl gap-4 py-6 mx-auto px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 max-w-7xl gap-4 py-6 mx-auto px-4">
         {plans
           .filter((p) => (hideFreeTrial ? p.planKey !== 'free' : true))
           .map((plan, index) => (
@@ -335,7 +486,7 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
                     />
                   </span>
                   <span className="text-gray-500 dark:text-gray-300 ml-1">
-                    /month
+                    /{(plan as { priceLabel?: string }).priceLabel ?? "month"}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{plan.description}</p>
@@ -379,5 +530,6 @@ export default function PricingSection4({ hideFreeTrial = false }: PricingSectio
         ))}
       </div>
     </div>
+    </>
   );
 }

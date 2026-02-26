@@ -151,10 +151,31 @@ const TermsOfService = () => {
 
                 <h3 className="text-xl font-semibold mb-3 mt-6">6.3 Refunds and Cancellations</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  You may cancel your subscription at any time through your account settings.
-                  Cancellation takes effect at the end of your current billing period. Refunds are
-                  provided in accordance with our refund policy, which may vary by subscription
-                  plan. Contact us for specific refund terms.
+                  Due to the digital nature of Jobrabbit&apos;s services, all purchases are
+                  considered final once the service has been accessed, processed, or used.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  A subscription may be canceled at any time through the user&apos;s account
+                  settings. Cancellation will take effect at the end of the current billing period.
+                  No partial or prorated refunds will be issued for unused time within an active
+                  billing cycle.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Refunds will not be provided in the following cases:
+                </p>
+                <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
+                  <li>The service has been accessed or used</li>
+                  <li>A resume has been uploaded or processed</li>
+                  <li>An optimized resume has been generated</li>
+                  <li>Any downloadable file has been accessed or downloaded</li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  If a billing error has occurred, users must contact support within 7 days of the
+                  transaction date. Verified billing errors may be eligible for correction at our
+                  sole discretion.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  By purchasing a subscription, you acknowledge and agree to this refund policy.
                 </p>
 
                 <h3 className="text-xl font-semibold mb-3 mt-6">6.4 Price Changes</h3>

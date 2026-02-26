@@ -1,85 +1,86 @@
-import { useState, useEffect } from "react";
-import { DashboardStats } from "@/types/dashboard.types";
+import { useState, useEffect, useCallback } from "react";
+import { DashboardStats, DashboardActivityItem, AnalysesMeta } from "@/types/dashboard.types";
 import { apiClient } from "@/features/resume/services/resumeService";
 import { AxiosError } from "axios";
 
+const _PAGE_LIMIT = 20;
+
 export const useDashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentList, setRecentList] = useState<DashboardActivityItem[]>([]);
+  const [Meta, setMeta] = useState<AnalysesMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingList, setLoadingList] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchAnalyses = useCallback(async (page = 1): Promise<AnalysesMeta | null> => {
+    setLoadingList(true);
+    try {
+      const res = await apiClient.get<{
+        success: boolean;
+        data: {
+          analyses: Array<{
+            id: string;
+            job_title?: string;
+            jobTitle?: string;
+            created_at?: string;
+            createdAt?: string;
+            ats_score?: number | null;
+            atsScore?: number | null;
+          }>;
+          meta: { page: number; limit: number; total: number; totalPages: number };
+        };
+      }>("/profile/analyses/v2", { params: { page, limit: _PAGE_LIMIT } });
+      const data = res.data?.data;
+      if (!res.data.success || !data) {
+        setRecentList([]);
+        setMeta(null);
+        return null;
+      }
+      const list: DashboardActivityItem[] = (data.analyses ?? []).map((a: any) => ({
+        id: a.id,
+        jobTitle: a.job_title ?? a.jobTitle ?? "",
+        createdAt: a.created_at ?? a.createdAt ?? "",
+        atsScore: a.ats_score ?? a.atsScore ?? null,
+      }));
+      setRecentList(list);
+      const meta = data.meta;
+      const analysesMeta: AnalysesMeta = {
+        page: meta.page ?? page,
+        limit: meta.limit ?? _PAGE_LIMIT,
+        total: meta.total ?? 0,
+        totalPages: meta.totalPages ?? 1,
+      };
+      setMeta(analysesMeta);
+      return analysesMeta;
+    } catch (_) {
+      setRecentList([]);
+      setMeta(null);
+      return null;
+    } finally {
+      setLoadingList(false);
+    }
+  }, []);
 
   const fetchDashboardStats = async (retryCount = 0): Promise<void> => {
     const maxRetries = 3;
-    const retryDelay = 500; // Start with 500ms delay
+    const retryDelay = 500;
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.get<{
-        success: boolean;
-        data: DashboardStats;
-        message?: string;
-      }>("/dashboard/stats");
-
-      if (response.data.success) {
-        const rawData = response.data.data as any;
-        let statsData: DashboardStats;
-
-        // Handle snake_case to camelCase conversion if needed
-        if (rawData.recent_activity && !rawData.recentActivity) {
-          const mappedOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
-
-          statsData = {
-            recentActivity: rawData.recent_activity.map((activity: any) => ({
-              id: activity.id,
-              resumeId: activity.resume_id || activity.resumeId,
-              jobId: activity.job_id || activity.jobId,
-              jobTitle: activity.job_title || activity.jobTitle,
-              atsScoreBefore:
-                activity.ats_score_before ??
-                (activity.atsScoreBefore !== undefined ? activity.atsScoreBefore : null),
-              atsScoreAfter: activity.ats_score_after ?? activity.atsScoreAfter ?? null,
-              scoreImprovement: activity.score_improvement ?? activity.scoreImprovement ?? null,
-              status: activity.status,
-              createdAt: activity.created_at || activity.createdAt,
-              optimizedFileUrl: activity.optimized_file_url || activity.optimizedFileUrl || null,
-            })),
-            averageAtsScore: rawData.average_ats_score ?? rawData.averageAtsScore ?? null,
-            resumesAnalyzed: rawData.resumes_analyzed ?? rawData.resumesAnalyzed ?? 0,
-            optimizations: mappedOptimizations,
-          };
-        } else {
-          const directOptimizations = rawData.optimizations_completed ?? rawData.optimizations ?? 0;
-          statsData = rawData as DashboardStats;
-          statsData.optimizations = directOptimizations;
-        }
-
-        // Count optimizations from the activity data
-        const optimizationsCount = statsData.recentActivity.filter(
-          (activity) => activity.atsScoreAfter !== null && activity.atsScoreAfter !== undefined
-        ).length;
-
-        // Override the optimizations count with our computed value
-        statsData.optimizations = optimizationsCount;
-
-        // Attempt to read the authoritative total optimizations from the profile stats
-        try {
-          const profileResp = await apiClient.get<{ success: boolean; data: any }>(
-            "/profile/stats"
-          );
-          if (profileResp.data?.success && profileResp.data.data?.totalOptimizations !== undefined) {
-            // Prefer profile's totalOptimizations as the authoritative value
-            statsData.optimizations = profileResp.data.data.totalOptimizations;
-          }
-        } catch (e) {
-          // ignore - fall back to computed value
-        }
-
-        setStats(statsData);
-      } else {
-        throw new Error(response.data.message || "Failed to fetch dashboard stats");
-      }
+      // Only GET /profile/analyses/v2 — no /dashboard/stats
+      const analysesMeta = await fetchAnalyses(1);
+      const total = analysesMeta?.total ?? 0;
+      setStats({
+        recentActivity: [],
+        averageAtsScore: null,
+        resumesAnalyzed: 0,
+        optimizations: 0,
+        AnalysesCount: total,
+        recentAnalyses: undefined,
+      });
     } catch (err: any) {
       const axiosError = err as AxiosError;
 
@@ -154,8 +155,12 @@ export const useDashboard = () => {
 
   return {
     stats,
+    recentList,
+    Meta,
+    loadingList,
     loading,
     error,
     refetch: () => fetchDashboardStats(0),
+    fetchPage: fetchAnalyses,
   };
 };
