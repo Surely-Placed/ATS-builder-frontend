@@ -56,6 +56,7 @@ const InterviewPacketDetailPage = lazyWithRetry(
 const InterviewFollowUpPage = lazyWithRetry(
   () => import("./pages/InterviewFollowUpPage")
 );
+const ManageMeetings = lazyWithRetry(() => import("./pages/ManageMeetings"));
 
 // Loading component
 const PageLoader = () => (
@@ -157,6 +158,7 @@ const App = () => (
                       <Route path="/meetings" element={<Meeting />} />
                       <Route path="/meetings/success" element={<SubscriptionSuccess />} />
                       <Route path="/meetings/cancel" element={<MeetingCancel />} />
+                      <Route path="/manage-meetings" element={<ManageMeetings />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

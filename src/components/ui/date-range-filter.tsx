@@ -13,8 +13,6 @@ interface DateRangeFilterProps {
   onChange: (range: DateRange | undefined) => void;
   /** When set and a date is selected, show this count in a badge next to the trigger */
   count?: number;
-  /** Label for the count badge, e.g. "Total Application count" → "Total Application count: 6" */
-  countLabel?: string;
   className?: string;
 }
 
@@ -24,7 +22,6 @@ export function DateRangeFilter({
   value,
   onChange,
   count,
-  countLabel = "Total",
   className,
 }: DateRangeFilterProps) {
   const [open, setOpen] = React.useState(false);
@@ -54,7 +51,7 @@ export function DateRangeFilter({
           <Button
             variant="outline"
             className={cn(
-              "h-9 gap-2 px-3 text-xs sm:text-sm font-normal text-muted-foreground",
+              "h-10 gap-2 px-3 text-xs sm:text-sm font-normal text-muted-foreground",
               !selectedDate && "text-muted-foreground"
             )}
           >
@@ -89,10 +86,8 @@ export function DateRangeFilter({
         </PopoverContent>
       </Popover>
       {showBadge && (
-        <Badge
-          className="bg-red-400 px-2 py-0.5 text-xs font-bold text-white tabular-nums dark:bg-red-500"
-        >
-          {countLabel}: {count}
+        <Badge variant="secondary" className="h-5 min-w-5 px-1.5 text-xs tabular-nums">
+          {count}
         </Badge>
       )}
     </div>

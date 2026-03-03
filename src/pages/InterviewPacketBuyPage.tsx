@@ -30,6 +30,11 @@ export default function InterviewPacketBuyPage() {
   const [error, setError] = useState<string | null>(null);
   const [redirectingToCheckout, setRedirectingToCheckout] = useState(false);
 
+  // Ensure page starts at the top when opened (from dashboard CTA, etc.)
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
   const isDark = theme === "dark";
   const isLoggedIn = !!user;
 

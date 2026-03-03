@@ -100,6 +100,11 @@ export default function Meeting() {
   const { theme } = useTheme();
   const { user } = useAuth();
 
+  // Ensure page starts at top when navigated to (from dashboard, success page, etc.)
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");

@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, Check } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
+import { useAuth } from '@/context/AuthContext';
 
 const PACKET_STEPS = [
   'Understanding job description',
@@ -74,6 +75,7 @@ function runConfetti(container: HTMLDivElement | null) {
 export default function SubscriptionSuccess() {
   const navigate = useNavigate();
   const loc = useLocation();
+  const { user } = useAuth();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [packetStatus, setPacketStatus] = useState<'idle' | 'creating' | 'error'>('idle');
   const [packetError, setPacketError] = useState<string | null>(null);
@@ -226,7 +228,11 @@ export default function SubscriptionSuccess() {
             <p className="text-muted-foreground mb-6">We’ll send the meeting link and details to your email. </p>
             <div className="flex justify-center gap-3">
               <Button onClick={() => navigate('/meeting')}>Book another call</Button>
-              <Button variant="outline" onClick={() => navigate('/dashboard')}>Go to Dashboard</Button>
+              {user && (
+                <Button variant="outline" onClick={() => navigate('/manage-meetings')}>
+                  Go to meetings
+                </Button>
+              )}
             </div>
           </>
         )}

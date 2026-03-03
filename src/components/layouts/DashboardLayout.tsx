@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Menu, Sparkles, LayoutDashboard, FileText, Briefcase } from "lucide-react";
+import { Menu, Sparkles, LayoutDashboard, FileText, Briefcase, Video } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { HeaderActions } from "@/components/shared/HeaderActions";
@@ -41,6 +41,7 @@ const DashboardLayout = ({ children, activeTab }: DashboardLayoutProps) => {
       icon: Sparkles,
     },
     { id: "Interview Packets", label: "Interview Packets", path: "/interview-packet", icon: Briefcase },
+    { id: "Manage Meetings", label: "Manage meetings", path: "/manage-meetings", icon: Video },
   ];
 
   const handleTabClick = (path: string) => {

@@ -104,6 +104,13 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex flex-row items-center gap-2 flex-wrap justify-end">
+            {/* Overall applications badge (styled to match premium badge) */}
+            <div className="inline-flex h-9 items-center gap-3 rounded-md border border-border bg-muted/30 px-3 py-1.5 box-border">
+              <span className="text-xs text-muted-foreground">Total applications</span>
+              <span className="text-sm font-semibold text-foreground">
+                {Meta?.total ?? recentList.length}
+              </span>
+            </div>
             <SubscriptionBadges />
             <Button onClick={handleStartOptimization} className="shrink-0" size="sm">
               <Sparkles className="w-4 h-4 mr-2" />
@@ -133,13 +140,11 @@ const Dashboard = () => {
               value={dateRange}
               onChange={setDateRange}
               count={dateRange?.from || dateRange?.to ? filteredList.length : undefined}
-              countLabel="Total Application count"
             />
             {Meta && (
               <div className="flex items-center gap-2 flex-shrink-0 sm:ml-auto">
                 <p className="text-sm text-muted-foreground whitespace-nowrap">
                   Page {Meta.page} of {Meta.totalPages}
-                  {Meta.total > 0 && ` · ${Meta.total} total`}
                 </p>
                 <div className="flex gap-2">
                   <Button
