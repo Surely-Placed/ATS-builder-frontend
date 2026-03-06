@@ -40,7 +40,7 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
           <Card className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
             <CardContent className="p-6">
               <div className="flex items-center gap-2 mb-3">
-                {subscription.active ? (
+                {subscription.active && !subscription.isExpired && subscription.daysRemaining !== 0 ? (
                   <div className="w-5 h-5 rounded-full bg-green-500" />
                 ) : (
                   <XCircle className="w-5 h-5 text-red-500" />
@@ -48,10 +48,16 @@ export const SubscriptionTab = ({ subscription, onCancel, cancelling }: Subscrip
                 <h3 className="font-semibold">Status</h3>
               </div>
               <Badge
-                variant={subscription.active ? "default" : "secondary"}
+                variant={
+                  subscription.active && !subscription.isExpired && subscription.daysRemaining !== 0
+                    ? "default"
+                    : "destructive"
+                }
                 className="text-base px-3 py-1"
               >
-                {subscription.active ? "Active" : "Inactive"}
+                {subscription.active && !subscription.isExpired && subscription.daysRemaining !== 0
+                  ? "Active"
+                  : "Plan expired"}
               </Badge>
             </CardContent>
           </Card>

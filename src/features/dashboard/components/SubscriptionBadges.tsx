@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getStatus, SubStatus } from '@/features/subscription/services/subscriptionService';
 import { Badge } from '@/components/ui/badge';
-import { Gift, Crown, Server, Loader2 } from 'lucide-react';
+import { Gift, Crown, Server, Loader2, AlertTriangle } from 'lucide-react';
 
 export default function SubscriptionBadges() {
   const [status, setStatus] = useState<SubStatus | null>(null);
@@ -76,8 +76,25 @@ export default function SubscriptionBadges() {
 
     // premium or enterprise
     const d = days;
-    if (d === null) return <Badge className="text-sm">Active</Badge>;
-    return <Badge className="text-sm">{d} days</Badge>;
+    if (d === null) {
+      return <Badge className="text-sm">Active</Badge>;
+    }
+
+    if (d <= 0) {
+      // Red pill badge for expired state
+      return (
+        <Badge className="inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-0.5 text-xs font-semibold text-white dark:bg-red-600">
+          <AlertTriangle className="h-3 w-3" />
+          Plan expired
+        </Badge>
+      );
+    }
+
+    return (
+      <Badge className="text-sm">
+        {d} day{d === 1 ? '' : 's'}
+      </Badge>
+    );
   };
 
   return (

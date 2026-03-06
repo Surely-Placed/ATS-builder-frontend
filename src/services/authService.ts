@@ -28,10 +28,6 @@ export const authService = {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // Log token for Postman (e.g. copy into Authorization header)
-      auth.currentUser?.getIdToken(false).then((token) => {
-        console.log("FIREBASE_TOKEN_FOR_POSTMAN:", token);
-      });
       const firebaseToken = await result.user.getIdToken();
 
       const response = await fetch(`${API_URL}/auth/firebase`, {

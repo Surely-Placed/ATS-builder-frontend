@@ -110,15 +110,18 @@ export default function ProfileSubscription() {
         <Card className="border border-border bg-muted/30 hover:bg-muted/50 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-3">
-              {status.plan !== 'free' ? (
+              {status.plan !== 'free' && daysRemaining !== 0 ? (
                 <div className="w-5 h-5 rounded-full bg-green-500" />
               ) : (
                 <XCircle className="w-5 h-5 text-red-500" />
               )}
               <h3 className="font-semibold">Status</h3>
             </div>
-            <Badge variant={status.plan !== 'free' ? 'default' : 'secondary'} className="text-base px-3 py-1">
-              {status.plan !== 'free' ? 'Active' : 'Free'}
+            <Badge
+              variant={status.plan !== 'free' && daysRemaining !== 0 ? 'default' : 'destructive'}
+              className="text-base px-3 py-1"
+            >
+              {status.plan !== 'free' && daysRemaining !== 0 ? 'Active' : 'Plan expired'}
             </Badge>
           </CardContent>
         </Card>

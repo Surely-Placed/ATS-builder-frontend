@@ -3,6 +3,7 @@ import { DashboardStats, DashboardActivityItem, AnalysesMeta } from "@/types/das
 import { apiClient } from "@/features/resume/services/resumeService";
 import { AxiosError } from "axios";
 
+// Backend supports ?date=YYYY-MM-DD; keep page size at 20
 const _PAGE_LIMIT = 20;
 
 export const useDashboard = () => {
@@ -12,6 +13,7 @@ export const useDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [loadingList, setLoadingList] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null); // e.g. "2026-03-03"
 
   const fetchAnalyses = useCallback(async (page = 1): Promise<AnalysesMeta | null> => {
     setLoadingList(true);
@@ -30,7 +32,13 @@ export const useDashboard = () => {
           }>;
           meta: { page: number; limit: number; total: number; totalPages: number };
         };
-      }>("/profile/analyses/v2", { params: { page, limit: _PAGE_LIMIT } });
+      }>("/profile/analyses/v2", {
+        params: {
+          page,
+          limit: _PAGE_LIMIT,
+          ...(dateFilter ? { date: dateFilter } : {}),
+        },
+      });
       const data = res.data?.data;
       if (!res.data.success || !data) {
         setRecentList([]);
@@ -60,7 +68,7 @@ export const useDashboard = () => {
     } finally {
       setLoadingList(false);
     }
-  }, []);
+  }, [dateFilter]);
 
   const fetchDashboardStats = async (retryCount = 0): Promise<void> => {
     const maxRetries = 3;
@@ -162,5 +170,6 @@ export const useDashboard = () => {
     error,
     refetch: () => fetchDashboardStats(0),
     fetchPage: fetchAnalyses,
+    setDateFilter,
   };
 };

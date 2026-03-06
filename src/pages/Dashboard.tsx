@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { GetStartedCard } from "@/features/dashboard/components/GetStartedCard";
 import { EmptyActivityCard } from "@/features/dashboard/components/EmptyActivityCard";
@@ -15,7 +15,7 @@ import { DateRange } from "react-day-picker";
 import { DateRangeFilter } from "@/components/ui/date-range-filter";
 
 const Dashboard = () => {
-  const { stats, recentList, Meta, loadingList, loading, error, refetch, fetchPage } = useDashboard();
+  const { stats, recentList, Meta, loadingList, loading, error, refetch, fetchPage, setDateFilter } = useDashboard();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -50,6 +50,19 @@ const Dashboard = () => {
   const remaining = remainingRaw === 'unlimited' ? Infinity : (typeof remainingRaw === 'number' ? remainingRaw : null);
 
 
+
+  // Sync backend date filter whenever the user changes the date range
+  useEffect(() => {
+    if (dateRange?.from) {
+      const isoDate = dateRange.from.toISOString().slice(0, 10); // YYYY-MM-DD
+      setDateFilter(isoDate);
+      fetchPage(1);
+    } else {
+      setDateFilter(null);
+      fetchPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange]);
 
   // Auto-load dashboard on mount (useDashboard already triggers the fetch with a short delay)
   // Keep a retry handler available for error state
@@ -139,7 +152,7 @@ const Dashboard = () => {
               label="Date"
               value={dateRange}
               onChange={setDateRange}
-              count={dateRange?.from || dateRange?.to ? filteredList.length : undefined}
+              count={dateRange?.from && Meta ? Meta.total : undefined}
             />
             {Meta && (
               <div className="flex items-center gap-2 flex-shrink-0 sm:ml-auto">
